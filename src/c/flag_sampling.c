@@ -9,6 +9,7 @@
 
 #include <ssht.h>
 
+#include "flag_sampling.h"
 #include "flag_spherlaguerre.h"
 
 /*!  
@@ -18,22 +19,12 @@
  * \param[in] L Harmonic band-limit.
  * \param[in] N Laguerre band-limit.
  * \retval none
- *
- * \author <a href="http://www.jasonmcewen.org">Jason McEwen</a>
  */
 
-enum ssht_methods { 
-	MW, 
-	MWSS, 
-	GL, 
-	DH, 
-	HPX 
-};
-
-void flag_allocate_sampling(double *rs, double *thetas, double *phis, double *laguweights, double R, int L, int N, enum ssht_methods method){
+void flag_allocate_sampling(double **rs, double **thetas, double **phis, double **laguweights, double R, int L, int N, enum ssht_methods method){
 	
 	ssht_allocate_sampling(thetas, phis, L, method);
-	flag_spherlaguerre_sampling_allocate(rs, laguweights);
+	flag_spherlaguerre_sampling_allocate(rs, laguweights, N);
 
 }
 
@@ -41,11 +32,11 @@ void flag_deallocate_sampling(double *rs, double *thetas, double *phis, double *
 	
 	free(thetas);
 	free(phis);
-	flag_spherlaguerre_deallocate_sampling(rs, laguweights);
+	flag_spherlaguerre_sampling_deallocate(rs, laguweights);
 
 }
 
-void ssht_allocate_sampling(double *thetas, double *phis, int L, enum ssht_methods method){
+void ssht_allocate_sampling(double **thetas, double **phis, int L, enum ssht_methods method){
 
 	int nphi, ntheta;
 
@@ -67,14 +58,10 @@ void ssht_allocate_sampling(double *thetas, double *phis, int L, enum ssht_metho
       		ntheta = ssht_sampling_dh_ntheta(L);
     		nphi = ssht_sampling_dh_nphi(L);
     		break;
-      	case HPX: //TODO
-      		break;
-	  	default: //TODO
-	  		break;
 	  }
 
-	  thetas = (double*)calloc(ntheta, sizeof(double));
-	  phis = (double*)calloc(nphi, sizeof(double));
+	  *thetas = (double*)calloc(ntheta, sizeof(double));
+	  *phis = (double*)calloc(nphi, sizeof(double));
 
 }
 
@@ -84,8 +71,8 @@ void ssht_sampling(double *thetas, double *phis, int L, enum ssht_methods method
 
   	switch (method)
   	{
-  		case MW:
-  			ntheta = ssht_sampling_mw_ntheta(L);
+  	    case MW:
+  		    ntheta = ssht_sampling_mw_ntheta(L);
     		nphi = ssht_sampling_mw_nphi(L);
     		for (t=0; t<ntheta; t++)
 	      		thetas[t] = ssht_sampling_mw_t2theta(t, L);
@@ -109,7 +96,7 @@ void ssht_sampling(double *thetas, double *phis, int L, enum ssht_methods method
     		for (p=0; p<nphi; p++)
       			phis[p] = ssht_sampling_gl_p2phi(p, L);
       		break;
-      	case DH:
+      	    case DH:
       		ntheta = ssht_sampling_dh_ntheta(L);
     		nphi = ssht_sampling_dh_nphi(L);
     		for (t=0; t<ntheta; t++)
@@ -117,10 +104,6 @@ void ssht_sampling(double *thetas, double *phis, int L, enum ssht_methods method
     		for (p=0; p<nphi; p++)
       			phis[p] = ssht_sampling_dh_p2phi(p, L);
       		break;
-      	case HPX: //TODO
-      		break;
-	  	default: //TODO
-	  		break;
 	  }
 }
 

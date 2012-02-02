@@ -9,11 +9,11 @@
 #include "flag_sampling.h"
 #include "flag_spherlaguerre.h"
 
-void ssht_forward(complex double *flm, complex double *f, int L, int reality, enum ssht_methods method){
+/*
+void ssht_core_forward(complex double *flm, complex double *f, int L, enum ssht_methods method, enum ssht_dl_method_t dl_method){
 	
 	int spin = 0;
 	int verbosity = 0;
-	ssht_dl_method_t dl_method = SSHT_DL_TRAPANI;
 
 	// TODO : NORTH / SOUTH POLE PROBLEM
 	// TODO : SPIN PROBLEM
@@ -52,12 +52,17 @@ void ssht_forward(complex double *flm, complex double *f, int L, int reality, en
 
 }
 
+void ssht_core_forward_real(complex double *flm, double *f, int L, enum ssht_methods method, enum ssht_dl_method_t dl_method){
+
+}
+*/
+	
 void flag_analysis(complex double *flmn, double *f, int L, int N, enum ssht_methods method){
 
 	int n;
 
 	for (n = 0; n < N; n++){
-		ssht_forward(complex double *flm, complex double *f, int L, int reality, enum ssht_methods method){
+	//	ssht_forward(complex double *flm, complex double *f, int L, int reality, enum ssht_methods method){
 	}
 
 }

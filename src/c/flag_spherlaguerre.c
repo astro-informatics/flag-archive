@@ -57,7 +57,7 @@ void flag_spherlaguerre_quadrature(double *roots, double *weights, int N){
 			ppp = ((2.0*N+1.0-z)*p2-N*p3)/(N+1.0);
 	   } 
 		roots[n] = z;
-		weights[n] =  exp(z)*z / (pow(N+1,2.0)*pow(ppp,2.0)); 
+		weights[n] =  exp(z)*pow(z,3.0) / (pow(N+1,2.0)*pow(ppp,2.0)); 
 	}
 
 }
@@ -101,7 +101,7 @@ double flag_spherlaguerre_tau(double R, int N){
 void flag_spherlaguerre_sampling(double *nodes, double *weights, double R, int N){
 	
 	flag_spherlaguerre_quadrature(nodes, weights, N);
-
+    
 	double tau = R / nodes[N-1];
 	
 	int n;
@@ -112,10 +112,17 @@ void flag_spherlaguerre_sampling(double *nodes, double *weights, double R, int N
 
 }
 
-void flag_spherlaguerre_allocate_sampling(double *nodes, double *weights, int N){
+void flag_spherlaguerre_sampling_allocate(double **nodes, double **weights, int N){
 	
-	nodes = (double*)calloc(N, sizeof(double));
-	weights = (double*)calloc(N, sizeof(double));
+	*nodes = (double*)calloc(N, sizeof(double));
+	*weights = (double*)calloc(N, sizeof(double));
+
+}
+
+void flag_spherlaguerre_sampling_deallocate(double *nodes, double *weights){
+	
+	free(nodes);
+	free(weights);
 
 }
 
@@ -130,7 +137,7 @@ void flag_spherlaguerre_analysis(double *fn, const double *f, const double *node
 	{
 
 		double r = nodes[i]/tau;
-		double factor = f[i] * weights[i] * exp(-r/2.0) * (1.0/sqrt(tau));
+		double factor = f[i] * weights[i] * (1.0/r) * exp(-r/2.0) * (1.0/sqrt(tau));
 
 		double lagu0 = 1.0;
 		double lagu1 = 1.0 - r;
@@ -146,7 +153,7 @@ void flag_spherlaguerre_analysis(double *fn, const double *f, const double *node
 					((2 * n - 1) - r) * lagu1 - 
 					(n - 1) * lagu0
 				) / n;
-
+ 
 			fn[n] += factor * lagu2;
 
 			lagu0 = lagu1;
@@ -166,9 +173,9 @@ void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nod
 
 	for (i = 0; i < N; i++)
 	{
-
+  
 		double r = nodes[i]/tau;
-		double factor = exp(-r/2.0) * (1.0/sqrt(tau));
+		double factor = (1.0/r) * exp(-r/2.0) * (1.0/sqrt(tau));
 
 		double lagu0 = 1.0;
 		double lagu1 = 1.0 - r;

@@ -3,6 +3,7 @@
 
 #include "../../src/c/flag_types.h"
 #include "../../src/c/flag_error.h"
+#include "../../src/c/flag_sampling.h"
 #include "../../src/c/flag_spherlaguerre.h"
 
 #endif
