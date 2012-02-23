@@ -1,13 +1,11 @@
+// FLAG package
+// Copyright (C) 2012 
+// Boris Leistedt & Jason McEwen
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <complex.h> 
+#include "flag.h"
 
-#include "flag_error.h"
-
-void flag_spherlaguerre_quadrature(double *roots, double *weights, int N){
+void flag_spherlaguerre_quadrature(double *roots, double *weights, int N)
+{
 
 	int i, n, k;
 
@@ -62,7 +60,8 @@ void flag_spherlaguerre_quadrature(double *roots, double *weights, int N){
 
 }
 
-double flag_spherlaguerre_tau(double R, int N){
+double flag_spherlaguerre_tau(double R, int N)
+{
 	
 	int k, i;
 	int MAXIT = 5;
@@ -98,7 +97,8 @@ double flag_spherlaguerre_tau(double R, int N){
 	return R / tau;
 }
 
-void flag_spherlaguerre_sampling(double *nodes, double *weights, double R, int N){
+void flag_spherlaguerre_sampling(double *nodes, double *weights, double R, int N)
+{
 	
 	flag_spherlaguerre_quadrature(nodes, weights, N);
     
@@ -112,21 +112,20 @@ void flag_spherlaguerre_sampling(double *nodes, double *weights, double R, int N
 
 }
 
-void flag_spherlaguerre_sampling_allocate(double **nodes, double **weights, int N){
-	
+void flag_allocate_spherlaguerre_sampling(double **nodes, double **weights, int N)
+{
 	*nodes = (double*)calloc(N, sizeof(double));
 	*weights = (double*)calloc(N, sizeof(double));
-
 }
 
-void flag_spherlaguerre_sampling_deallocate(double *nodes, double *weights){
-	
+void flag_deallocate_spherlaguerre_sampling(double *nodes, double *weights)
+{
 	free(nodes);
 	free(weights);
-
 }
 
-void flag_spherlaguerre_analysis(double *fn, const double *f, const double *nodes, const double *weights, int N){
+void flag_spherlaguerre_analysis(double *fn, const double *f, const double *nodes, const double *weights, int N)
+{
 
 	int i, n;
 
@@ -164,7 +163,8 @@ void flag_spherlaguerre_analysis(double *fn, const double *f, const double *node
 	
 }
 
-void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nodes, int N){
+void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nodes, int N)
+{
 	
 	int i, n;
 
@@ -198,6 +198,90 @@ void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nod
 			lagu1 = lagu2;
 		}
 		
+	}
+
+}
+
+void flag_mapped_spherlaguerre_analysis(complex double *fn, const complex double *f, const double *nodes, const double *weights, int mapsize, int N)
+{
+
+	int i, n, l;
+
+	const double R = nodes[N-1];
+	const double tau = flag_spherlaguerre_tau(R, N);
+
+    for(l=0; l<mapsize; l++)
+	{
+		//printf("> Laguerre analysis : %i on %i\n",l,mapsize);
+		for(i=0; i<N; i++)
+		{
+
+			double r = nodes[i]/tau;
+			complex double factor = f[l+i*mapsize] * weights[i] * (1.0/r) * exp(-r/2.0) * (1.0/sqrt(tau));
+
+			complex double lagu0 = 1.0;
+			complex double lagu1 = 1.0 - r;
+			complex double lagu2;
+
+			fn[l] += factor * lagu0;
+			fn[l+mapsize] += factor * lagu1;
+
+			for (n = 2; n < N; n++) 
+			{ 
+				lagu2 = 
+					( 
+						((2 * n - 1) - r) * lagu1 - 
+						(n - 1) * lagu0
+					) / n;
+	 
+				fn[l+n*mapsize] += factor * lagu2;
+
+				lagu0 = lagu1;
+				lagu1 = lagu2;
+			}
+		}
+	}
+
+}
+
+void flag_mapped_spherlaguerre_synthesis(complex double *f, const complex double *fn, const double *nodes, int mapsize, int N)
+{
+
+	int i, n, l;
+
+	const double R = nodes[N-1];
+	const double tau = flag_spherlaguerre_tau(R, N);
+
+	for(l=0; l<mapsize; l++)
+	{
+		//printf("> Laguerre synthesis : %i on %i\n",l,mapsize);
+		for (i = 0; i < N; i++)
+		{
+	  
+			double r = nodes[i]/tau;
+			complex double factor = (1.0/r) * exp(-r/2.0) * (1.0/sqrt(tau));
+
+			complex double lagu0 = 1.0;
+			complex double lagu1 = 1.0 - r;
+			complex double lagu2;
+
+			f[l+i*mapsize] += factor * lagu0 * fn[l];
+			f[l+i*mapsize] += factor * lagu1 * fn[l+mapsize];
+
+			for (n = 2; n < N; n++) 
+			{ 
+				lagu2 = 
+					( 
+						((2 * n - 1) - r) * lagu1 - 
+						(n - 1) * lagu0
+					) / n;
+
+				f[l+i*mapsize] += factor * lagu2 * fn[l+n*mapsize];
+
+				lagu0 = lagu1;
+				lagu1 = lagu2;
+			}
+		}
 	}
 
 }

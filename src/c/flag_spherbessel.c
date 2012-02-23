@@ -1,3 +1,6 @@
+// FLAG package
+// Copyright (C) 2012 
+// Boris Leistedt & Jason McEwen
 
 #ifndef FLAG_SPHERBESSEL
 #define FLAG_SPHERBESSEL

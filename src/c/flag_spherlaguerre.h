@@ -16,4 +16,8 @@ void flag_spherlaguerre_sampling_allocate(double **nodes, double **weights, int 
 
 void flag_spherlaguerre_sampling_deallocate(double *nodes, double *weights);
 
+void flag_mapped_spherlaguerre_analysis(complex double *fn, const complex double *f, const double *nodes, const double *weights, int mapsize, int N);
+
+void flag_mapped_spherlaguerre_synthesis(complex double *f, const complex double *fn, const double *nodes, int mapsize, int N);
+
 #endif

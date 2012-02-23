@@ -17,12 +17,17 @@ SSHTLIB	= $(SSHTDIR)/lib/c
 SSHTINC	= $(SSHTDIR)/include/c
 SSHTLIBN= ssht
 
+FFTWDIR	= ${FFTW}
+FFTWINC	     = $(FFTWDIR)/include
+FFTWLIB      = $(FFTWDIR)/lib
+FFTWLIBNM    = fftw3
+
 vpath %.c $(FLAGSRC)
 vpath %.h $(FLAGSRC)
 
-LDFLAGS = -L$(SSHTLIB) -l$(SSHTLIBN) -L$(FLAGLIB) -l$(FLAGLIBN) -lm
+LDFLAGS = -L$(FFTWLIB) -l$(FFTWLIBNM) -L$(SSHTLIB) -l$(SSHTLIBN) -L$(FLAGLIB) -l$(FLAGLIBN) -lm
 
-FFLAGS  = -I$(SSHTINC) -I$(FLAGINC) 
+FFLAGS  = -I$(FFTWINC) -I$(SSHTINC) -I$(FLAGINC) 
 
 FLAGOBJS= $(FLAGOBJ)/flag_core.o	\
 	  $(FLAGOBJ)/flag_sampling.o	\

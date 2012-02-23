@@ -2,15 +2,7 @@
 // Copyright (C) 2012 
 // Boris Leistedt & Jason McEwen
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-
-#include <ssht.h>
-
-#include "flag_sampling.h"
-#include "flag_spherlaguerre.h"
+#include "flag.h"
 
 /*!  
  * Compute the exact Fourier-Laguerre sampling.
@@ -21,25 +13,21 @@
  * \retval none
  */
 
-void flag_allocate_sampling(double **rs, double **thetas, double **phis, double **laguweights, double R, int L, int N, enum ssht_methods method){
-	
-	ssht_allocate_sampling(thetas, phis, L, method);
-	flag_spherlaguerre_sampling_allocate(rs, laguweights, N);
-
+void flag_allocate_sampling(double **rs, double **thetas, double **phis, double **laguweights, double R, int L, int N)
+{
+	ssht_allocate_sampling(thetas, phis, L);
+	flag_allocate_spherlaguerre_sampling(rs, laguweights, N);
 }
 
-void flag_deallocate_sampling(double *rs, double *thetas, double *phis, double *laguweights){
-	
-	free(thetas);
-	free(phis);
-	flag_spherlaguerre_sampling_deallocate(rs, laguweights);
-
-}
-
-void ssht_allocate_sampling(double **thetas, double **phis, int L, enum ssht_methods method){
+void ssht_allocate_sampling(double **thetas, double **phis, int L)
+{
 
 	int nphi, ntheta;
 
+    ntheta = ssht_sampling_mw_ntheta(L);
+    nphi = ssht_sampling_mw_nphi(L);
+
+  	/* FOR FUTURE IMPROVEMENTS // multi-scheme support
   	switch (method)
   	{
   		case MW:
@@ -59,16 +47,26 @@ void ssht_allocate_sampling(double **thetas, double **phis, int L, enum ssht_met
     		nphi = ssht_sampling_dh_nphi(L);
     		break;
 	  }
+	  */
 
 	  *thetas = (double*)calloc(ntheta, sizeof(double));
 	  *phis = (double*)calloc(nphi, sizeof(double));
 
 }
 
-void ssht_sampling(double *thetas, double *phis, int L, enum ssht_methods method){
+void ssht_sampling(double *thetas, double *phis, int L)
+{
 	
 	int t, p, nphi, ntheta;
 
+	ntheta = ssht_sampling_mw_ntheta(L);
+  nphi = ssht_sampling_mw_nphi(L);
+  for (t=0; t<ntheta; t++)
+	 	thetas[t] = ssht_sampling_mw_t2theta(t, L);
+	for (p=0; p<nphi; p++)
+	  phis[p] = ssht_sampling_mw_p2phi(p, L);
+
+  	/* FOR FUTURE IMPROVEMENTS // multi-scheme support
   	switch (method)
   	{
   	    case MW:
@@ -105,11 +103,12 @@ void ssht_sampling(double *thetas, double *phis, int L, enum ssht_methods method
       			phis[p] = ssht_sampling_dh_p2phi(p, L);
       		break;
 	  }
+	  */
+
 }
 
-void flag_sampling(double *rs, double *thetas, double *phis, double *laguweights, double R, int L, int N, enum ssht_methods method) {
-	
+void flag_sampling(double *rs, double *thetas, double *phis, double *laguweights, double R, int L, int N) 
+{
 	flag_spherlaguerre_sampling(rs, laguweights, R, N);
-	ssht_sampling(thetas, phis, L, method);
-
+	ssht_sampling(thetas, phis, L);
 }

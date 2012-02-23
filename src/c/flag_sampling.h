@@ -1,22 +1,25 @@
+// FLAG package
+// Copyright (C) 2012 
+// Boris Leistedt & Jason McEwen
 
 #ifndef FLAG_SAMPLING
 #define FLAG_SAMPLING
 
+/* FOR FUTURE IMPROVEMENTS // multi-scheme support
 enum ssht_methods { 
 	MW, 
 	MWSS, 
 	GL, 
 	DH 
 };
+*/
 
-void flag_allocate_sampling(double **rs, double **thetas, double **phis, double **laguweights, double R, int L, int N, enum ssht_methods method);
+void flag_allocate_sampling(double **rs, double **thetas, double **phis, double **laguweights, double R, int L, int N);
 
-void flag_deallocate_sampling(double *rs, double *thetas, double *phis, double *laguweights);
+void ssht_allocate_sampling(double **thetas, double **phis, int L);
 
-void ssht_allocate_sampling(double **thetas, double **phis, int L, enum ssht_methods method);
+void ssht_sampling(double *thetas, double *phis, int L);
 
-void ssht_sampling(double *thetas, double *phis, int L, enum ssht_methods method);
-
-void flag_sampling(double *rs, double *thetas, double *phis, double *laguweights, double R, int L, int N, enum ssht_methods method);
+void flag_sampling(double *rs, double *thetas, double *phis, double *laguweights, double R, int L, int N);
 
 #endif
