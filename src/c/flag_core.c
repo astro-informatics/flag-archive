@@ -4,64 +4,9 @@
 
 #include "flag.h"
 
-double ran2_dp(int idum) {
-
-  int IM1=2147483563,IM2=2147483399,IMM1=IM1-1, 
-    IA1=40014,IA2=40692,IQ1=53668,IQ2=52774,IR1=12211,IR2=3791, 
-    NTAB=32,NDIV=1+IMM1/NTAB;
-
-  double AM=1./IM1,EPS=1.2e-7,RNMX=1.-EPS;
-  int j,k;
-  static int iv[32],iy,idum2 = 123456789; 
-  // N.B. in C static variables are initialised to 0 by default.
-
-  if (idum <= 0) {
-    idum= (-idum>1 ? -idum : 1); // max(-idum,1);
-    idum2=idum;
-    for(j=NTAB+8;j>=1;j--) {
-      k=idum/IQ1;
-      idum=IA1*(idum-k*IQ1)-k*IR1;
-      if (idum < 0) idum=idum+IM1;
-      if (j < NTAB) iv[j-1]=idum;
-    }
-    iy=iv[0];
-  }
-  k=idum/IQ1;
-  idum=IA1*(idum-k*IQ1)-k*IR1;
-  if (idum < 0) idum=idum+IM1;
-  k=idum2/IQ2;
-  idum2=IA2*(idum2-k*IQ2)-k*IR2;
-  if (idum2 < 0) idum2=idum2+IM2;
-  j=1+iy/NDIV;
-  iy=iv[j-1]-idum2;
-  iv[j-1]=idum;
-  if(iy < 1)iy=iy+IMM1;
-  return (AM*iy < RNMX ? AM*iy : RNMX); // min(AM*iy,RNMX);
-
-}
-	
-void flag_random_f(complex double *f, int L, int N, int seed)
-{
-	int i;
-	srand( time(NULL) );
-	for (i=0; i<N*ssht_fr_size(L); i++){
-		f[i] = (2.0*ran2_dp(seed) - 1.0) + I * (2.0*ran2_dp(seed) - 1.0);
-	}
-}
-	
-void flag_random_flmn(complex double *flmn, int L, int N, int seed)
-{
-	int i;
-	srand( time(NULL) );
-	for (i=0; i<N*ssht_flm_size(L); i++){
-		flmn[i] = (2.0*ran2_dp(seed) - 1.0) + I * (2.0*ran2_dp(seed) - 1.0);//rand()/795079784.0;
-	}
-}
-
 void flag_allocate_flmn(complex double **flmn, int L, int N)
 {
 	int flmsize = ssht_flm_size(L);
-	//printf("\n FLMSIZE = %i \n",flmsize);
 	long totalsize = N*flmsize;
 	*flmn = (complex double*)calloc(totalsize, sizeof(complex double));
 }
@@ -69,23 +14,30 @@ void flag_allocate_flmn(complex double **flmn, int L, int N)
 void flag_allocate_f(complex double **f, int L, int N)
 {
 	int frsize = ssht_fr_size(L);
-	//printf("\n FRSIZE = %i \n",frsize);
 	long totalsize = N*frsize;
 	*f = (complex double*)calloc(totalsize, sizeof(complex double));
 }
 
 int ssht_fr_size(int L)
-{
-	// In case we want to extend to various sampling schemes
+{// In case we want to extend to various sampling schemes
 	int mapsize = L*(2*L-1); // MW sampling scheme
 	return mapsize;
 }
 
 int ssht_flm_size(int L)
-{
-	// In case we want to extend to various sampling schemes
+{// In case we want to extend to various sampling schemes
 	int mapsize = L*L;
 	return mapsize;
+}
+
+int flag_flmn_size(int L, int N)
+{// In case we want to extend to various sampling schemes
+	return ssht_flm_size(L)*N;
+}
+
+int flag_f_size(int L, int N)
+{// In case we want to extend to various sampling schemes
+	return ssht_fr_size(L)*N;
 }
 
 void flag_analysis(complex double *flmn, 

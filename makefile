@@ -34,16 +34,14 @@ FLAGOBJS= $(FLAGOBJ)/flag_core.o	\
 	  $(FLAGOBJ)/flag_spherbessel.o	\
 	  $(FLAGOBJ)/flag_spherlaguerre.o
 
-FLAGHEADERS = flag_spherlaguerre.h
-
-$(FLAGOBJ)/%.o: %.c $(FLAGHEADERS)
+$(FLAGOBJ)/%.o: %.c
 	$(CC) $(OPT) $(FFLAGS) -c $< -o $@
 
 .PHONY: default
 default: lib test tidy
 
 .PHONY: about
-about: $(FLAGBIN)/ssht_about
+about: $(FLAGBIN)/flag_about
 $(FLAGBIN)/flag_about: $(FLAGOBJ)/flag_about.o 
 	$(CC) $(OPT) $< -o $(FLAGBIN)/flag_about
 
@@ -59,10 +57,10 @@ $(FLAGBIN)/flag_test: $(FLAGOBJ)/flag_test.o $(FLAGLIB)/lib$(FLAGLIBN).a
 
 .PHONY: clean
 clean:	tidy
-	rm -f $(FLAGOBJ)/*.o
 	rm -f $(FLAGLIB)/lib$(FLAGLIBN).a
 
 .PHONY: tidy
 tidy:
+	rm -f $(FLAGOBJ)/*.o
 	rm -f *~ 
 
