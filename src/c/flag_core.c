@@ -18,6 +18,13 @@ void flag_allocate_f(complex double **f, int L, int N)
 	*f = (complex double*)calloc(totalsize, sizeof(complex double));
 }
 
+void flag_allocate_f_real(double **f, int L, int N)
+{
+	int frsize = ssht_fr_size(L);
+	long totalsize = N*frsize;
+	*f = (double*)calloc(totalsize, sizeof(double));
+}
+
 int ssht_fr_size(int L)
 {// In case we want to extend to various sampling schemes
 	int mapsize = L*(2*L-1); // MW sampling scheme

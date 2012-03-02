@@ -15,7 +15,6 @@ double maxerr_cplx(complex double *a, complex double *b, int size)
 		value = MAX( cabs( a[i]-b[i] ), value );
 	}
 	return value;
-	return value;
 }
 
 double maxerr(double *a, double *b, int size)
@@ -444,7 +443,7 @@ int main(int argc, char *argv[])
 	const int L = 50;
 	const int N = 50;
 	const double R = 10.0;
-	const int seed = (int)(1000000.0*(double)clock()/(double)CLOCKS_PER_SEC)/10;
+	const int seed = (int)(10000.0*(double)clock()/(double)CLOCKS_PER_SEC);
 	printf("==========================================================\n");
 	printf("PARAMETERS : ");
 	printf("  L = %i   N = %i   R = %4.1f   seed = %i\n", L, N, R, seed);

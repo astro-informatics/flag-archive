@@ -9,6 +9,7 @@ void flag_random_f(complex double *f, int L, int N, int seed);
 void flag_random_flmn(complex double *flmn, int L, int N, int seed);
 
 void flag_allocate_flmn(complex double **flmn, int L, int N);
+void flag_allocate_f_real(double **f, int L, int N);
 void flag_allocate_f(complex double **f, int L, int N);
 
 int ssht_fr_size(int L);
