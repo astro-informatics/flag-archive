@@ -15,17 +15,20 @@
 
 void flag_allocate_sampling(double **rs, double **thetas, double **phis, double **laguweights, double R, int L, int N)
 {
+  assert(L > 0);
+  assert(N > 1);
+  assert(R > 0.0);
 	ssht_allocate_sampling(thetas, phis, L);
 	flag_allocate_spherlaguerre_sampling(rs, laguweights, N);
 }
 
 void ssht_allocate_sampling(double **thetas, double **phis, int L)
 {
-
+  assert(L > 0);
 	int nphi, ntheta;
 
-    ntheta = ssht_sampling_mw_ntheta(L);
-    nphi = ssht_sampling_mw_nphi(L);
+  ntheta = ssht_sampling_mw_ntheta(L);
+  nphi = ssht_sampling_mw_nphi(L);
 
   	/* FOR FUTURE IMPROVEMENTS // multi-scheme support
   	switch (method)
@@ -56,7 +59,7 @@ void ssht_allocate_sampling(double **thetas, double **phis, int L)
 
 void ssht_sampling(double *thetas, double *phis, int L)
 {
-	
+  assert(L > 0);
 	int t, p, nphi, ntheta;
 
 	ntheta = ssht_sampling_mw_ntheta(L);
@@ -109,6 +112,9 @@ void ssht_sampling(double *thetas, double *phis, int L)
 
 void flag_sampling(double *rs, double *thetas, double *phis, double *laguweights, double R, int L, int N) 
 {
+  assert(L > 0);
+  assert(N > 1);
+  assert(R > 0.0);
 	flag_spherlaguerre_sampling(rs, laguweights, R, N);
 	ssht_sampling(thetas, phis, L);
 }

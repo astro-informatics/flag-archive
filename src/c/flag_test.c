@@ -3,7 +3,6 @@
 // Boris Leistedt & Jason McEwen
 
 #include "flag.h"
-#include <assert.h>
 
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 
@@ -79,6 +78,29 @@ void flag_random_flmn(complex double *flmn, int L, int N, int seed)
 	for (i=0; i<flag_flmn_size(L, N); i++){
 		flmn[i] = (2.0*ran2_dp(seed) - 1.0) + I * (2.0*ran2_dp(seed) - 1.0);//rand()/795079784.0;
 	}
+}
+
+void flag_random_flmn_real(complex double *flmn, int L, int N, int seed)
+{
+	int en, el, m, msign, i, i_op, offset;
+	int flmsize = ssht_flm_size(L);
+
+	for (en=0; en<N; en++) {
+		offset = en * flmsize;
+		for (el=0; el<L; el++) {
+    		m = 0;
+    		ssht_sampling_elm2ind(&i, el, m);
+    		flmn[offset+i] = (2.0*ran2_dp(seed) - 1.0);
+    		for (m=1; m<=el; m++) {
+      			ssht_sampling_elm2ind(&i, el, m);
+      			flmn[offset+i] = (2.0*ran2_dp(seed) - 1.0) + I * (2.0*ran2_dp(seed) - 1.0);
+      			ssht_sampling_elm2ind(&i_op, el, -m);
+      			msign = m & 1;
+     			msign = 1 - msign - msign; // (-1)^m
+     	 		flmn[offset+i_op] = msign * conj(flmn[offset+i]);
+    		}
+ 		}
+ 	}
 }
 
 void print_f(const complex double *f,int L, int N)
@@ -267,6 +289,8 @@ void flag_transform_test(int L, int N, int seed)
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
 	//print_f(f, L, N);
 
+	//flag_write_f_real(f, L, N, "ftest.dat");
+
 	//printf("\n <--- Recovered FLMN array ---> \n");
 	time_start = clock();
 	flag_analysis(flmnrec, f, L, N);
@@ -283,75 +307,7 @@ void flag_transform_test(int L, int N, int seed)
 	free(flmnrec);
 }
 
-/*void flag_transform_analysis_test(int L, int N, int seed)
-{
-	int spin = 0;
-	int verbosity = 0;
-	clock_t time_start, time_end, t_for, t_back;
-	int flmsize = ssht_flm_size(L);
-	int frsize = ssht_fr_size(L);
-	int i, n, offset_lm, offset_r;
-	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
 
-	complex double *f, *flmr, *f_rec, *flmn, *flmr_rec;
-
-	flag_allocate_f(&f, L, N);
-	flag_allocate_flmn(&flmr, L, N);
-	flag_allocate_f(&f_rec, L, N);
-
-	flag_random_f(f, L, N, seed);
-
-	t_for = 0;
-	t_back = 0;
-	for (n = 0; n < N; n++){
-		offset_lm = n * flmsize;
-		offset_r = n * frsize;
-		time_start = clock();
-		ssht_core_mw_forward_sov_conv_sym(flmr + offset_lm, f + offset_r, L, spin, dl_method, verbosity);
-		time_end = clock();
-		t_for += (time_end - time_start) / N;
-		time_start = clock();
-		ssht_core_mw_inverse_sov_sym(f_rec + offset_r, flmr + offset_lm, L, spin, dl_method, verbosity);
-		time_end = clock();
-		t_back += (time_end - time_start) / N;
-	}
-	printf("  - SSHT forward average duration        : %4.4f seconds\n", 
-		t_for / (double)CLOCKS_PER_SEC);
-	printf("  - SSHT backward average duration       : %4.4f seconds\n", 
-		t_back / (double)CLOCKS_PER_SEC);
-	printf("  - SSHT maximum absolute error          : %6.5e\n", 
-		maxerr_cplx(f, f_rec, flag_f_size(L, N)));
-	for (n = 0; n < N; n++){
-		for (i = 0; i < frsize; i++){
-			//printf("n=%i - i=%i - (%f,%f) - (%f,%f)\n",n,i,creal(f[i+n*frsize]),cimag(f[i+n*frsize]),creal(f_rec[i+n*frsize]),cimag(f_rec[i+n*frsize]));
-		}
-	}
-
-	free(f);
-	free(f_rec);
-	flag_allocate_flmn(&flmr_rec, L, N);
-	flag_allocate_flmn(&flmn, L, N);
-	
-	double *nodes = (double*)calloc(N, sizeof(double));
-	double *weights = (double*)calloc(N, sizeof(double));
-	flag_spherlaguerre_quadrature(nodes, weights, N);
-	time_start = clock();
-	flag_mapped_spherlaguerre_analysis(flmn, flmr, nodes, weights, flmsize, N);
-	time_end = clock();
-	printf("  - SLAG mapped cmplx analysis duration  : %4.4f seconds\n", 
-		(time_end - time_start) / (double)CLOCKS_PER_SEC);
-	time_start = clock();
-	flag_mapped_spherlaguerre_synthesis(flmr_rec, flmn, nodes, flmsize, N);
-	time_end = clock();
-	printf("  - SLAG mapped cmplx synthesis duration : %4.4f seconds\n", 
-		(time_end - time_start) / (double)CLOCKS_PER_SEC);
-	printf("  - SLAG maximum absolute error          : %6.5e\n", 
-		maxerr_cplx(flmr, flmr_rec, flag_flmn_size(L, N)));
-
-	free(flmn);
-	free(flmr);
-	free(flmr_rec);
-}*/
 
 void flag_transform_furter_test(int L, int N, int seed)
 {
@@ -383,6 +339,7 @@ void flag_transform_furter_test(int L, int N, int seed)
 	printf("  - Synthesis : SLAG 3D synthes duration : %4.4f seconds\n", 
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
 	time_start = clock();
+
 	flag_mapped_spherlaguerre_analysis(flmn_rec, flmr, nodes, weights, flmsize, N);
 	time_end = clock();
 	printf("  - Synthesis : SLAG 3D analys duration  : %4.4f seconds\n", 
@@ -403,6 +360,11 @@ void flag_transform_furter_test(int L, int N, int seed)
 		time_end = clock();
 		t_for += (time_end - time_start) / N;
 		time_start = clock();
+	}
+	for (n = 0; n < N; n++){
+		for (i = 0; i < frsize; i++){
+			//printf("n=%i - i=%i - (%f,%f)\n",n,i,creal(f[i+n*frsize]),cimag(f[i+n*frsize]));
+		}
 	}
 	printf("  - Synthesis : SSHT forward av duration : %4.4f seconds\n", 
 		t_for / (double)CLOCKS_PER_SEC);
@@ -437,11 +399,52 @@ void flag_transform_furter_test(int L, int N, int seed)
 	free(flmr_rec);
 }
 
+void flag_transform_real_test(int L, int N, int seed)
+{
+	double *f;
+	complex *flmn, *flmnrec;
+	clock_t time_start, time_end;
+
+	flag_allocate_f_real(&f, L, N);
+	flag_allocate_flmn(&flmn, L, N);
+	flag_allocate_flmn(&flmnrec, L, N);
+
+    //printf("\n <--- Initial FLMN array ---> \n");
+	flag_random_flmn_real(flmn, L, N, seed);
+	//print_flmn(flmn, L, N);
+
+    //printf("\n <--- Resulting field ---> \n");
+    time_start = clock();
+	flag_synthesis_real(f, flmn, L, N);
+	time_end = clock();
+	printf("  - Duration of full 3D synthesis        : %4.4f seconds\n", 
+		(time_end - time_start) / (double)CLOCKS_PER_SEC);
+	
+	//print_f(f, L, N);
+
+	//flag_write_f_real(f, L, N, "ftest.dat");
+
+	//printf("\n <--- Recovered FLMN array ---> \n");
+	time_start = clock();
+	flag_analysis_real(flmnrec, f, L, N);
+	time_end = clock();
+	printf("  - Duration of full 3D analysis         : %4.4f seconds\n", 
+		(time_end - time_start) / (double)CLOCKS_PER_SEC);
+	//print_flmn(flmnrec, L, N);
+
+	printf("  - Maximum abs error on reconstruction  : %6.5e\n", 
+		maxerr_cplx(flmn, flmnrec, flag_flmn_size(L, N)));
+
+	free(f);
+	free(flmn);
+	free(flmnrec);
+}
+
 
 int main(int argc, char *argv[]) 
 {
-	const int L = 50;
-	const int N = 50;
+	const int L = 64;
+	const int N = 64;
 	const double R = 10.0;
 	const int seed = (int)(10000.0*(double)clock()/(double)CLOCKS_PER_SEC);
 	printf("==========================================================\n");
@@ -471,7 +474,7 @@ int main(int argc, char *argv[])
 	printf("> Testing cmplx mapped Laguerre transform...\n");
 	flag_spherlaguerre_cmplx_transform_test(L, N, R, seed);
 	fflush(NULL);
-
+/*
 	printf("----------------------------------------------------------\n");
 
 	printf("> Testing FLAG sampling scheme...");
@@ -482,13 +485,17 @@ int main(int argc, char *argv[])
 	flag_transform_test(L, N, seed);
 	fflush(NULL);
 
+	printf("> Testing REAL FLAG transform...\n");
+	flag_transform_real_test(L, N, seed);
+	fflush(NULL);
+
 	printf("----------------------------------------------------------\n");
 
 	printf("> Testing FLAG in further details...\n");
 	flag_transform_furter_test(L, N, seed);
 	fflush(NULL);
-
+*/
 	printf("==========================================================\n");
-	
+
 	return 0;		
 }

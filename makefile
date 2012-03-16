@@ -25,12 +25,13 @@ FFTWLIBNM    = fftw3
 vpath %.c $(FLAGSRC)
 vpath %.h $(FLAGSRC)
 
-LDFLAGS = -L$(FFTWLIB) -l$(FFTWLIBNM) -L$(SSHTLIB) -l$(SSHTLIBN) -L$(FLAGLIB) -l$(FLAGLIBN) -lm
+LDFLAGS = -L$(FFTWLIB) -l$(FFTWLIBNM) -L$(SSHTLIB) -l$(SSHTLIBN) -L$(FLAGLIB) -l$(FLAGLIBN) -lm -fopenmp
 
-FFLAGS  = -I$(FFTWINC) -I$(SSHTINC) -I$(FLAGINC) 
+FFLAGS  = -I$(FFTWINC) -I$(SSHTINC) -I$(FLAGINC)  -fopenmp
 
 FLAGOBJS= $(FLAGOBJ)/flag_core.o	\
 	  $(FLAGOBJ)/flag_sampling.o	\
+	  $(FLAGOBJ)/flag_io.o	\
 	  $(FLAGOBJ)/flag_spherbessel.o	\
 	  $(FLAGOBJ)/flag_spherlaguerre.o
 
@@ -39,11 +40,6 @@ $(FLAGOBJ)/%.o: %.c
 
 .PHONY: default
 default: lib test tidy
-
-.PHONY: about
-about: $(FLAGBIN)/flag_about
-$(FLAGBIN)/flag_about: $(FLAGOBJ)/flag_about.o 
-	$(CC) $(OPT) $< -o $(FLAGBIN)/flag_about
 
 .PHONY: lib
 lib: $(FLAGLIB)/lib$(FLAGLIBN).a
