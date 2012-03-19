@@ -1,7 +1,6 @@
-// SSHT package to perform spin spherical harmonic transforms
-// Copyright (C) 2011  Jason McEwen
-// See LICENSE.txt for license details
-
+// FLAG package
+// Copyright (C) 2012 
+// Boris Leistedt & Jason McEwen
 
 #include <flag.h>
 #include "mex.h"
@@ -37,14 +36,14 @@ void mexFunction( int nlhs, mxArray *plhs[],
           "Require one output.");
   }
 
-  /* Parse reality. */
+  // Parse reality flag
   iin = 3;
   if( !mxIsLogicalScalar(prhs[iin]) )
     mexErrMsgIdAndTxt("flag_analysis_mex:InvalidInput:reality",
           "Reality flag must be logical.");
   reality = mxIsLogicalScalarTrue(prhs[iin]);
 
-  /* Parse function samples f. */
+  // Parse function samples f
   iin = 0;
   if( !mxIsDouble(prhs[iin]) ) {
     mexErrMsgIdAndTxt("flag_analysis_mex:InvalidInput:f",
@@ -73,7 +72,8 @@ void mexFunction( int nlhs, mxArray *plhs[],
   if (!f_is_complex && !reality)
     mexWarnMsgTxt("Running complex transform on real signal (set reality flag to improve performance).");
 
-  /* Parse harmonic band-limit L. */
+
+  // Parse harmonic band-limit L
   iin = 1;
   if( !mxIsDouble(prhs[iin]) || 
       mxIsComplex(prhs[iin]) || 
@@ -97,10 +97,6 @@ void mexFunction( int nlhs, mxArray *plhs[],
     mexErrMsgIdAndTxt("flag_analysis_mex:InvalidInput:bandLimitNonInt",
           "Harmonic band-limit N must be positive integer.");
 
-
-  //printf("L = %i\n",L);
-  //printf("N = %i\n",N);
-
   ntheta = L;
   nphi = 2 * L - 1;
   flmn = (complex double*)calloc(L*L*N, sizeof(complex double));
@@ -110,20 +106,17 @@ void mexFunction( int nlhs, mxArray *plhs[],
     flag_analysis(flmn, f, L, N); 
   }
 
-  //mexPrintf("f_m = %d; f_n = %d\n", f_m, f_n); 
-  //mexPrintf("L = %d; N = %d; reality = %d\n", L, N, reality); 
-
-
-  /* Copy flm to output. */
+  // Copy flm to output
   plhs[iout] = mxCreateDoubleMatrix(N, L*L, mxCOMPLEX);
   flmn_real = mxGetPr(plhs[iout]);
   flmn_imag = mxGetPi(plhs[iout]);
-  for (i=0; i<L*L*N; i++) {
-    flmn_real[i] = creal(flmn[i]);
-    flmn_imag[i] = cimag(flmn[i]);;
+  for(n=0; n<N; n++) {    
+    for(i=0; i<L*L; i++) {
+      flmn_real[i*N+n] = creal(flmn[n*L*L+i]);
+      flmn_imag[i*N+n] = cimag(flmn[n*L*L+i]);;
+    }
   }
 
-  /* Free memory. */
   free(flmn);
   if (reality)
     free(fr);

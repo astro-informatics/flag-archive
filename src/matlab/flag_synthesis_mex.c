@@ -21,10 +21,10 @@ void mexFunction( int nlhs, mxArray *plhs[],
   double *flmn_real, *flmn_imag, *f_real, *f_imag;
   double *fr = NULL;
   complex double *flmn = NULL, *f = NULL;
-  int ntheta, nphi, t, p;
+  int ntheta, nphi;
   int iin = 0, iout = 0;
 
-  /* Check number of arguments. */
+  // Check number of arguments
   if(nrhs!=4) {
     mexErrMsgIdAndTxt("flag_synthesis_mex:InvalidInput:nrhs",
 		      "Require four inputs.");
@@ -34,29 +34,29 @@ void mexFunction( int nlhs, mxArray *plhs[],
 		      "Require one output.");
   }
 
-  /* Parse reality. */
+  // Parse reality flag
   iin = 3;
   if( !mxIsLogicalScalar(prhs[iin]) )
     mexErrMsgIdAndTxt("flag_synthesis_mex:InvalidInput:reality",
 		      "Reality flag must be logical.");
   reality = mxIsLogicalScalarTrue(prhs[iin]);
 
-  /* Parse harmonic coefficients flm. */
+  // Parse harmonic coefficients flm
   iin = 0;
   flmn_m = mxGetM(prhs[iin]);
   flmn_n = mxGetN(prhs[iin]);
+
   flmn_real = mxGetPr(prhs[iin]);
   flmn_imag = mxGetPi(prhs[iin]);
   flmn = (complex double*)malloc(flmn_m * flmn_n * sizeof(complex double));
-  for (i=0; i<flmn_m*flmn_n; i++)
-    flmn[i] = flmn_real[i];
-  if( mxIsComplex(prhs[iin]) ) {
-    flmn_imag = mxGetPi(prhs[iin]);
-    for (i=0; i<flmn_m*flmn_n; i++)
-      flmn[i] += I * flmn_imag[i];
-  }
+  for(n=0; n<flmn_m; n++)  
+    for(i=0; i<flmn_n; i++) 
+      flmn[n*flmn_n+i] = flmn_real[i*flmn_m+n];
+  for(n=0; n<flmn_m; n++)  
+    for(i=0; i<flmn_n; i++) 
+      flmn[n*flmn_n+i] += I * flmn_imag[i*flmn_m+n];
 
-  /* Parse harmonic band-limit L. */
+  // Parse harmonic band-limit L
   iin = 1;
   if( !mxIsDouble(prhs[iin]) || 
       mxIsComplex(prhs[iin]) || 
@@ -84,10 +84,6 @@ void mexFunction( int nlhs, mxArray *plhs[],
   if (flmn_m * flmn_n != L * L * N)
     mexErrMsgIdAndTxt("flag_synthesis_mex:InvalidInput:flmnSize",
 		      "Invalid number of harmonic coefficients.");
-
-  //printf("L = %i\n",L);
-  //printf("N = %i\n",N);
-
   ntheta = L;
   nphi = 2 * L - 1;
 
@@ -99,10 +95,6 @@ void mexFunction( int nlhs, mxArray *plhs[],
 	  flag_synthesis(f, flmn, L, N); 
   }
 
-  //mexPrintf("flmn_m = %d; flmn_n = %d\n", flmn_m, flmn_n); 
-  //mexPrintf("L = %d; N = %d; reality = %d\n", L, N, reality); 
-
-
   if (reality) {
 
     iout = 0;
@@ -110,7 +102,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
     f_real = mxGetPr(plhs[iout]);
     for(n=0; n<N; n++)
       for(i=0; i<ntheta*nphi; i++) 
-	        f_real[n*ntheta*nphi + i] = fr[n*ntheta*nphi + i];
+	        f_real[i*N + n] = fr[n*ntheta*nphi + i];
 
   } else {
 
@@ -132,6 +124,5 @@ void mexFunction( int nlhs, mxArray *plhs[],
     free(fr);
   else
     free(f);
-
 
 }

@@ -116,6 +116,19 @@ void print_f(const complex double *f,int L, int N)
 	printf("\n");
 }
 
+void print_f_real(const double *f,int L, int N)
+{	
+	int mapsize = ssht_fr_size(L);
+	int n, j;
+	for(n=0;n<N;n++){
+		printf("\n -- Layer %i -- \n", n);
+		for(j=0;j<mapsize;j++){
+			printf(" %f ",(f[n*mapsize+j]));
+		}
+	}
+	printf("\n");
+}
+
 void print_flmn(const complex double *flmn,int L, int N)
 {	
 	int mapsize = ssht_flm_size(L);
@@ -420,7 +433,7 @@ void flag_transform_real_test(int L, int N, int seed)
 	printf("  - Duration of full 3D synthesis        : %4.4f seconds\n", 
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
 	
-	//print_f(f, L, N);
+	//print_f_real(f, L, N);
 
 	//flag_write_f_real(f, L, N, "ftest.dat");
 
@@ -443,8 +456,8 @@ void flag_transform_real_test(int L, int N, int seed)
 
 int main(int argc, char *argv[]) 
 {
-	const int L = 32;
-	const int N = 32;
+	const int L = 2;
+	const int N = 2;
 	const double R = 10.0;
 	const int seed = (int)(10000.0*(double)clock()/(double)CLOCKS_PER_SEC);
 	printf("==========================================================\n");

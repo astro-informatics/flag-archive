@@ -57,15 +57,23 @@ FFLAGS  = -I$(FFTWINC) -I$(SSHTINC) -I$(FLAGINC)  -fopenmp
 
 FLAGOBJS= $(FLAGOBJ)/flag_core.o	\
 	  $(FLAGOBJ)/flag_sampling.o	\
-	  $(FLAGOBJ)/flag_io.o	\
+	  $(FLAGOBJ)/flag_io.o			\
 	  $(FLAGOBJ)/flag_spherbessel.o	\
 	  $(FLAGOBJ)/flag_spherlaguerre.o
 
 FLAGOBJSMAT = $(FLAGOBJMAT)/flag_analysis_mex.o	\
-	$(FLAGOBJMAT)/flag_synthesis_mex.o
+	$(FLAGOBJMAT)/flag_synthesis_mex.o	\
+	$(FLAGOBJMAT)/flag_sampling_mex.o	\
+	$(FLAGOBJMAT)/slag_synthesis_mex.o	\
+	$(FLAGOBJMAT)/slag_analysis_mex.o	\
+	$(FLAGOBJMAT)/slag_sampling_mex.o
 
 FLAGOBJSMEX = $(FLAGOBJMEX)/flag_analysis_mex.$(MEXEXT)	\
-	$(FLAGOBJMEX)/flag_synthesis_mex.$(MEXEXT)      
+	$(FLAGOBJMEX)/flag_synthesis_mex.$(MEXEXT)	\
+	$(FLAGOBJMEX)/flag_sampling_mex.$(MEXEXT)	\
+	$(FLAGOBJMEX)/slag_synthesis_mex.$(MEXEXT)	\
+	$(FLAGOBJMEX)/slag_analysis_mex.$(MEXEXT)	\
+	$(FLAGOBJMEX)/slag_sampling_mex.$(MEXEXT)
 
 $(FLAGOBJ)/%.o: %.c
 	$(CC) $(OPT) $(FFLAGS) -c $< -o $@
@@ -80,7 +88,7 @@ $(FLAGOBJMEX)/%_mex.$(MEXEXT): $(FLAGOBJMAT)/%_mex.o $(FLAGLIB)/lib$(FLAGLIBN).a
 matlab: $(FLAGOBJSMEX)
 
 .PHONY: default
-default: lib test matlab tidy
+default: lib test tidy
 
 .PHONY: all
 all: lib test matlab tidy
@@ -98,7 +106,7 @@ $(FLAGBIN)/flag_test: $(FLAGOBJ)/flag_test.o $(FLAGLIB)/lib$(FLAGLIBN).a
 .PHONY: clean
 clean:	tidy
 	rm -f $(FLAGLIB)/lib$(FLAGLIBN).a
-	rm -f $(FLAGOBJMEX)/%_mex.$(MEXEXT)
+	rm -f $(FLAGOBJMEX)/*_mex.$(MEXEXT)
 	rm -f $(FLAGBIN)/flag_test
 
 .PHONY: tidy
