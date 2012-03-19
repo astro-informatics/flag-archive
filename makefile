@@ -1,28 +1,38 @@
+# ======================================== #
 
+# Directory for SSHT
+SSHTDIR	= ${SSHT}
+# Directory for FFTW
+FFTWDIR	= ${FFTW}
+# Directory for FFTW
+GSLDIR	= ${GSL}
+# Directory for MATLAB
+MLAB	= /usr/local/MATLAB/R2010aSV
+
+# Compiler and options
 CC	= gcc
 OPT	= -Wall -O3
-
 UNAME := $(shell uname)
 
+# ======================================== #
+
+# === MATLAB ===
 ifeq ($(UNAME), Linux)
-  MLAB		= /usr/local/MATLAB/R2010aSV
   MLABINC	= ${MLAB}/extern/include
   MLABLIB	= ${MLAB}/extern/lib
-
   MEXEXT	= mexa64
   MEX 		= ${MLAB}/bin/mex
   MEXFLAGS	= -cxx
 endif
 ifeq ($(UNAME), Darwin)
-  MLAB		= /Applications/MATLAB_R2011b.app
   MLABINC	= ${MLAB}/extern/include
   MLABLIB	= ${MLAB}/extern/lib
-
   MEXEXT	= mexmaci64
   MEX 		= ${MLAB}/bin/mex
   MEXFLAGS	= -cxx
 endif
 
+# === FLAG ===
 FLAGDIR = .
 FLAGLIB = $(FLAGDIR)/lib/c
 FLAGINC = $(FLAGDIR)/include/c
@@ -31,19 +41,21 @@ FLAGLIBN= flag
 FLAGSRC	= $(FLAGDIR)/src/c
 FLAGOBJ = $(FLAGSRC)
 
-SSHTDIR	= ${SSHT}
+# === SSHT ===
 SSHTLIB	= $(SSHTDIR)/lib/c
 SSHTINC	= $(SSHTDIR)/include/c
 SSHTLIBN= ssht
 
-FFTWDIR	= ${FFTW}
+# === FFTW ===
 FFTWINC	     = $(FFTWDIR)/include
 FFTWLIB      = $(FFTWDIR)/lib
 FFTWLIBNM    = fftw3
 
+# ======================================== #
+
 FLAGSRCMAT	= $(FLAGDIR)/src/matlab
-FLAGOBJMAT  	= $(FLAGSRCMAT)
-FLAGOBJMEX  	= $(FLAGSRCMAT)
+FLAGOBJMAT  = $(FLAGSRCMAT)
+FLAGOBJMEX  = $(FLAGSRCMAT)
 
 vpath %.c $(FLAGSRC)
 vpath %.h $(FLAGSRC)
@@ -58,8 +70,14 @@ FFLAGS  = -I$(FFTWINC) -I$(SSHTINC) -I$(FLAGINC)  -fopenmp
 FLAGOBJS= $(FLAGOBJ)/flag_core.o	\
 	  $(FLAGOBJ)/flag_sampling.o	\
 	  $(FLAGOBJ)/flag_io.o			\
-	  $(FLAGOBJ)/flag_spherbessel.o	\
 	  $(FLAGOBJ)/flag_spherlaguerre.o
+
+ifneq (,$(wildcard $(GSLDIR)/gsl_math.h))
+	FLAGOBJS+= $(FLAGOBJ)/flag_spherbessel.o
+	FFLAGS+= -I$(GSLDIR)
+	LDFLAGS+= -L$(GSLDIR)
+	LDFLAGSMEX+= -L$(GSLDIR)
+endif
 
 FLAGOBJSMAT = $(FLAGOBJMAT)/flag_analysis_mex.o	\
 	$(FLAGOBJMAT)/flag_synthesis_mex.o	\
@@ -84,11 +102,13 @@ $(FLAGOBJMAT)/%_mex.o: %_mex.c $(FLAGLIB)/lib$(FLAGLIBN).a
 $(FLAGOBJMEX)/%_mex.$(MEXEXT): $(FLAGOBJMAT)/%_mex.o $(FLAGLIB)/lib$(FLAGLIBN).a
 	$(MEX) $< -o $@ $(LDFLAGSMEX) $(MEXFLAGS) -L$(MLABLIB)
 
-.PHONY: matlab
-matlab: $(FLAGOBJSMEX)
+# ======================================== #
 
 .PHONY: default
 default: lib test tidy
+
+.PHONY: matlab
+matlab: $(FLAGOBJSMEX)
 
 .PHONY: all
 all: lib test matlab tidy

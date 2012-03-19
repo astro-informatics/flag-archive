@@ -1,7 +1,6 @@
 #ifndef FLAG
 #define FLAG
 
-#include <gsl/gsl_math.h>
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>

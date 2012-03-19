@@ -183,7 +183,7 @@ void flag_spherlaguerre_analysis(double *fn, const double *f, const double *node
 
 		lagu0 = 1.0;
 		lagu1 = 1.0 - r;
-		lagu2;
+		//lagu2;
 
 		fn[0] += factor * lagu0;
 		fn[1] += factor * lagu1;

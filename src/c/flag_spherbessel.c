@@ -3,6 +3,7 @@
 // Boris Leistedt & Jason McEwen
 
 #include "flag.h"
+#include <gsl/gsl_math.h>
 
 void flag_spherlaguerre2spherbessel(complex double *flk, complex double *fn, double *kvalues, int Nk, int N, int ell, double tau)
 {
