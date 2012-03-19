@@ -8,6 +8,8 @@ FFTWDIR	= ${FFTW}
 GSLDIR	= ${GSL}
 # Directory for MATLAB
 MLAB	= /usr/local/MATLAB/R2010aSV
+# Directory for DOXYGEN
+DOXYGEN_PATH=/Applications/Doxygen.app/Contents/Resources/doxygen
 
 # Compiler and options
 CC	= gcc
@@ -122,6 +124,13 @@ $(FLAGLIB)/lib$(FLAGLIBN).a: $(FLAGOBJS)
 test: $(FLAGBIN)/flag_test
 $(FLAGBIN)/flag_test: $(FLAGOBJ)/flag_test.o $(FLAGLIB)/lib$(FLAGLIBN).a
 	$(CC) $(OPT) $< -o $(FLAGBIN)/flag_test $(LDFLAGS)
+
+.PHONY: doc
+doc:
+	$(DOXYGEN_PATH) $(FLAGDIR)/src/doxygen.config
+.PHONY: cleandoc
+cleandoc:
+	rm -rf $(FLAGDIR)/doc/html/*
 
 .PHONY: clean
 clean:	tidy
