@@ -5,6 +5,16 @@
 #include <flag.h>
 #include "mex.h"
 
+/**
+ * MATLAB interface: flag_sampling.
+ * This function for internal use only.
+ * Compute FLAG sampling scheme.
+ *
+ * Usage: 
+ *   [rs, thetas, phis] = ...
+ *     flag_sampling(L, N, R);
+ *
+ */
 void mexFunction( int nlhs, mxArray *plhs[],
                   int nrhs, const mxArray *prhs[])
 {

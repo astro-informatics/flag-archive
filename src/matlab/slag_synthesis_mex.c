@@ -6,6 +6,8 @@
 #include "mex.h"
 
 /**
+ * MATLAB interface: slag_synthesis.
+ * This function for internal use only.
  * Compute forward 1D SLAG transform (synthesis).
  *
  * Usage: 

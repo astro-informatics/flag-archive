@@ -4,6 +4,14 @@
 
 #include "flag.h"
 
+/*!
+ * Allocate FLAG coefficients.
+ *
+ * \param[out]  flmn Fourier-Laguerre coefficients.
+ * \param[in]  L Angular harmonic band-limit.
+ * \param[in]  N Radial harmonic band-limit.
+ * \retval none
+ */
 void flag_allocate_flmn(complex double **flmn, int L, int N)
 {
 	assert(L > 0);
@@ -14,33 +22,61 @@ void flag_allocate_flmn(complex double **flmn, int L, int N)
 	assert(flmn != NULL);
 }
 
+/*!
+ * Allocate sampled field (MW sampling, complex).
+ *
+ * \param[out]  f Sampled dataset (complex).
+ * \param[in]  L Angular harmonic band-limit.
+ * \param[in]  N Radial harmonic band-limit.
+ * \retval none
+ */
 void flag_allocate_f(complex double **f, int L, int N)
 {
 	assert(L > 0);
 	assert(N > 1);
-	int frsize = ssht_fr_size(L);
+	int frsize = ssht_fr_size_mw(L);
 	long totalsize = N*frsize;
 	*f = (complex double*)calloc(totalsize, sizeof(complex double));
 	assert(f != NULL);
 }
 
+/*!
+ * Allocate sampled field (MW sampling, real).
+ *
+ * \param[out]  f Sampled dataset (real).
+ * \param[in]  L Angular harmonic band-limit.
+ * \param[in]  N Radial harmonic band-limit.
+ * \retval none
+ */
 void flag_allocate_f_real(double **f, int L, int N)
 {
 	assert(L > 0);
 	assert(N > 1);
-	int frsize = ssht_fr_size(L);
+	int frsize = ssht_fr_size_mw(L);
 	long totalsize = N*frsize;
 	*f = (double*)calloc(totalsize, sizeof(double));
 	assert(f != NULL);
 }
 
-int ssht_fr_size(int L)
-{// In case we want to extend to various sampling schemes
+/*!
+ * Get size of a single layer in MW sampling.
+ *
+ * \param[in]  L Angular harmonic band-limit.
+ * \retval L*(2*L-1) for MW sampling.
+ */
+int ssht_fr_size_mw(int L)
+{// In case we want to extend to various sampling schemes.
 	assert(L > 0);
 	int mapsize = L*(2*L-1); // MW sampling scheme
 	return mapsize;
 }
 
+/*!
+ * Get size of a single layer in harmonic space (L^2).
+ *
+ * \param[in]  L Angular harmonic band-limit.
+ * \retval L^2
+ */
 int ssht_flm_size(int L)
 {// In case we want to extend to various sampling schemes
 	assert(L > 0);
@@ -48,6 +84,13 @@ int ssht_flm_size(int L)
 	return mapsize;
 }
 
+/*!
+ * Get size of the full FLAG decomposition.
+ *
+ * \param[in]  L Angular harmonic band-limit. 
+ * \param[in]  N Radial harmonic band-limit.
+ * \retval N*L^2
+ */
 int flag_flmn_size(int L, int N)
 {// In case we want to extend to various sampling schemes
 	assert(L > 0);
@@ -55,13 +98,29 @@ int flag_flmn_size(int L, int N)
 	return ssht_flm_size(L)*N;
 }
 
-int flag_f_size(int L, int N)
+/*!
+ * Get size of the full dataset for MW sampling.
+ *
+ * \param[in]  L Angular harmonic band-limit. 
+ * \param[in]  N Radial harmonic band-limit.
+ * \retval N*L*(2*L-1)
+ */
+int flag_f_size_mw(int L, int N)
 {// In case we want to extend to various sampling schemes
 	assert(L > 0);
 	assert(N > 1);
-	return ssht_fr_size(L)*N;
+	return ssht_fr_size_mw(L)*N;
 }
 
+/*!
+ * Perform Fourier-Laguerre analysis (MW sampling, complex signal).
+ *
+ * \param[out] flmn Fourier-Laguerre coefficients.
+ * \param[in]  f Input dataset (MW sampling, complex signal)
+ * \param[in]  L Angular harmonic band-limit. 
+ * \param[in]  N Radial harmonic band-limit.
+ * \retval none
+ */
 void flag_analysis(complex double *flmn, 
 		const complex double *f, 
 		int L, int N)
@@ -72,7 +131,7 @@ void flag_analysis(complex double *flmn,
 	int verbosity = 0;
 	int n, offset_lm, offset_r;
 	int flmsize = ssht_flm_size(L);
-	int frsize = ssht_fr_size(L);
+	int frsize = ssht_fr_size_mw(L);
 	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
 
 	complex double *flmr;
@@ -98,6 +157,15 @@ void flag_analysis(complex double *flmn,
 
 }
 
+/*!
+ * Perform Fourier-Laguerre synthesis (MW sampling, complex signal).
+ *
+ * \param[out]  f Input dataset (MW sampling, complex signal)
+ * \param[in] flmn Fourier-Laguerre coefficients.
+ * \param[in]  L Angular harmonic band-limit. 
+ * \param[in]  N Radial harmonic band-limit.
+ * \retval none
+ */
 void flag_synthesis(complex double *f, 
 		const complex double *flmn, 
 		int L, int N)
@@ -108,7 +176,7 @@ void flag_synthesis(complex double *f,
 	int verbosity = 0;
 	int n, offset_lm, offset_r;
 	int flmsize = ssht_flm_size(L);
-	int frsize = ssht_fr_size(L);
+	int frsize = ssht_fr_size_mw(L);
 	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
 
 	double *nodes = (double*)calloc(N, sizeof(double));
@@ -133,6 +201,17 @@ void flag_synthesis(complex double *f,
     free(flmr);
 }
 
+/*!
+ * Perform Fourier-Laguerre synthesis on a radial grid (=layered synthesis)
+ * which is not the SLAG grid (angular MW sampling, complex signal).
+ *
+ * \param[out]  f Input dataset (MW sampling, complex signal)
+ * \param[in] flmn Fourier-Laguerre coefficients.
+ * \param[in]  nodes Radial grid / nodes for the layered synthesis .
+ * \param[in]  L Angular harmonic band-limit. 
+ * \param[in]  N Radial harmonic band-limit.
+ * \retval none
+ */
 void flag_synthesis_ongrid(complex double *f, 
 		const complex double *flmn, 
 		const double *nodes, int L, int N)
@@ -143,7 +222,7 @@ void flag_synthesis_ongrid(complex double *f,
 	int verbosity = 0;
 	int n, offset_lm, offset_r;
 	int flmsize = ssht_flm_size(L);
-	int frsize = ssht_fr_size(L);
+	int frsize = ssht_fr_size_mw(L);
 	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
 
 	complex double *flmr;
@@ -160,6 +239,15 @@ void flag_synthesis_ongrid(complex double *f,
     free(flmr);
 }
 
+/*!
+ * Perform Fourier-Laguerre analysis (MW sampling, real signal).
+ *
+ * \param[out] flmn Fourier-Laguerre coefficients.
+ * \param[in]  f Input dataset (MW sampling, real signal)
+ * \param[in]  L Angular harmonic band-limit. 
+ * \param[in]  N Radial harmonic band-limit.
+ * \retval none
+ */
 void flag_analysis_real(complex double *flmn, 
 		const double *f, int L, int N)
 {
@@ -168,7 +256,7 @@ void flag_analysis_real(complex double *flmn,
 	int verbosity = 0;
 	int n, offset_lm, offset_r;
 	int flmsize = ssht_flm_size(L);
-	int frsize = ssht_fr_size(L);
+	int frsize = ssht_fr_size_mw(L);
 	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
 
 	complex double *flmr;
@@ -192,6 +280,15 @@ void flag_analysis_real(complex double *flmn,
     free(flmr);
 }
 
+/*!
+ * Perform Fourier-Laguerre synthesis (MW sampling, real signal).
+ *
+ * \param[out]  f Input dataset (MW sampling, real signal)
+ * \param[in] flmn Fourier-Laguerre coefficients.
+ * \param[in]  L Angular harmonic band-limit. 
+ * \param[in]  N Radial harmonic band-limit.
+ * \retval none
+ */
 void flag_synthesis_real(double *f, 
 		const complex double *flmn, int L, int N)
 {
@@ -200,7 +297,7 @@ void flag_synthesis_real(double *f,
 	int verbosity = 0;
 	int n, offset_lm, offset_r;
 	int flmsize = ssht_flm_size(L);
-	int frsize = ssht_fr_size(L);
+	int frsize = ssht_fr_size_mw(L);
 	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
 
 	double *nodes = (double*)calloc(N, sizeof(double));
@@ -224,49 +321,3 @@ void flag_synthesis_real(double *f,
 
     free(flmr);
 }
-
-
-/* In case we want to extend to various sampling schemes
-void ssht_core_forward(complex double *flm, complex double *f, int L, enum ssht_methods method, enum ssht_dl_method_t dl_method){
-	
-	int spin = 0;
-	int verbosity = 0;
-
-	// TODO : NORTH / SOUTH POLE PROBLEM
-	// TODO : SPIN PROBLEM
-
-	switch (method)
-  	{
-  		case MW:
-  			if (reality)
-				ssht_core_mw_forward_sov_conv_sym_real(flm, f, L, dl_method, verbosity);
-      		else
-				ssht_core_mw_forward_sov_conv_sym(flm, f, L, spin, dl_method, verbosity);
-    		break;
-	  	case MWSS:
-	  		if (reality)
-				ssht_core_mw_forward_sov_conv_sym_ss_real(flm, f, L, dl_method, verbosity);   
-      		else
-				ssht_core_mw_forward_sov_conv_sym_ss(flm, f, L, spin,  dl_method, verbosity);   
-    		break;
-	    case GL:
-	    	if (reality)
-      			ssht_core_gl_forward_sov_real(flm, f, L, verbosity);    
-    		else
-      			ssht_core_gl_forward_sov(flm, f, L, spin, verbosity);
-    		break;
-      	case DH:
-      		if (reality)
-      			ssht_core_dh_forward_sov_real(flm, f, L, verbosity);    
-    		else
-      			ssht_core_dh_forward_sov(flm, f, L, spin, verbosity);    
-    		break;
-      	case HPX: //TODO
-      		break;
-	  	default: //TODO
-	  		break;
-	  }
-
-}
-
-*/

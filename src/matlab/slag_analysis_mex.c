@@ -6,6 +6,8 @@
 #include "mex.h"
 
 /**
+ * MATLAB interface: slag_analysis.
+ * This function for internal use only.
  * Compute backward 1D SLAG transform (analysis).
  *
  * Usage: 

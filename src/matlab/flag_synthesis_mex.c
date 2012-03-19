@@ -6,6 +6,8 @@
 #include "mex.h"
 
 /**
+ * MATLAB interface: flag_synthesis.
+ * This function for internal use only.
  * Compute forward FLAG transform (synthesis).
  *
  * Usage: 

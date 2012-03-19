@@ -66,7 +66,7 @@ void flag_random_f(complex double *f, int L, int N, int seed)
 {
 	int i;
 	srand( time(NULL) );
-	for (i=0; i<flag_f_size(L, N); i++){
+	for (i=0; i<flag_f_size_mw(L, N); i++){
 		f[i] = (2.0*ran2_dp(seed) - 1.0) + I * (2.0*ran2_dp(seed) - 1.0);
 	}
 }
@@ -105,7 +105,7 @@ void flag_random_flmn_real(complex double *flmn, int L, int N, int seed)
 
 void print_f(const complex double *f,int L, int N)
 {	
-	int mapsize = ssht_fr_size(L);
+	int mapsize = ssht_fr_size_mw(L);
 	int n, j;
 	for(n=0;n<N;n++){
 		printf("\n -- Layer %i -- \n", n);
@@ -118,7 +118,7 @@ void print_f(const complex double *f,int L, int N)
 
 void print_f_real(const double *f,int L, int N)
 {	
-	int mapsize = ssht_fr_size(L);
+	int mapsize = ssht_fr_size_mw(L);
 	int n, j;
 	for(n=0;n<N;n++){
 		printf("\n -- Layer %i -- \n", n);
@@ -328,7 +328,7 @@ void flag_transform_furter_test(int L, int N, int seed)
 	int verbosity = 0;
 	clock_t time_start, time_end, t_for, t_back;
 	int flmsize = ssht_flm_size(L);
-	int frsize = ssht_fr_size(L);
+	int frsize = ssht_fr_size_mw(L);
 	int i, n, offset_lm, offset_r;
 	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
 
@@ -456,8 +456,8 @@ void flag_transform_real_test(int L, int N, int seed)
 
 int main(int argc, char *argv[]) 
 {
-	const int L = 2;
-	const int N = 2;
+	const int L = 32;
+	const int N = 32;
 	const double R = 10.0;
 	const int seed = (int)(10000.0*(double)clock()/(double)CLOCKS_PER_SEC);
 	printf("==========================================================\n");

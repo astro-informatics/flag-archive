@@ -6,6 +6,8 @@
 #include "mex.h"
 
 /**
+ * MATLAB interface: slag_sampling.
+ * This function for internal use only.
  * Compute Spherical Laguerre sampling
  *
  * Usage: 

@@ -4,6 +4,14 @@
 
 #include "flag.h"
 
+/*!
+ * Compute Gauss-Laguerre quadrature (nodes and weights).
+ *
+ * \param[out]  roots Gauss-Laguerre nodes.
+ * \param[out]  weights Gauss-Laguerre weights.
+ * \param[in]  N Harmonic band-limit.
+ * \retval none
+ */
 void flag_spherlaguerre_quadrature(double *roots, double *weights, int N)
 {
 	assert(N > 1);
@@ -60,6 +68,13 @@ void flag_spherlaguerre_quadrature(double *roots, double *weights, int N)
 
 }
 
+/*!
+ * Compute spherical Laguerre scaling factor tau.
+ *
+ * \param[in]  R Radial limit / boundary.
+ * \param[in]  N Harmonic band-limit.
+ * \retval tau Scaling factor for the SLAG sampling.
+ */
 double flag_spherlaguerre_tau(double R, int N)
 {
 	assert(R > 0.0);
@@ -98,6 +113,15 @@ double flag_spherlaguerre_tau(double R, int N)
 	return R / tau;
 }
 
+/*!
+ * Compute spherical Laguerre sampling scheme.
+ *
+ * \param[out]  nodes Nodes of the sampling.
+ * \param[out]  weights Weights for the SLAG quadrature.
+ * \param[in]  R Radial limit / boundary.
+ * \param[in]  N Harmonic band-limit.
+ * \retval none
+ */
 void flag_spherlaguerre_sampling(double *nodes, double *weights, double R, int N)
 {
 	assert(R > 0.0);
@@ -115,6 +139,14 @@ void flag_spherlaguerre_sampling(double *nodes, double *weights, double R, int N
 
 }
 
+/*!
+ * Allocate spherical Laguerre sampling scheme.
+ *
+ * \param[out]  nodes Nodes of the sampling.
+ * \param[out]  weights Weights for the SLAG quadrature.
+ * \param[in]  N Harmonic band-limit.
+ * \retval none
+ */
 void flag_allocate_spherlaguerre_sampling(double **nodes, double **weights, int N)
 {
 	assert(N > 1);
@@ -124,12 +156,16 @@ void flag_allocate_spherlaguerre_sampling(double **nodes, double **weights, int 
 	assert(weights != NULL);
 }
 
-void flag_deallocate_spherlaguerre_sampling(double *nodes, double *weights)
-{
-	free(nodes);
-	free(weights);
-}
-
+/*!
+ * Perform spherical Laguerre analysis.
+ *
+ * \param[out]  fn SLAG coefficients.
+ * \param[in]  f Input dataset.
+ * \param[in]  nodes Nodes of the sampling.
+ * \param[in]  weights Weights for the SLAG quadrature.
+ * \param[in]  N Harmonic band-limit.
+ * \retval none
+ */
 void flag_spherlaguerre_analysis(double *fn, const double *f, const double *nodes, const double *weights, int N)
 {
 	assert(N > 1);
@@ -170,6 +206,15 @@ void flag_spherlaguerre_analysis(double *fn, const double *f, const double *node
 	
 }
 
+/*!
+ * Perform spherical Laguerre synthesis.
+ *
+ * \param[out]  f Synthetised dataset.
+ * \param[in]  fn Input SLAG coefficients.
+ * \param[in]  nodes Nodes of the sampling.
+ * \param[in]  N Harmonic band-limit.
+ * \retval none
+ */
 void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nodes, int N)
 {
 	assert(N > 1);
@@ -210,6 +255,18 @@ void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nod
 
 }
 
+/*!
+ * Perform spherical Laguerre analysis.
+ * 3D mapped version - suitable for FLAG transform.
+ *
+ * \param[out]  fn SLAG coefficients.
+ * \param[in]  f Input dataset.
+ * \param[in]  nodes Nodes of the sampling.
+ * \param[in]  weights Weights for the SLAG quadrature.
+ * \param[in]  mapsize Size of each layer (L^2 in FLAG).
+ * \param[in]  N Harmonic band-limit.
+ * \retval none
+ */
 void flag_mapped_spherlaguerre_analysis(complex double *fn, const complex double *f, const double *nodes, const double *weights, int mapsize, int N)
 {
 	assert(N > 1);
@@ -252,6 +309,17 @@ void flag_mapped_spherlaguerre_analysis(complex double *fn, const complex double
 
 }
 
+/*!
+ * Perform spherical Laguerre synthesis.
+ * 3D mapped version - suitable for FLAG transform.
+ *
+ * \param[out]  f Synthetised dataset.
+ * \param[in]  fn Input SLAG coefficients.
+ * \param[in]  nodes Nodes of the sampling.
+ * \param[in]  mapsize Size of each layer (L^2 in FLAG).
+ * \param[in]  N Harmonic band-limit.
+ * \retval none
+ */
 void flag_mapped_spherlaguerre_synthesis(complex double *f, const complex double *fn, const double *nodes, int mapsize, int N)
 {
 	assert(N > 1);

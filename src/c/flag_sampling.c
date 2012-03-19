@@ -4,15 +4,18 @@
 
 #include "flag.h"
 
-/*!  
- * Compute the exact Fourier-Laguerre sampling.
+/*!
+ * Allocate FLAG sampling.
  *
- * \param[out] f Sampling on the 3-ball.
- * \param[in] L Harmonic band-limit.
- * \param[in] N Laguerre band-limit.
+ * \param[out]  rs Radial coordinates.
+ * \param[out]  thetas Theta angular coordinates.
+ * \param[out]  phis Phi angular coordinates.
+ * \param[out]  laguweights Laguerre radial weights for FLAG transform.
+ * \param[in]  R Radial boundary / limit.
+ * \param[in]  L Angular harmonic band-limit.
+ * \param[in]  N Radial harmonic band-limit.
  * \retval none
  */
-
 void flag_allocate_sampling(double **rs, double **thetas, double **phis, double **laguweights, double R, int L, int N)
 {
   assert(L > 0);
@@ -57,7 +60,15 @@ void ssht_allocate_sampling(double **thetas, double **phis, int L)
 
 }
 
-void ssht_sampling(double *thetas, double *phis, int L)
+/*!
+ * Compute SSHT MW sampling.
+ *
+ * \param[out]  thetas Theta angular coordinates.
+ * \param[out]  phis Phi angular coordinates.
+ * \param[in]  L Angular harmonic band-limit.
+ * \retval none
+ */
+void ssht_sampling_mw(double *thetas, double *phis, int L)
 {
   assert(L > 0);
 	int t, p, nphi, ntheta;
@@ -68,53 +79,25 @@ void ssht_sampling(double *thetas, double *phis, int L)
 	 	thetas[t] = ssht_sampling_mw_t2theta(t, L);
 	for (p=0; p<nphi; p++)
 	  phis[p] = ssht_sampling_mw_p2phi(p, L);
-
-  	/* FOR FUTURE IMPROVEMENTS // multi-scheme support
-  	switch (method)
-  	{
-  	    case MW:
-  		    ntheta = ssht_sampling_mw_ntheta(L);
-    		nphi = ssht_sampling_mw_nphi(L);
-    		for (t=0; t<ntheta; t++)
-	      		thetas[t] = ssht_sampling_mw_t2theta(t, L);
-	    	for (p=0; p<nphi; p++)
-	      		phis[p] = ssht_sampling_mw_p2phi(p, L);
-	  		break;
-	  	case MWSS:
-	  		ntheta = ssht_sampling_mw_ss_ntheta(L);
-	    	nphi = ssht_sampling_mw_ss_nphi(L);
-	    	for (t=0; t<ntheta; t++)
-	      		thetas[t] = ssht_sampling_mw_ss_t2theta(t, L);
-		   	for (p=0; p<nphi; p++)
-	      		phis[p] = ssht_sampling_mw_ss_p2phi(p, L);
-	      	break;
-	    case GL:
-	    	ntheta = ssht_sampling_gl_ntheta(L);
-    		nphi = ssht_sampling_gl_nphi(L);
-    		double *weights_unused = (double*)calloc(L,sizeof(double));
-    		ssht_sampling_gl_thetas_weights(thetas, weights_unused, L);
-    		free(weights_unused);
-    		for (p=0; p<nphi; p++)
-      			phis[p] = ssht_sampling_gl_p2phi(p, L);
-      		break;
-      	    case DH:
-      		ntheta = ssht_sampling_dh_ntheta(L);
-    		nphi = ssht_sampling_dh_nphi(L);
-    		for (t=0; t<ntheta; t++)
-      			thetas[t] = ssht_sampling_dh_t2theta(t, L);
-    		for (p=0; p<nphi; p++)
-      			phis[p] = ssht_sampling_dh_p2phi(p, L);
-      		break;
-	  }
-	  */
-
 }
 
+/*!
+ * Compute FLAG sampling.
+ *
+ * \param[out]  rs Radial coordinates.
+ * \param[out]  thetas Theta angular coordinates.
+ * \param[out]  phis Phi angular coordinates.
+ * \param[out]  laguweights Laguerre radial weights for FLAG transform.
+ * \param[in]  R Radial boundary / limit.
+ * \param[in]  L Angular harmonic band-limit.
+ * \param[in]  N Radial harmonic band-limit.
+ * \retval none
+ */
 void flag_sampling(double *rs, double *thetas, double *phis, double *laguweights, double R, int L, int N) 
 {
   assert(L > 0);
   assert(N > 1);
   assert(R > 0.0);
 	flag_spherlaguerre_sampling(rs, laguweights, R, N);
-	ssht_sampling(thetas, phis, L);
+	ssht_sampling_mw(thetas, phis, L);
 }
