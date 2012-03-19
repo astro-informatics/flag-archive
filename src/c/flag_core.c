@@ -70,7 +70,7 @@ void flag_analysis(complex double *flmn,
 	assert(N > 1);
 	int spin = 0;
 	int verbosity = 0;
-	int i, n, offset_lm, offset_r;
+	int n, offset_lm, offset_r;
 	int flmsize = ssht_flm_size(L);
 	int frsize = ssht_fr_size(L);
 	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
@@ -106,7 +106,7 @@ void flag_synthesis(complex double *f,
 	assert(N > 1);
 	int spin = 0;
 	int verbosity = 0;
-	int n, i, offset_lm, offset_r;
+	int n, offset_lm, offset_r;
 	int flmsize = ssht_flm_size(L);
 	int frsize = ssht_fr_size(L);
 	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
@@ -141,7 +141,7 @@ void flag_synthesis_ongrid(complex double *f,
 	assert(N > 1);
 	int spin = 0;
 	int verbosity = 0;
-	int n, i, offset_lm, offset_r;
+	int n, offset_lm, offset_r;
 	int flmsize = ssht_flm_size(L);
 	int frsize = ssht_fr_size(L);
 	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
@@ -166,7 +166,7 @@ void flag_analysis_real(complex double *flmn,
 	assert(L > 0);
 	assert(N > 1);
 	int verbosity = 0;
-	int i, n, offset_lm, offset_r;
+	int n, offset_lm, offset_r;
 	int flmsize = ssht_flm_size(L);
 	int frsize = ssht_fr_size(L);
 	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
@@ -198,7 +198,7 @@ void flag_synthesis_real(double *f,
 	assert(L > 0);
 	assert(N > 1);
 	int verbosity = 0;
-	int n, i, offset_lm, offset_r;
+	int n, offset_lm, offset_r;
 	int flmsize = ssht_flm_size(L);
 	int frsize = ssht_fr_size(L);
 	ssht_dl_method_t dl_method = SSHT_DL_RISBO;

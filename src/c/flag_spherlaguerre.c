@@ -137,16 +137,17 @@ void flag_spherlaguerre_analysis(double *fn, const double *f, const double *node
 
 	const double R = nodes[N-1];
 	const double tau = flag_spherlaguerre_tau(R, N);
+	double r, factor, lagu0, lagu1, lagu2;
 
 	for(i=0; i<N; i++)
 	{
 
-		double r = nodes[i]/tau;
-		double factor = f[i] * weights[i] * (1.0/r) * exp(-r/2.0) * (1.0/sqrt(tau));
+		r = nodes[i]/tau;
+		factor = f[i] * weights[i] * (1.0/r) * exp(-r/2.0) * (1.0/sqrt(tau));
 
-		double lagu0 = 1.0;
-		double lagu1 = 1.0 - r;
-		double lagu2;
+		lagu0 = 1.0;
+		lagu1 = 1.0 - r;
+		lagu2;
 
 		fn[0] += factor * lagu0;
 		fn[1] += factor * lagu1;
@@ -186,7 +187,7 @@ void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nod
 
 		lagu0 = 1.0;
 		lagu1 = 1.0 - r;
-		lagu2;
+		//lagu2;
 
 		f[i] += factor * lagu0 * fn[0];
 		f[i] += factor * lagu1 * fn[1];
@@ -228,7 +229,7 @@ void flag_mapped_spherlaguerre_analysis(complex double *fn, const complex double
 
 			lagu0 = 1.0;
 			lagu1 = 1.0 - r;
-			lagu2;
+			//lagu2;
 
 			fn[l] += factor * lagu0;
 			fn[l+mapsize] += factor * lagu1;
@@ -259,17 +260,19 @@ void flag_mapped_spherlaguerre_synthesis(complex double *f, const complex double
 
 	const double R = nodes[N-1];
 	const double tau = flag_spherlaguerre_tau(R, N);
+	double r;
+	complex double factor, lagu0, lagu1, lagu2;
 
 	for(l=0; l<mapsize; l++)
 	{
 		for (i = 0; i < N; i++)
 		{
-			double r = nodes[i]/tau;
-			complex double factor = (1.0/r) * exp(-r/2.0) * (1.0/sqrt(tau));
+			r = nodes[i]/tau;
+			factor = (1.0/r) * exp(-r/2.0) * (1.0/sqrt(tau));
 
-			complex double lagu0 = 1.0;
-			complex double lagu1 = 1.0 - r;
-			complex double lagu2;
+			lagu0 = 1.0;
+			lagu1 = 1.0 - r;
+			//lagu2;
 
 			f[l+i*mapsize] += factor * lagu0 * fn[l];
 			f[l+i*mapsize] += factor * lagu1 * fn[l+mapsize];

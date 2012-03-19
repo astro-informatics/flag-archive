@@ -443,8 +443,8 @@ void flag_transform_real_test(int L, int N, int seed)
 
 int main(int argc, char *argv[]) 
 {
-	const int L = 64;
-	const int N = 64;
+	const int L = 32;
+	const int N = 32;
 	const double R = 10.0;
 	const int seed = (int)(10000.0*(double)clock()/(double)CLOCKS_PER_SEC);
 	printf("==========================================================\n");
@@ -474,7 +474,7 @@ int main(int argc, char *argv[])
 	printf("> Testing cmplx mapped Laguerre transform...\n");
 	flag_spherlaguerre_cmplx_transform_test(L, N, R, seed);
 	fflush(NULL);
-/*
+
 	printf("----------------------------------------------------------\n");
 
 	printf("> Testing FLAG sampling scheme...");
@@ -494,7 +494,7 @@ int main(int argc, char *argv[])
 	printf("> Testing FLAG in further details...\n");
 	flag_transform_furter_test(L, N, seed);
 	fflush(NULL);
-*/
+
 	printf("==========================================================\n");
 
 	return 0;		

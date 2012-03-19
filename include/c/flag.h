@@ -1,6 +1,7 @@
 #ifndef FLAG
 #define FLAG
 
+#include <gsl/gsl_math.h>
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,5 +17,6 @@
 #include "../../src/c/flag_core.h"
 #include "../../src/c/flag_sampling.h"
 #include "../../src/c/flag_spherlaguerre.h"
+#include "../../src/c/flag_spherbessel.h"
 
 #endif
