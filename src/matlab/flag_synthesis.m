@@ -23,10 +23,11 @@ p = inputParser;
 p.addRequired('flmn', @isnumeric);          
 p.addRequired('L', @isnumeric);          
 p.addRequired('N', @isnumeric);   
+p.addParamValue('Nodes', 0.0, @isnumeric);
 p.addParamValue('Reality', false, @islogical);
 p.parse(flmn, L, N, varargin{:});
 args = p.Results;
 
 % Compute inverse transform.
-f = flag_synthesis_mex(flmn, L, N, args.Reality);
+f = flag_synthesis_mex(flmn, L, N, args.Nodes, args.Reality);
   

@@ -23,10 +23,10 @@ function [f, nodes] = slag_synthesis(fn, N, varargin)
 p = inputParser;
 p.addRequired('fn', @isnumeric);          
 p.addRequired('N', @isnumeric);   
-p.addParamValue('nodes', 0.0, @isnumeric);
+p.addParamValue('Nodes', 0.0, @isnumeric);
 p.addParamValue('R', 1.0, @isnumeric);
 p.parse(fn, N, varargin{:});
 args = p.Results;
 
-[f, nodes] = slag_synthesis_mex(fn, N, args.R, args.nodes);
+[f, nodes] = slag_synthesis_mex(fn, N, args.R, args.Nodes);
   

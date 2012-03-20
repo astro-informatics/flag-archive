@@ -12,7 +12,7 @@
  *
  * Usage: 
  *   f = ...
- *     flag_synthesis_mex(flmn, L, N, reality);
+ *     flag_synthesis_mex(flmn, L, N, nodes, reality);
  *
  */
 void mexFunction( int nlhs, mxArray *plhs[],
@@ -27,9 +27,9 @@ void mexFunction( int nlhs, mxArray *plhs[],
   int iin = 0, iout = 0;
 
   // Check number of arguments
-  if(nrhs!=4) {
+  if(nrhs!=5) {
     mexErrMsgIdAndTxt("flag_synthesis_mex:InvalidInput:nrhs",
-		      "Require four inputs.");
+		      "Require five inputs.");
   }
   if(nlhs!=1) {
     mexErrMsgIdAndTxt("flag_synthesis_mex:InvalidOutput:nlhs",
@@ -37,7 +37,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
   }
 
   // Parse reality flag
-  iin = 3;
+  iin = 4;
   if( !mxIsLogicalScalar(prhs[iin]) )
     mexErrMsgIdAndTxt("flag_synthesis_mex:InvalidInput:reality",
 		      "Reality flag must be logical.");
@@ -89,12 +89,36 @@ void mexFunction( int nlhs, mxArray *plhs[],
   ntheta = L;
   nphi = 2 * L - 1;
 
-  if (reality) {
-	  fr = (double*)calloc(ntheta*nphi*N, sizeof(double));
-	  flag_synthesis_real(fr, flmn, L, N);
-  } else {
-	  f = (complex double*)calloc(ntheta*nphi*N, sizeof(complex double));
-	  flag_synthesis(f, flmn, L, N); 
+  // Parse nodes
+  int nodes_m, nodes_n;
+  iin = 3;
+  nodes_m = mxGetM(prhs[iin]);
+  nodes_n = mxGetN(prhs[iin]);
+  double *nodes_real, *nodes;
+
+  if(nodes_m*nodes_n > 1){
+    nodes_real = mxGetPr(prhs[iin]);
+    nodes = (double*)malloc(nodes_m*nodes_n * sizeof(complex double));  
+    for(n=0; n<nodes_m*nodes_n; n++)  
+      nodes[n] = nodes_real[n];
+    f = (complex double*)calloc(ntheta*nphi*N, sizeof(complex double));
+    flag_synthesis_ongrid(f, flmn, nodes, L, N);
+    if (reality) {
+      fr = (double*)calloc(ntheta*nphi*N, sizeof(double));
+      for(n=0; n<ntheta*nphi*N; n++)  
+        fr[n] = creal(f[n]);
+      free(f);
+    }
+    free(nodes);
+  }
+  else{
+    if (reality) {
+  	  fr = (double*)calloc(ntheta*nphi*N, sizeof(double));
+  	  flag_synthesis_real(fr, flmn, L, N);
+    } else {
+  	  f = (complex double*)calloc(ntheta*nphi*N, sizeof(complex double));
+  	  flag_synthesis(f, flmn, L, N); 
+    }
   }
 
   if (reality) {

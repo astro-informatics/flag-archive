@@ -7,6 +7,8 @@
 
 void flag_spherlaguerre2spherbessel(complex double *flk, complex double *fn, double *kvalues, int Nk, int N, int ell, double tau);
 
-double flag_mujlk(int j, int l, double k, double tau);
+void flag_sbesselslag(double *sbesselslag, int ell, double *kvalues, int Nk, int N, double tau);
+
+double flag_mujlk(int j, int ell, double k, double tau);
 
 #endif

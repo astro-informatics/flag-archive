@@ -256,6 +256,57 @@ void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nod
 }
 
 /*!
+ * Perform oversampled spherical Laguerre synthesis.
+ *
+ * \param[out]  f Synthetised dataset.
+ * \param[in]  fn Input SLAG coefficients.
+ * \param[in]  nodes Nodes of the sampling.
+ * \param[in]  N Harmonic band-limit, number of nodes in the oversampled scheme.
+ * \param[in]  Nnodes Harmonic band-limit of initial SLAG sampling.
+ * \retval none
+ */
+void flag_spherlaguerre_synthesis_oversampled(double *f, const double *fn, const double *nodes, int Nnodes, int N)
+{
+	assert(N > 1);
+	assert(Nnodes > 1);
+	int i, n;
+	complex double factor, lagu0, lagu1, lagu2, r;
+
+	const double R = nodes[Nnodes-1];
+	const double tau = flag_spherlaguerre_tau(R, N);
+
+	for (i = 0; i < Nnodes; i++)
+	{
+  
+		r = nodes[i]/tau;
+		factor = (1.0/r) * exp(-r/2.0) * (1.0/sqrt(tau));
+
+		lagu0 = 1.0;
+		lagu1 = 1.0 - r;
+		//lagu2;
+
+		f[i] += factor * lagu0 * fn[0];
+		f[i] += factor * lagu1 * fn[1];
+
+		for (n = 2; n < N; n++) 
+		{ 
+			lagu2 = 
+				( 
+					((2 * n - 1) - r) * lagu1 - 
+					(n - 1) * lagu0
+				) / n;
+
+			f[i] += factor * lagu2 * fn[n];
+
+			lagu0 = lagu1;
+			lagu1 = lagu2;
+		}
+		
+	}
+
+}
+
+/*!
  * Perform spherical Laguerre analysis.
  * 3D mapped version - suitable for FLAG transform.
  *

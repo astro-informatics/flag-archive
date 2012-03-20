@@ -7,7 +7,7 @@ FFTWDIR	= ${FFTW}
 # Directory for FFTW
 GSLDIR	= ${GSL}
 # Directory for MATLAB
-MLAB	= /usr/local/MATLAB/R2010aSV
+MLAB	=  /Applications/MATLAB_R2011b.app
 # Directory for DOXYGEN
 DOXYGEN_PATH=/Applications/Doxygen.app/Contents/Resources/doxygen
 
@@ -86,14 +86,16 @@ FLAGOBJSMAT = $(FLAGOBJMAT)/flag_analysis_mex.o	\
 	$(FLAGOBJMAT)/flag_sampling_mex.o	\
 	$(FLAGOBJMAT)/slag_synthesis_mex.o	\
 	$(FLAGOBJMAT)/slag_analysis_mex.o	\
-	$(FLAGOBJMAT)/slag_sampling_mex.o
+	$(FLAGOBJMAT)/slag_sampling_mex.o	\
+	$(FLAGOBJMAT)/flag_get_tau_mex
 
 FLAGOBJSMEX = $(FLAGOBJMEX)/flag_analysis_mex.$(MEXEXT)	\
 	$(FLAGOBJMEX)/flag_synthesis_mex.$(MEXEXT)	\
 	$(FLAGOBJMEX)/flag_sampling_mex.$(MEXEXT)	\
 	$(FLAGOBJMEX)/slag_synthesis_mex.$(MEXEXT)	\
 	$(FLAGOBJMEX)/slag_analysis_mex.$(MEXEXT)	\
-	$(FLAGOBJMEX)/slag_sampling_mex.$(MEXEXT)
+	$(FLAGOBJMEX)/slag_sampling_mex.$(MEXEXT)	\
+	$(FLAGOBJMEX)/flag_get_tau_mex.$(MEXEXT)
 
 $(FLAGOBJ)/%.o: %.c
 	$(CC) $(OPT) $(FFLAGS) -c $< -o $@
@@ -124,6 +126,7 @@ $(FLAGLIB)/lib$(FLAGLIBN).a: $(FLAGOBJS)
 test: $(FLAGBIN)/flag_test
 $(FLAGBIN)/flag_test: $(FLAGOBJ)/flag_test.o $(FLAGLIB)/lib$(FLAGLIBN).a
 	$(CC) $(OPT) $< -o $(FLAGBIN)/flag_test $(LDFLAGS)
+	bin/c/flag_test
 
 .PHONY: doc
 doc:

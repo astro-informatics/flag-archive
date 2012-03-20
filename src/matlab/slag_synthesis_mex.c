@@ -71,41 +71,63 @@ void mexFunction( int nlhs, mxArray *plhs[],
           "Radial limit R must be positive real.");
   }
   R = mxGetScalar(prhs[iin]);
-  if ( R <= 0)
+  if ( R <= 0 )
     mexErrMsgIdAndTxt("slag_synthesis_mex:InvalidInput:RLimitNonInt",
           "Radial limit R must be positive real.");
 
-  nodes = (double*)calloc(N, sizeof(double));
+  
 
   // Parse nodes
   iin = 3;
   nodes_m = mxGetM(prhs[iin]);
   nodes_n = mxGetN(prhs[iin]);
-  if( nodes_m*nodes_n == N ){
+  if( nodes_m*nodes_n > 1 ){
+
+    f = (double*)calloc(nodes_m*nodes_n, sizeof(double));
+
     nodes_in = mxGetPr(prhs[iin]);
-    for (i=0; i<N; i++)
+    nodes = (double*)calloc(nodes_m*nodes_n, sizeof(double));
+    for (i=0; i<nodes_m*nodes_n; i++)
       nodes[i] = nodes_in[i];
+
+    // Run spherical Laguerre synthesis
+    flag_spherlaguerre_synthesis_oversampled(f, fn, nodes, nodes_m*nodes_n, N);
+
+    iout = 0;
+    plhs[iout] = mxCreateDoubleMatrix(nodes_m, nodes_n, mxREAL);
+    f_real = mxGetPr(plhs[iout]);
+    for(n=0; n<nodes_m*nodes_n; n++)
+      f_real[n] = f[n];
+    iout = 1;
+    plhs[iout] = mxCreateDoubleMatrix(nodes_m, nodes_n, mxREAL);
+    nodes_out = mxGetPr(plhs[iout]);
+    for(n=0; n<nodes_n*nodes_m; n++)
+      nodes_out[n] = nodes[n];
+
   }else{
+
+    f = (double*)calloc(N, sizeof(double));
+
     weights = (double*)calloc(N, sizeof(double));
+    nodes = (double*)calloc(N, sizeof(double));
     flag_spherlaguerre_sampling(nodes, weights, R, N);
     free(weights);
+
+    // Run spherical Laguerre synthesis
+    flag_spherlaguerre_synthesis(f, fn, nodes, N);
+
+    iout = 0;
+    plhs[iout] = mxCreateDoubleMatrix(1, N, mxREAL);
+    f_real = mxGetPr(plhs[iout]);
+    for(n=0; n<N; n++)
+      f_real[n] = f[n];
+    iout = 1;
+    plhs[iout] = mxCreateDoubleMatrix(1, N, mxREAL);
+    nodes_out = mxGetPr(plhs[iout]);
+    for(n=0; n<N; n++)
+      nodes_out[n] = nodes[n];
+
   }
-
-  // Run spherical Laguerre synthesis
-  f = (double*)calloc(N, sizeof(double));
-	flag_spherlaguerre_synthesis(f, fn, nodes, N);
-
-  iout = 0;
-  plhs[iout] = mxCreateDoubleMatrix(1, N, mxREAL);
-  f_real = mxGetPr(plhs[iout]);
-  for(n=0; n<N; n++)
-	 f_real[n] = f[n];
-
-  iout = 1;
-  plhs[iout] = mxCreateDoubleMatrix(1, N, mxREAL);
-  nodes_out = mxGetPr(plhs[iout]);
-  for(n=0; n<N; n++)
-   nodes_out[n] = nodes[n];
 
   free(fn);
   free(nodes);

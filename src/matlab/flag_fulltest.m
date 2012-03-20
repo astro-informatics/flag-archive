@@ -50,7 +50,7 @@ nodes2 = slag_sampling(N, R);
 if (max(abs(nodes-nodes2))) ~= 0
     print('Problem with sampling scheme');
 end
-[f2, nodes] = slag_synthesis(fn, N, 'nodes', nodes);
+[f2, nodes] = slag_synthesis(fn, N, 'Nodes', nodes);
 if max(max(abs(f-f2))) ~= 0
     print('Problem with transform when nodes is specified');
 end
