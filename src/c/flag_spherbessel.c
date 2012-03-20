@@ -17,7 +17,7 @@
  * \param[in]  tau SLAG rescaling factor.
  * \retval none
  */
-void flag_spherlaguerre2spherbessel(complex double *flk, complex double *fn, double *kvalues, int Nk, int N, int ell, double tau)
+void flag_spherlaguerre2spherbessel(double *flk, double *fn, double *kvalues, int Nk, int N, int ell, double tau)
 {
 	double PI = 3.141592653589793;
 	double *sbesselslag  = (double*)calloc(N*Nk, sizeof(double));

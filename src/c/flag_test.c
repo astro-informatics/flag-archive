@@ -454,10 +454,71 @@ void flag_transform_real_test(int L, int N, int seed)
 }
 
 
+void flag_sbesselslag_test(int N, double R)
+{	
+	clock_t time_start, time_end;
+	double *f = (double*)calloc(N, sizeof(double));
+	double *fn = (double*)calloc(N, sizeof(double));
+	int n;
+	srand ( time(NULL) );
+	for (n=0; n<N; n++)
+		fn[n] = rand()/795079784.0;
+	double *nodes = (double*)calloc(N, sizeof(double));
+	double *weights = (double*)calloc(N, sizeof(double));
+
+ 	flag_spherlaguerre_sampling(nodes, weights, R, N);
+ 	flag_spherlaguerre_synthesis(f, fn, nodes, N);
+ 	double tau = flag_spherlaguerre_tau(R,N);
+
+ 	//-------
+
+ 	int Nk = N;
+ 	double kmin = 0.05;
+ 	double kmax = 0.5;
+ 	int ell = 2;
+
+ 	//-------
+
+ 	double *flk = (double*)calloc(Nk, sizeof(double));
+ 	double *kvalues = (double*)calloc(Nk, sizeof(double));
+ 	for (n=0; n<Nk; n++)
+ 		kvalues[n] = kmin + (kmax - kmin)*(double)n/(double)Nk;
+
+	time_start = clock();
+	//flag_spherlaguerre2spherbessel(flk, fn, kvalues, Nk, N, ell, tau);
+	time_end = clock();
+
+	//-------
+
+	double *frec = (double*)calloc(N, sizeof(double));
+	time_start = clock();
+
+	time_end = clock();
+
+	
+	printf("  - Maximum abs error on reconstruction  : %6.5e\n", 
+		maxerr(f, frec, N));
+
+	//printf("\nTau = %f\n",flag_spherlaguerre_tau(1.0, N));
+	//for (n=0; n<N; n++){
+	   //printf("\nnodes[%i] = %f",n,nodes[n]);
+	   //printf("\nweights[%i] = %f",n,weights[n]);
+	   //printf("\nfn[%i] = %f",n,fn[n]);   
+	//   printf("\nf[%i] = %f - frec[%i] = %f",n,f[n],n,frec[n]);
+	//}
+	free(f);
+	free(fn);
+	free(flk);
+	free(frec);
+	free(weights);
+	free(nodes);
+}
+
+
 int main(int argc, char *argv[]) 
 {
-	const int L = 32;
-	const int N = 32;
+	const int L = 8;
+	const int N = 8;
 	const double R = 10.0;
 	const int seed = (int)(10000.0*(double)clock()/(double)CLOCKS_PER_SEC);
 	printf("==========================================================\n");
@@ -506,6 +567,12 @@ int main(int argc, char *argv[])
 
 	printf("> Testing FLAG in further details...\n");
 	flag_transform_furter_test(L, N, seed);
+	fflush(NULL);
+
+	printf("----------------------------------------------------------\n");
+
+	printf("> Testing 1D spherical Bessel transform...\n");
+	flag_sbesselslag_test(N, R);
 	fflush(NULL);
 
 	printf("==========================================================\n");

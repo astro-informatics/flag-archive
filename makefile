@@ -4,7 +4,7 @@
 SSHTDIR	= ${SSHT}
 # Directory for FFTW
 FFTWDIR	= ${FFTW}
-# Directory for FFTW
+# Directory for GSL
 GSLDIR	= ${GSL}
 # Directory for MATLAB
 MLAB	=  /Applications/MATLAB_R2011b.app
@@ -115,7 +115,7 @@ default: lib test tidy
 matlab: $(FLAGOBJSMEX)
 
 .PHONY: all
-all: lib test matlab tidy
+all: lib matlab doc test tidy
 
 .PHONY: lib
 lib: $(FLAGLIB)/lib$(FLAGLIBN).a
@@ -136,7 +136,7 @@ cleandoc:
 	rm -rf $(FLAGDIR)/doc/html/*
 
 .PHONY: clean
-clean:	tidy
+clean:	tidy cleandoc
 	rm -f $(FLAGLIB)/lib$(FLAGLIBN).a
 	rm -f $(FLAGOBJMEX)/*_mex.$(MEXEXT)
 	rm -f $(FLAGBIN)/flag_test
@@ -146,3 +146,4 @@ tidy:
 	rm -f $(FLAGOBJ)/*.o
 	rm -f *~ 
 
+# ======================================== #

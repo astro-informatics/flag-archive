@@ -5,7 +5,7 @@
 #ifndef FLAG_SPHERBESSEL
 #define FLAG_SPHERBESSEL
 
-void flag_spherlaguerre2spherbessel(complex double *flk, complex double *fn, double *kvalues, int Nk, int N, int ell, double tau);
+void flag_spherlaguerre2spherbessel(double *flk, double *fn, double *kvalues, int Nk, int N, int ell, double tau);
 
 void flag_sbesselslag(double *sbesselslag, int ell, double *kvalues, int Nk, int N, double tau);
 
