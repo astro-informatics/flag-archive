@@ -27,6 +27,12 @@ p.addParamValue('Reality', false, @islogical);
 p.parse(f, L, N, varargin{:});
 args = p.Results;
 
-flmn = flag_analysis_mex(f, L, N, args.Reality);
+f_vec = zeros(N, L*(2*L-1));
+for n = 1:N
+    temp(:,:) = f(n,:,:);
+    f_vec(n,:,:) = flag_mw_arr2vec( temp );
+end
+
+flmn = flag_analysis_mex(f_vec, L, N, args.Reality);
   
 end

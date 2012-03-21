@@ -29,6 +29,12 @@ p.parse(flmn, L, N, varargin{:});
 args = p.Results;
 
 % Compute inverse transform.
-f = flag_synthesis_mex(flmn, L, N, args.Nodes, args.Reality);
+f_vec = flag_synthesis_mex(flmn, L, N, args.Nodes, args.Reality);
+
+f = zeros(N, L, (2*L-1));
+for n = 1:N
+    temp = f_vec(n,:);
+    f(n,:,:) = flag_mw_vec2arr( temp );
+end
     
 end
