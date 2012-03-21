@@ -30,3 +30,4 @@ args = p.Results;
 
 [f, nodes] = slag_synthesis_mex(fn, N, args.R, args.Nodes);
   
+end

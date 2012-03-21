@@ -112,7 +112,7 @@ $(FLAGOBJMEX)/%_mex.$(MEXEXT): $(FLAGOBJMAT)/%_mex.o $(FLAGLIB)/lib$(FLAGLIBN).a
 default: lib test tidy
 
 .PHONY: matlab
-matlab: $(FLAGOBJSMEX)
+matlab: lib $(FLAGOBJSMEX)
 
 .PHONY: all
 all: lib matlab doc test tidy

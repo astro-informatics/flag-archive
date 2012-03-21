@@ -30,4 +30,5 @@ args = p.Results;
 
 % Compute inverse transform.
 f = flag_synthesis_mex(flmn, L, N, args.Nodes, args.Reality);
-  
+    
+end

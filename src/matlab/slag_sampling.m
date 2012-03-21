@@ -21,4 +21,5 @@ p.parse(N, R);
 args = p.Results;
 
 nodes = slag_sampling_mex(N, R);
-  
+    
+end

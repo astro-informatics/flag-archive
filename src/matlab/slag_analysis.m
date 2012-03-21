@@ -23,4 +23,5 @@ p.parse(f, N, R);
 args = p.Results;
 
 fn = slag_analysis_mex(f, N, R);
-  
+    
+end

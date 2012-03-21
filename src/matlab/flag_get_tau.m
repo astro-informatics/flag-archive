@@ -20,4 +20,5 @@ p.parse(N, R);
 args = p.Results;
 
 tau = flag_get_tau_mex(N, R);
-     
+       
+end

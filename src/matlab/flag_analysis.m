@@ -28,3 +28,5 @@ p.parse(f, L, N, varargin{:});
 args = p.Results;
 
 flmn = flag_analysis_mex(f, L, N, args.Reality);
+  
+end

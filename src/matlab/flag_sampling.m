@@ -26,4 +26,5 @@ p.parse(L, N, R);
 args = p.Results;
 
 [rs, thetas, phis] = flag_sampling_mex(L, N, R);
-     
+       
+end
