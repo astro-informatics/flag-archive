@@ -13,7 +13,7 @@ DOXYGEN_PATH=/Applications/Doxygen.app/Contents/Resources/doxygen
 
 # Compiler and options
 CC	= gcc
-OPT	= -Wall -O3
+OPT	= -Wall -O3 -g -DFLAG_VERSION=\"1.0\" -DFLAG_BUILD=\"`svnversion -n .`\"
 UNAME := $(shell uname)
 
 # ======================================== #
@@ -109,13 +109,13 @@ $(FLAGOBJMEX)/%_mex.$(MEXEXT): $(FLAGOBJMAT)/%_mex.o $(FLAGLIB)/lib$(FLAGLIBN).a
 # ======================================== #
 
 .PHONY: default
-default: lib test tidy
+default: lib test about tidy
 
 .PHONY: matlab
 matlab: lib $(FLAGOBJSMEX)
 
 .PHONY: all
-all: lib matlab doc test tidy
+all: lib matlab doc test about tidy
 
 .PHONY: lib
 lib: $(FLAGLIB)/lib$(FLAGLIBN).a
@@ -123,10 +123,16 @@ $(FLAGLIB)/lib$(FLAGLIBN).a: $(FLAGOBJS)
 	ar -r $(FLAGLIB)/lib$(FLAGLIBN).a $(FLAGOBJS)
 
 .PHONY: test
-test: $(FLAGBIN)/flag_test
+test: lib $(FLAGBIN)/flag_test
 $(FLAGBIN)/flag_test: $(FLAGOBJ)/flag_test.o $(FLAGLIB)/lib$(FLAGLIBN).a
 	$(CC) $(OPT) $< -o $(FLAGBIN)/flag_test $(LDFLAGS)
 	bin/c/flag_test
+
+.PHONY: about
+about: $(FLAGBIN)/flag_about
+$(FLAGBIN)/flag_about: $(FLAGOBJ)/flag_about.o 
+	$(CC) $(OPT) $< -o $(FLAGBIN)/flag_about
+	$(FLAGBIN)/flag_about
 
 .PHONY: doc
 doc:
@@ -140,6 +146,7 @@ clean:	tidy cleandoc
 	rm -f $(FLAGLIB)/lib$(FLAGLIBN).a
 	rm -f $(FLAGOBJMEX)/*_mex.$(MEXEXT)
 	rm -f $(FLAGBIN)/flag_test
+	rm -f $(FLAGBIN)/flag_about
 
 .PHONY: tidy
 tidy:
