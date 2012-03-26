@@ -123,7 +123,7 @@ int flag_f_size_mw(int L, int N)
  */
 void flag_analysis(complex double *flmn, 
 		const complex double *f, 
-		int L, int N)
+		double R, int L, int N)
 {
 	assert(L > 0);
 	assert(N > 1);
@@ -149,8 +149,8 @@ void flag_analysis(complex double *flmn,
 	double *weights = (double*)calloc(N, sizeof(double));
 	assert(nodes != NULL);
 	assert(weights != NULL);
-	flag_spherlaguerre_quadrature(nodes, weights, N);
-	flag_mapped_spherlaguerre_analysis(flmn, flmr, nodes, weights, flmsize, N);
+	flag_spherlaguerre_sampling(nodes, weights, R, N);
+	flag_mapped_spherlaguerre_analysis(flmn, flmr, nodes, weights, N, flmsize);
 	free(nodes);
 	free(weights);
     free(flmr);
@@ -168,6 +168,7 @@ void flag_analysis(complex double *flmn,
  */
 void flag_synthesis(complex double *f, 
 		const complex double *flmn, 
+		const double *nodes, int Nnodes,
 		int L, int N)
 {
 	assert(L > 0);
@@ -179,57 +180,11 @@ void flag_synthesis(complex double *f,
 	int frsize = ssht_fr_size_mw(L);
 	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
 
-	double *nodes = (double*)calloc(N, sizeof(double));
-	double *weights = (double*)calloc(N, sizeof(double));
-	assert(nodes != NULL);
-	assert(weights != NULL);
-	flag_spherlaguerre_quadrature(nodes, weights, N);
-
 	complex double *flmr;
-	flag_allocate_flmn(&flmr, L, N);
-	flag_mapped_spherlaguerre_synthesis(flmr, flmn, nodes, flmsize, N);
-	free(nodes);
-	free(weights);
+	flag_allocate_flmn(&flmr, L, Nnodes);
+	flag_mapped_spherlaguerre_synthesis(flmr, flmn, nodes, Nnodes, N, flmsize);
 
-	for (n = 0; n < N; n++){
-		//printf("> Synthesis: layer %i on %i\n",n+1,N);
-		offset_lm = n * flmsize;
-		offset_r = n * frsize;
-		ssht_core_mw_inverse_sov_sym(f + offset_r, flmr + offset_lm, L, spin, dl_method, verbosity);
-	}
-
-    free(flmr);
-}
-
-/*!
- * Perform Fourier-Laguerre synthesis on a radial grid (=layered synthesis)
- * which is not the SLAG grid (angular MW sampling, complex signal).
- *
- * \param[out]  f Input dataset (MW sampling, complex signal)
- * \param[in] flmn Fourier-Laguerre coefficients.
- * \param[in]  nodes Radial grid / nodes for the layered synthesis .
- * \param[in]  L Angular harmonic band-limit. 
- * \param[in]  N Radial harmonic band-limit.
- * \retval none
- */
-void flag_synthesis_ongrid(complex double *f, 
-		const complex double *flmn, 
-		const double *nodes, int L, int N)
-{
-	assert(L > 0);
-	assert(N > 1);
-	int spin = 0;
-	int verbosity = 0;
-	int n, offset_lm, offset_r;
-	int flmsize = ssht_flm_size(L);
-	int frsize = ssht_fr_size_mw(L);
-	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
-
-	complex double *flmr;
-	flag_allocate_flmn(&flmr, L, N);
-	flag_mapped_spherlaguerre_synthesis(flmr, flmn, nodes, flmsize, N);
-
-	for (n = 0; n < N; n++){
+	for (n = 0; n < Nnodes; n++){
 		//printf("> Synthesis: layer %i on %i\n",n+1,N);
 		offset_lm = n * flmsize;
 		offset_r = n * frsize;
@@ -249,7 +204,7 @@ void flag_synthesis_ongrid(complex double *f,
  * \retval none
  */
 void flag_analysis_real(complex double *flmn, 
-		const double *f, int L, int N)
+		const double *f, double R, int L, int N)
 {
 	assert(L > 0);
 	assert(N > 1);
@@ -273,8 +228,8 @@ void flag_analysis_real(complex double *flmn,
 	double *weights = (double*)calloc(N, sizeof(double));
 	assert(nodes != NULL);
 	assert(weights != NULL);
-	flag_spherlaguerre_quadrature(nodes, weights, N);
-	flag_mapped_spherlaguerre_analysis(flmn, flmr, nodes, weights, flmsize, N);
+	flag_spherlaguerre_sampling(nodes, weights, R, N);
+	flag_mapped_spherlaguerre_analysis(flmn, flmr, nodes, weights, N, flmsize);
 	free(nodes);
 	free(weights);
     free(flmr);
@@ -290,7 +245,9 @@ void flag_analysis_real(complex double *flmn,
  * \retval none
  */
 void flag_synthesis_real(double *f, 
-		const complex double *flmn, int L, int N)
+		const complex double *flmn, 
+		const double *nodes, int Nnodes, 
+		int L, int N)
 {
 	assert(L > 0);
 	assert(N > 1);
@@ -300,19 +257,11 @@ void flag_synthesis_real(double *f,
 	int frsize = ssht_fr_size_mw(L);
 	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
 
-	double *nodes = (double*)calloc(N, sizeof(double));
-	double *weights = (double*)calloc(N, sizeof(double));
-	assert(nodes != NULL);
-	assert(weights != NULL);
-	flag_spherlaguerre_quadrature(nodes, weights, N);
-
 	complex double *flmr;
-	flag_allocate_flmn(&flmr, L, N);
-	flag_mapped_spherlaguerre_synthesis(flmr, flmn, nodes, flmsize, N);
-	free(nodes);
-	free(weights);
+	flag_allocate_flmn(&flmr, L, Nnodes);
+	flag_mapped_spherlaguerre_synthesis(flmr, flmn, nodes, Nnodes, N, flmsize);
 
-	for (n = 0; n < N; n++){
+	for (n = 0; n < Nnodes; n++){
 		//printf("> Synthesis: layer %i on %i\n",n+1,N);
 		offset_lm = n * flmsize;
 		offset_r = n * frsize;

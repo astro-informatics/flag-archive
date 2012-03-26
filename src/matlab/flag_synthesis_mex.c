@@ -12,24 +12,24 @@
  *
  * Usage: 
  *   f = ...
- *     flag_synthesis_mex(flmn, L, N, nodes, reality);
+ *     flag_synthesis_mex(flmn, L, N, nodes, R, reality);
  *
  */
 void mexFunction( int nlhs, mxArray *plhs[],
                   int nrhs, const mxArray *prhs[])
 {
-
-  int n, i, L, N, reality, flmn_m, flmn_n;
+  int f_is_complex, n, i, L, N, reality, flmn_m, flmn_n, Nnodes;
   double *flmn_real, *flmn_imag, *f_real, *f_imag;
   double *fr = NULL;
   complex double *flmn = NULL, *f = NULL;
   int ntheta, nphi;
   int iin = 0, iout = 0;
 
+
   // Check number of arguments
-  if(nrhs!=5) {
+  if(nrhs!=6) {
     mexErrMsgIdAndTxt("flag_synthesis_mex:InvalidInput:nrhs",
-		      "Require five inputs.");
+		      "Require six inputs.");
   }
   if(nlhs!=1) {
     mexErrMsgIdAndTxt("flag_synthesis_mex:InvalidOutput:nlhs",
@@ -37,26 +37,28 @@ void mexFunction( int nlhs, mxArray *plhs[],
   }
 
   // Parse reality flag
-  iin = 4;
+  iin = 5;
   if( !mxIsLogicalScalar(prhs[iin]) )
     mexErrMsgIdAndTxt("flag_synthesis_mex:InvalidInput:reality",
 		      "Reality flag must be logical.");
   reality = mxIsLogicalScalarTrue(prhs[iin]);
 
+
   // Parse harmonic coefficients flm
   iin = 0;
   flmn_m = mxGetM(prhs[iin]);
   flmn_n = mxGetN(prhs[iin]);
-
   flmn_real = mxGetPr(prhs[iin]);
   flmn_imag = mxGetPi(prhs[iin]);
+  f_is_complex = mxIsComplex(prhs[iin]);
   flmn = (complex double*)malloc(flmn_m * flmn_n * sizeof(complex double));
   for(n=0; n<flmn_m; n++)  
     for(i=0; i<flmn_n; i++) 
       flmn[n*flmn_n+i] = flmn_real[i*flmn_m+n];
   for(n=0; n<flmn_m; n++)  
     for(i=0; i<flmn_n; i++) 
-      flmn[n*flmn_n+i] += I * flmn_imag[i*flmn_m+n];
+      flmn[n*flmn_n+i] += I * (f_is_complex ? flmn_imag[i*flmn_m+n] : 0.0);
+
 
   // Parse harmonic band-limit L
   iin = 1;
@@ -89,57 +91,70 @@ void mexFunction( int nlhs, mxArray *plhs[],
   ntheta = L;
   nphi = 2 * L - 1;
 
+  // Parse harmonic band-limit R
+  iin = 4;
+  if( !mxIsDouble(prhs[iin]) || 
+      mxIsComplex(prhs[iin]) || 
+      mxGetNumberOfElements(prhs[iin])!=1 ) {
+    mexErrMsgIdAndTxt("slag_synthesis_mex:InvalidInput:Rlimit",
+          "Radial limit R must be positive real.");
+  }
+  double R = mxGetScalar(prhs[iin]);
+  if ( R <= 0 )
+    mexErrMsgIdAndTxt("slag_synthesis_mex:InvalidInput:RLimitNonInt",
+          "Radial limit R must be positive real.");
+
   // Parse nodes
   int nodes_m, nodes_n;
   iin = 3;
   nodes_m = mxGetM(prhs[iin]);
   nodes_n = mxGetN(prhs[iin]);
-  double *nodes_real, *nodes;
+  double *nodes_real, *nodes, *weights;
+
 
   if(nodes_m*nodes_n > 1){
     nodes_real = mxGetPr(prhs[iin]);
-    nodes = (double*)malloc(nodes_m*nodes_n * sizeof(complex double));  
+    nodes = (double*)malloc(nodes_m*nodes_n * sizeof(double));  
     for(n=0; n<nodes_m*nodes_n; n++)  
       nodes[n] = nodes_real[n];
-    f = (complex double*)calloc(ntheta*nphi*N, sizeof(complex double));
-    flag_synthesis_ongrid(f, flmn, nodes, L, N);
-    if (reality) {
-      fr = (double*)calloc(ntheta*nphi*N, sizeof(double));
-      for(n=0; n<ntheta*nphi*N; n++)  
-        fr[n] = creal(f[n]);
-      free(f);
-    }
-    free(nodes);
+    Nnodes = nodes_m*nodes_n;
+  }else{
+    nodes = (double*)calloc(N, sizeof(double));
+    weights  = (double*)calloc(N, sizeof(double));
+    Nnodes = N;
+    flag_spherlaguerre_sampling(nodes, weights, R, N);
+    free(weights);
   }
-  else{
-    if (reality) {
-  	  fr = (double*)calloc(ntheta*nphi*N, sizeof(double));
-  	  flag_synthesis_real(fr, flmn, L, N);
-    } else {
-  	  f = (complex double*)calloc(ntheta*nphi*N, sizeof(complex double));
-  	  flag_synthesis(f, flmn, L, N); 
-    }
+
+
+  if (reality) {
+  	fr = (double*)calloc(ntheta*nphi*Nnodes, sizeof(double));
+  	flag_synthesis_real(fr, flmn, nodes, Nnodes, L, N);
+  } else {
+  	 f = (complex double*)calloc(ntheta*nphi*Nnodes, sizeof(complex double));
+  	 flag_synthesis(f, flmn, nodes, Nnodes, L, N); 
   }
+
 
   if (reality) {
 
     iout = 0;
-    plhs[iout] = mxCreateDoubleMatrix(N, ntheta*nphi, mxREAL);
+    plhs[iout] = mxCreateDoubleMatrix(Nnodes, ntheta*nphi, mxREAL);
     f_real = mxGetPr(plhs[iout]);
-    for(n=0; n<N; n++)
+    for(n=0; n<Nnodes; n++)
       for(i=0; i<ntheta*nphi; i++) 
-	        f_real[i*N + n] = fr[n*ntheta*nphi + i];
+	        f_real[i*Nnodes + n] = fr[n*ntheta*nphi + i];
 
   } else {
 
     iout = 0;
-    plhs[iout] = mxCreateDoubleMatrix(N, ntheta*nphi, mxCOMPLEX);
+    plhs[iout] = mxCreateDoubleMatrix(Nnodes, ntheta*nphi, mxCOMPLEX);
     f_real = mxGetPr(plhs[iout]);
     f_imag = mxGetPi(plhs[iout]);
-    for(n=0; n<N; n++) {    
+    for(n=0; n<Nnodes; n++) {    
       for(i=0; i<ntheta*nphi; i++) {
-      	  f_real[i*N + n] = creal(f[n*ntheta*nphi + i]);
-	        f_imag[i*N + n] = cimag(f[n*ntheta*nphi + i]);
+      	  f_real[i*Nnodes + n] = creal(f[n*ntheta*nphi + i]);
+	        f_imag[i*Nnodes + n] = cimag(f[n*ntheta*nphi + i]);
       }
     }
 
@@ -150,5 +165,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
     free(fr);
   else
     free(f);
+
+  free(nodes);
 
 }

@@ -12,7 +12,7 @@
  *
  * Usage: 
  *   flmn = ...
- *     flag_analysis_mex(f, L, N, reality);
+ *     flag_analysis_mex(f, L, N, R, reality);
  *
  */
 void mexFunction( int nlhs, mxArray *plhs[],
@@ -29,9 +29,9 @@ void mexFunction( int nlhs, mxArray *plhs[],
   int iin = 0, iout = 0;
 
   /* Check number of arguments. */
-  if(nrhs!=4) {
+  if(nrhs!=5) {
     mexErrMsgIdAndTxt("flag_analysis_mex:InvalidInput:nrhs",
-          "Require four inputs.");
+          "Require five inputs.");
   }
   if(nlhs!=1) {
     mexErrMsgIdAndTxt("flag_analysis_mex:InvalidOutput:nlhs",
@@ -39,7 +39,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
   }
 
   // Parse reality flag
-  iin = 3;
+  iin = 4;
   if( !mxIsLogicalScalar(prhs[iin]) )
     mexErrMsgIdAndTxt("flag_analysis_mex:InvalidInput:reality",
           "Reality flag must be logical.");
@@ -99,13 +99,27 @@ void mexFunction( int nlhs, mxArray *plhs[],
     mexErrMsgIdAndTxt("flag_analysis_mex:InvalidInput:bandLimitNonInt",
           "Harmonic band-limit N must be positive integer.");
 
+  // Parse harmonic band-limit R
+  iin = 3;
+  if( !mxIsDouble(prhs[iin]) || 
+      mxIsComplex(prhs[iin]) || 
+      mxGetNumberOfElements(prhs[iin])!=1 ) {
+    mexErrMsgIdAndTxt("slag_synthesis_mex:InvalidInput:Rlimit",
+          "Radial limit R must be positive real.");
+  }
+  double R = mxGetScalar(prhs[iin]);
+  if ( R <= 0 )
+    mexErrMsgIdAndTxt("slag_synthesis_mex:InvalidInput:RLimitNonInt",
+          "Radial limit R must be positive real.");
+
+
   ntheta = L;
   nphi = 2 * L - 1;
   flmn = (complex double*)calloc(L*L*N, sizeof(complex double));
   if (reality) {
-    flag_analysis_real(flmn, fr, L, N);
+    flag_analysis_real(flmn, fr, R, L, N);
   } else {
-    flag_analysis(flmn, f, L, N); 
+    flag_analysis(flmn, f, R, L, N); 
   }
 
   // Copy flm to output

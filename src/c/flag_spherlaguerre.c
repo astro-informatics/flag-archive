@@ -17,7 +17,7 @@ void flag_spherlaguerre_quadrature(double *roots, double *weights, int N)
 	assert(N > 1);
 	int i, n, k;
 
-	const int MAXIT = 10;         
+	const int MAXIT = 5;         
                                           
 	//double EPS = 0.00000001;         
 	const double C1 = 0.9084064; 
@@ -40,7 +40,7 @@ void flag_spherlaguerre_quadrature(double *roots, double *weights, int N)
 		theta = r3 * (C1 + r2 * 
 			(C2 + r2 * (C3 + r2 * C4)));
 		z = anu * pow(cos(theta), 2.0);
-
+		//printf(" \n %i",n);
 		for (i = 1; i <= MAXIT; i++)
 		{
 			p1 = 1.0;
@@ -52,8 +52,13 @@ void flag_spherlaguerre_quadrature(double *roots, double *weights, int N)
 			    p1 = ((2.0*k-1.0-z)*p2-(k-1.0)*p3)/k;
 			}
 			pp = (N*p1-N*p2)/z;
+			//printf(" %f ", z);
 			z1 = z;
 			z = z1-p1/pp;
+			if(isnan(z) || isinf(z)){
+				z = z1;
+				break;
+			}
 			   	/*if( abs(z[n]-z1[n]) < EPS*abs(z[n]) ){
 			   		unfinished[n] = 1;
 			   		printf("%i %f \n",n,abs(z[n]-z1[n])/z[n]);
@@ -215,57 +220,7 @@ void flag_spherlaguerre_analysis(double *fn, const double *f, const double *node
  * \param[in]  N Harmonic band-limit.
  * \retval none
  */
-void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nodes, int N)
-{
-	assert(N > 1);
-	int i, n;
-	complex double factor, lagu0, lagu1, lagu2, r;
-
-	const double R = nodes[N-1];
-	const double tau = flag_spherlaguerre_tau(R, N);
-
-	for (i = 0; i < N; i++)
-	{
-  
-		r = nodes[i]/tau;
-		factor = (1.0/r) * exp(-r/2.0) * (1.0/sqrt(tau));
-
-		lagu0 = 1.0;
-		lagu1 = 1.0 - r;
-		//lagu2;
-
-		f[i] += factor * lagu0 * fn[0];
-		f[i] += factor * lagu1 * fn[1];
-
-		for (n = 2; n < N; n++) 
-		{ 
-			lagu2 = 
-				( 
-					((2 * n - 1) - r) * lagu1 - 
-					(n - 1) * lagu0
-				) / n;
-
-			f[i] += factor * lagu2 * fn[n];
-
-			lagu0 = lagu1;
-			lagu1 = lagu2;
-		}
-		
-	}
-
-}
-
-/*!
- * Perform oversampled spherical Laguerre synthesis.
- *
- * \param[out]  f Synthetised dataset.
- * \param[in]  fn Input SLAG coefficients.
- * \param[in]  nodes Nodes of the sampling.
- * \param[in]  N Harmonic band-limit, number of nodes in the oversampled scheme.
- * \param[in]  Nnodes Harmonic band-limit of initial SLAG sampling.
- * \retval none
- */
-void flag_spherlaguerre_synthesis_oversampled(double *f, const double *fn, const double *nodes, int Nnodes, int N)
+void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nodes, int Nnodes, int N)
 {
 	assert(N > 1);
 	assert(Nnodes > 1);
@@ -318,7 +273,7 @@ void flag_spherlaguerre_synthesis_oversampled(double *f, const double *fn, const
  * \param[in]  N Harmonic band-limit.
  * \retval none
  */
-void flag_mapped_spherlaguerre_analysis(complex double *fn, const complex double *f, const double *nodes, const double *weights, int mapsize, int N)
+void flag_mapped_spherlaguerre_analysis(complex double *fn, const complex double *f, const double *nodes, const double *weights, int N, int mapsize)
 {
 	assert(N > 1);
 	assert(mapsize > 1);
@@ -371,20 +326,21 @@ void flag_mapped_spherlaguerre_analysis(complex double *fn, const complex double
  * \param[in]  N Harmonic band-limit.
  * \retval none
  */
-void flag_mapped_spherlaguerre_synthesis(complex double *f, const complex double *fn, const double *nodes, int mapsize, int N)
+void flag_mapped_spherlaguerre_synthesis(complex double *f, const complex double *fn, const double *nodes, int Nnodes, int N, int mapsize)
 {
 	assert(N > 1);
+	assert(Nnodes > 1);
 	assert(mapsize > 1);
 	int i, n, l;
 
-	const double R = nodes[N-1];
+	const double R = nodes[Nnodes-1];
 	const double tau = flag_spherlaguerre_tau(R, N);
 	double r;
 	complex double factor, lagu0, lagu1, lagu2;
 
 	for(l=0; l<mapsize; l++)
 	{
-		for (i = 0; i < N; i++)
+		for (i = 0; i < Nnodes; i++)
 		{
 			r = nodes[i]/tau;
 			factor = (1.0/r) * exp(-r/2.0) * (1.0/sqrt(tau));

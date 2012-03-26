@@ -17,10 +17,10 @@ int ssht_flm_size(int L);
 int flag_flmn_size(int L, int N);
 int flag_f_size(int L, int N);
 
-void flag_analysis(complex double *flmn, const complex double *f, int L, int N);
-void flag_synthesis(complex double *f, const complex double *flmn, int L, int N);
+void flag_analysis(complex double *flmn, const complex double *f, double R, int L, int N);
+void flag_synthesis(complex double *f, const complex double *flmn, const double *nodes, int Nnodes, int L, int N);
 
-void flag_analysis_real(complex double *flmn, const double *f, int L, int N);
-void flag_synthesis_real(double *f, const complex double *flmn, int L, int N);
+void flag_analysis_real(complex double *flmn, const double *f, double R, int L, int N);
+void flag_synthesis_real(double *f, const complex double *flmn, const double *nodes, int Nnodes, int L, int N);
 
 #endif
