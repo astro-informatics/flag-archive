@@ -4,6 +4,8 @@
 
 #include "flag.h"
 
+
+
 /*!
  * Compute Gauss-Laguerre quadrature (nodes and weights).
  *
@@ -14,10 +16,11 @@
  */
 void flag_spherlaguerre_quadrature(double *roots, double *weights, int N)
 {
+
 	assert(N > 1);
 	int i, n, k;
 
-	const int MAXIT = 5;         
+	const int MAXIT = 10;         
                                           
 	//double EPS = 0.00000001;         
 	const double C1 = 0.9084064; 
@@ -29,8 +32,18 @@ void flag_spherlaguerre_quadrature(double *roots, double *weights, int N)
 	const double anu = 4.0*N + 2.0;
 
 	int rhs = 4*N+3;
-	double rhsb, r3, r2, theta, z, p1, p2, p3, pp, z1, ppp;
+	double rhsb, r3, r2, theta, z, p1, p2, p3, pp, z1, ppp, pppp, norm;
 
+	double *infbound = (double*)calloc(N, sizeof(double));
+	double *supbound = (double*)calloc(N, sizeof(double));
+	double vsup, vinf;
+	int niter;
+	int NITERMAX = 2000;
+	double h = 1.0 / (double) N;
+
+	infbound[0] = h;
+
+	//printf("\n");
 	for (n = 0; n < N; n++)
 	{
 		rhs = rhs - 4;
@@ -40,35 +53,103 @@ void flag_spherlaguerre_quadrature(double *roots, double *weights, int N)
 		theta = r3 * (C1 + r2 * 
 			(C2 + r2 * (C3 + r2 * C4)));
 		z = anu * pow(cos(theta), 2.0);
-		//printf(" \n %i",n);
+		//printf("\nInitial guess : %f\n",z);
+		if( z < 10 ){
+
+			supbound[n] = infbound[n];
+
+			p1 = 1.0 ;
+			p2 = 0.0;
+			for (k = 1; k <= N; k++){
+				p3 = p2;
+				p2 = p1;
+				p1 = ((2.0*k-1.0-infbound[n])*p2-(k-1.0)*p3)/k;
+			}
+			vinf = p1;
+			vsup = p1;
+
+			niter = 0;
+			while( vinf * vsup >= 0 && niter < NITERMAX ){
+				supbound[n] += h;
+				p1 = 1.0 ;
+				p2 = 0.0;
+				for (k = 1; k <= N; k++){
+				    p3 = p2;
+				    p2 = p1;
+				    p1 = ((2.0*k-1.0-supbound[n])*p2-(k-1.0)*p3)/k;
+				}
+				vsup = p1;
+				niter++;
+			}
+
+			niter = 0;
+			while( vinf * vsup < 0 && niter < NITERMAX ){
+				infbound[n] += h;
+				p1 = 1.0 ;
+				p2 = 0.0;
+				for (k = 1; k <= N; k++){
+				    p3 = p2;
+				    p2 = p1;
+				    p1 = ((2.0*k-1.0-infbound[n])*p2-(k-1.0)*p3)/k;
+				}
+				vinf = p1;
+				niter++;
+			}
+			infbound[n] -= h;
+			p1 = 1.0 ;
+			p2 = 0.0;
+			for (k = 1; k <= N; k++){
+			    p3 = p2;
+			    p2 = p1;
+			    p1 = ((2.0*k-1.0-infbound[n])*p2-(k-1.0)*p3)/k;
+			}
+			vinf = p1;
+
+			infbound[n+1] = supbound[n];
+
+			z = infbound[n] - vinf * (supbound[n]-infbound[n]) / (vsup-vinf);
+
+			//printf("Bounds : [ %f, %f ] with [ %f %f ] -> z = %f \n",infbound[n], supbound[n], vinf, vsup, z);
+
+		}
+
+		norm = (1.0/sqrt(PI))*exp(z/4)*pow(z,-0.25)*cos(2*sqrt(z+n*z/2)-PI/4.0);
+
+		//printf(" %i ",n);
 		for (i = 1; i <= MAXIT; i++)
 		{
-			p1 = 1.0;
+			p1 = 1.0 / norm;
 			p2 = 0.0;
-			for (k = 1; k <= N; k++)
-			{
+			for (k = 1; k <= N; k++){
 			    p3 = p2;
 			    p2 = p1;
 			    p1 = ((2.0*k-1.0-z)*p2-(k-1.0)*p3)/k;
 			}
 			pp = (N*p1-N*p2)/z;
-			//printf(" %f ", z);
+			ppp = ((1-z)*pp + n*p1 )/(-z);
+			
 			z1 = z;
-			z = z1-p1/pp;
-			if(isnan(z) || isinf(z)){
+			
+			z = z1 - p1/pp; 
+			
+			/*if(isnan(z) || isinf(z)){
 				z = z1;
 				break;
-			}
-			   	/*if( abs(z[n]-z1[n]) < EPS*abs(z[n]) ){
-			   		unfinished[n] = 1;
-			   		printf("%i %f \n",n,abs(z[n]-z1[n])/z[n]);
-			    }*/
+			}*/
+			//printf(" %f ", z);//%6.5e
+
 			p3 = p2;
 			p2 = p1;
-			ppp = ((2.0*N+1.0-z)*p2-N*p3)/(N+1.0);
+			pppp = ((2.0*N+1.0-z)*p2-N*p3) / exp(z/4);
+
+			// old : ((2.0*N+1.0-z)*p2-N*p3)/(N+1.0);
+			//printf(" %6.5e ", pppp);
 	   } 
 		roots[n] = z;
-		weights[n] =  exp(z)*pow(z,3.0) / (pow(N+1,2.0)*pow(ppp,2.0)); 
+		//printf(" %6.5e ", pow(z,3.0) );
+		weights[n] =  pow( ((exp(z/4)*pow(z,1.5))/norm )/pppp,2.0) ;  
+		// old : (exp(z)*pow(z,3.0)/pow(norm,2.0)) / (pow(N+1,2.0)*pow(pppp,2.0)); 
+		//printf("  Root %i = %f with weight %f \n",n,roots[n],weights[n]);
 	}
 
 }
@@ -140,6 +221,7 @@ void flag_spherlaguerre_sampling(double *nodes, double *weights, double R, int N
 	for (n=0; n<N; n++){
 		nodes[n] *= tau;
 		weights[n] *= tau;
+		//printf("Node %i = %f with weight %f \n",n,nodes[n],weights[n]);
 	}
 
 }

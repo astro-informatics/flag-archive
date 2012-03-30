@@ -11,6 +11,7 @@ double maxerr_cplx(complex double *a, complex double *b, int size)
 	double value = 0;
 	int i;
 	for(i = 0; i<size; i++){
+		//printf("%6.5e %6.5e %6.5e\n", creal(a[i]-b[i]), cimag(a[i]-b[i]), cabs(a[i]-b[i]));
 		value = MAX( cabs( a[i]-b[i] ), value );
 	}
 	return value;
@@ -166,8 +167,8 @@ void flag_spherlaguerre_quadrature_test(int N)
 
 	flag_spherlaguerre_quadrature(roots, weights, N);
 	int n;
-	for (n=0; n<N; n++)
-		printf("Root %i = %f with weight %f \n",n,roots[n],weights[n]);
+	//for (n=0; n<N; n++)
+	//	printf("Root %i = %f with weight %f \n",n,roots[n],weights[n]);
 
 }
 
@@ -538,13 +539,13 @@ void flag_transform_performance_test(double R, int NREPEAT, int NSCALE, int seed
 	double tottime_analysis = 0, tottime_synthesis = 0;
 	double accuracy = 0.0;
 
-	int L = 32;
-	int N = 32;
+	int L = 4;
+	int N = 4;
 
 	for (sc=0; sc<NSCALE; sc++) {
 		
-		L += 16;
-		N += 16;
+		L *= 2;
+		N *= 2;
 	
 		flag_allocate_flmn(&flmn, L, N);
 		
@@ -553,9 +554,10 @@ void flag_transform_performance_test(double R, int NREPEAT, int NSCALE, int seed
 
 	 	flag_spherlaguerre_sampling(nodes, weights, R, N);
 
+	 	printf("\n  > R = %4.4f  --  L = N = %i \n", R, L);
 	 	for (repeat=0; repeat<NREPEAT; repeat++){
 
-	 		printf("  -> Iteration : %i on %i\n",repeat+1,NREPEAT);
+	 		//printf("  -> Iteration : %i on %i\n",repeat+1,NREPEAT);
 
 			flag_random_flmn(flmn, L, N, seed);
 
@@ -565,15 +567,16 @@ void flag_transform_performance_test(double R, int NREPEAT, int NSCALE, int seed
 			flag_synthesis(f, flmn, nodes, N, L, N);
 			time_end = clock();
 			tottime_synthesis += (time_end - time_start) / (double)CLOCKS_PER_SEC;
-
+			//printf("  - Duration for FLAG synthesis   : %4.4f seconds\n", (time_end - time_start) / (double)CLOCKS_PER_SEC);
 			flag_allocate_flmn(&flmnrec, L, N);
 
 			time_start = clock();
 			flag_analysis(flmnrec, f, R, L, N);
 			time_end = clock();
 			tottime_analysis += (time_end - time_start) / (double)CLOCKS_PER_SEC;
-
+			//printf("  - Duration for FLAG analysis   : %4.4f seconds\n", (time_end - time_start) / (double)CLOCKS_PER_SEC);
 			accuracy += maxerr_cplx(flmn, flmnrec, flag_flmn_size(L, N));
+			//printf("  - Max error on reconstruction  : %6.5e\n", maxerr_cplx(flmn, flmnrec, flag_flmn_size(L, N)));
 
 			free(f);
 			free(flmnrec);
@@ -584,7 +587,7 @@ void flag_transform_performance_test(double R, int NREPEAT, int NSCALE, int seed
 		tottime_analysis = tottime_analysis / (double)NREPEAT;
 		accuracy = accuracy / (double)NREPEAT;
 
-		printf("  > R = %4.4f  --  L = N = %i \n", R, L);
+		
 		printf("  - Average duration for FLAG synthesis  : %4.4f seconds\n", tottime_synthesis);
 		printf("  - Average duration for FLAG analysis   : %4.4f seconds\n", tottime_analysis);
 		printf("  - Average max error on reconstruction  : %6.5e\n", accuracy);
@@ -601,11 +604,11 @@ void flag_transform_performance_test(double R, int NREPEAT, int NSCALE, int seed
 
 int main(int argc, char *argv[]) 
 {
-	const int NREPEAT = 5;
-	const int NSCALE = 7;
+	const int NREPEAT = 2;
+	const int NSCALE = 9;
 	const int L = 32;
 	const int N = 32;
-	const double R = 10.0;
+	const double R = 1.0;
 	const int seed = (int)(10000.0*(double)clock()/(double)CLOCKS_PER_SEC);
 	printf("==========================================================\n");
 	printf("PARAMETERS : ");
