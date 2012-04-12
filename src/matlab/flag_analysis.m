@@ -23,7 +23,7 @@ function flmn = flag_analysis(f, varargin)
 % See LICENSE.txt for license details
 
 sz = size(f);
-Nguessed = sz(1);
+Nguessed = sz(1)-1;
 Lguessed = sz(2);
 
 p = inputParser;
@@ -35,8 +35,8 @@ p.addParamValue('Reality', false, @islogical);
 p.parse(f, varargin{:});
 args = p.Results;
 
-f_vec = zeros(args.N, args.L*(2*args.L-1));
-for n = 1:args.N
+f_vec = zeros(args.N + 1, args.L*(2*args.L-1));
+for n = 1:args.N + 1
     temp(:,:) = f(n,:,:);
     f_vec(n,:) = flag_mw_arr2vec( temp );
 end

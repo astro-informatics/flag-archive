@@ -88,6 +88,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
   if (flmn_m * flmn_n != L * L * N)
     mexErrMsgIdAndTxt("flag_synthesis_mex:InvalidInput:flmnSize",
 		      "Invalid number of harmonic coefficients.");
+
   ntheta = L;
   nphi = 2 * L - 1;
 
@@ -119,9 +120,9 @@ void mexFunction( int nlhs, mxArray *plhs[],
       nodes[n] = nodes_real[n];
     Nnodes = nodes_m*nodes_n;
   }else{
-    nodes = (double*)calloc(N, sizeof(double));
-    weights  = (double*)calloc(N, sizeof(double));
-    Nnodes = N;
+    Nnodes = N + 1;
+    nodes = (double*)calloc(Nnodes, sizeof(double));
+    weights  = (double*)calloc(Nnodes, sizeof(double));
     flag_spherlaguerre_sampling(nodes, weights, R, N);
     free(weights);
   }

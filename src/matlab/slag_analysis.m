@@ -20,7 +20,7 @@ function fn = slag_analysis(f, varargin)
 % See LICENSE.txt for license details
 
 sz = size(f);
-Nguessed = max([sz(1) sz(2)]);
+Nguessed = max([sz(1) sz(2)]) - 1;
 
 p = inputParser;
 p.addRequired('f', @isnumeric);          

@@ -74,7 +74,6 @@ void mexFunction( int nlhs, mxArray *plhs[],
   if ( R <= 0 )
     mexErrMsgIdAndTxt("slag_synthesis_mex:InvalidInput:RLimitNonInt",
           "Radial limit R must be positive real.");
-
   
 
   // Parse nodes
@@ -106,25 +105,25 @@ void mexFunction( int nlhs, mxArray *plhs[],
 
   }else{
 
-    f = (double*)calloc(N, sizeof(double));
+    f = (double*)calloc(N+1, sizeof(double));
 
-    weights = (double*)calloc(N, sizeof(double));
-    nodes = (double*)calloc(N, sizeof(double));
+    weights = (double*)calloc(N+1, sizeof(double));
+    nodes = (double*)calloc(N+1, sizeof(double));
     flag_spherlaguerre_sampling(nodes, weights, R, N);
     free(weights);
 
     // Run spherical Laguerre synthesis
-    flag_spherlaguerre_synthesis(f, fn, nodes, N, N);
+    flag_spherlaguerre_synthesis(f, fn, nodes, N+1, N);
 
     iout = 0;
-    plhs[iout] = mxCreateDoubleMatrix(1, nodes_m*nodes_n, mxREAL);
+    plhs[iout] = mxCreateDoubleMatrix(1, N+1, mxREAL);
     f_real = mxGetPr(plhs[iout]);
-    for(n=0; n<nodes_m*nodes_n; n++)
+    for(n=0; n<N+1; n++)
       f_real[n] = f[n];
     iout = 1;
-    plhs[iout] = mxCreateDoubleMatrix(1, nodes_m*nodes_n, mxREAL);
+    plhs[iout] = mxCreateDoubleMatrix(1, N+1, mxREAL);
     nodes_out = mxGetPr(plhs[iout]);
-    for(n=0; n<nodes_m*nodes_n; n++)
+    for(n=0; n<N+1; n++)
       nodes_out[n] = nodes[n];
 
   }

@@ -4,7 +4,49 @@
 
 #include "flag.h"
 
+double eval_laguerre(double z, int n, int alpha)
+{
+	int k;
+	double p1, p2, p3;
+	p1 = 1.0 ;
+	p2 = 0.0;
+	for (k = 1; k <= n; k++){
+		p3 = p2;
+		p2 = p1;
+		p1 = ( (alpha + 2.0 * k - 1.0 - z) * p2 - (alpha + k - 1.0) * p3 ) / k;
+	}
+	return(p1);
+}
 
+double eval_laguerre_rescaled(double z, int n, int alpha, double normfac)
+{
+	int k;
+	double p1, p2, p3;
+	p1 = 1.0 / normfac ;
+	p2 = 0.0;
+	for (k = 1; k <= n; k++){
+		p3 = p2;
+		p2 = p1;
+		p1 = ( (alpha + 2.0 * k - 1.0 - z) * p2 - (alpha + k - 1.0) * p3 ) / k;
+	}
+	return(p1);
+}
+
+long factorial(int n)
+{
+	int i, res = 1;
+	for(i = 1; i <= n; i++)
+		res *= i;
+	return(res);
+}
+
+long factorial_range(int min, int max)
+{
+	int i, res = 1;
+	for(i = min; i <= max; i++)
+		res *= i;
+	return(res);
+}
 
 /*!
  * Compute Gauss-Laguerre quadrature (nodes and weights).
@@ -14,145 +56,84 @@
  * \param[in]  N Harmonic band-limit.
  * \retval none
  */
-void flag_spherlaguerre_quadrature(double *roots, double *weights, int N)
+void flag_spherlaguerre_quadrature(double *roots, double *weights, int N, int alpha)
 {
+	double infbound ;
+	double supbound ;
+	const int NITERMAX = 2000;
+	const int MAXIT = 150; 
+	int niter, i, n;
+	int facalpha = factorial_range(N+1, N+alpha);
 
-	assert(N > 1);
-	int i, n, k;
-
-	const int MAXIT = 10;         
-                                          
-	//double EPS = 0.00000001;         
-	const double C1 = 0.9084064; 
-	const double C2 = 0.05214976;
-	const double C3 = 0.002579930;
-	const double C4 = 0.003986126;
-	const double PI = 3.141592653589793;
-
-	const double anu = 4.0*N + 2.0;
-
-	int rhs = 4*N+3;
-	double rhsb, r3, r2, theta, z, p1, p2, p3, pp, z1, ppp, pppp, norm;
-
-	double *infbound = (double*)calloc(N, sizeof(double));
-	double *supbound = (double*)calloc(N, sizeof(double));
-	double vsup, vinf;
-	int niter;
-	int NITERMAX = 2000;
 	double h = 1.0 / (double) N;
+	double vinf, vsup, p1, p2, pp, z, z1, temp;
+	double normfac = 1.0;
 
-	infbound[0] = h;
+	// First low-bound
+	infbound = h;
 
-	//printf("\n");
 	for (n = 0; n < N; n++)
 	{
-		rhs = rhs - 4;
-		rhsb = rhs * PI/anu;
-		r3 = pow(rhsb, 1.0 / 3.0);
-		r2 = pow(r3, 2.0);
-		theta = r3 * (C1 + r2 * 
-			(C2 + r2 * (C3 + r2 * C4)));
-		z = anu * pow(cos(theta), 2.0);
-		//printf("\nInitial guess : %f\n",z);
-		if( z < 10 ){
+		if( n > 100 )
+			h = 0.1;
+		supbound = infbound;
+		normfac = eval_laguerre_rescaled(z, n, alpha, normfac);
 
-			supbound[n] = infbound[n];
+		temp = eval_laguerre_rescaled(infbound, N, alpha, normfac);
+		vinf = temp;
+		vsup = temp;
 
-			p1 = 1.0 ;
-			p2 = 0.0;
-			for (k = 1; k <= N; k++){
-				p3 = p2;
-				p2 = p1;
-				p1 = ((2.0*k-1.0-infbound[n])*p2-(k-1.0)*p3)/k;
-			}
-			vinf = p1;
-			vsup = p1;
-
-			niter = 0;
-			while( vinf * vsup >= 0 && niter < NITERMAX ){
-				supbound[n] += h;
-				p1 = 1.0 ;
-				p2 = 0.0;
-				for (k = 1; k <= N; k++){
-				    p3 = p2;
-				    p2 = p1;
-				    p1 = ((2.0*k-1.0-supbound[n])*p2-(k-1.0)*p3)/k;
-				}
-				vsup = p1;
-				niter++;
-			}
-
-			niter = 0;
-			while( vinf * vsup < 0 && niter < NITERMAX ){
-				infbound[n] += h;
-				p1 = 1.0 ;
-				p2 = 0.0;
-				for (k = 1; k <= N; k++){
-				    p3 = p2;
-				    p2 = p1;
-				    p1 = ((2.0*k-1.0-infbound[n])*p2-(k-1.0)*p3)/k;
-				}
-				vinf = p1;
-				niter++;
-			}
-			infbound[n] -= h;
-			p1 = 1.0 ;
-			p2 = 0.0;
-			for (k = 1; k <= N; k++){
-			    p3 = p2;
-			    p2 = p1;
-			    p1 = ((2.0*k-1.0-infbound[n])*p2-(k-1.0)*p3)/k;
-			}
-			vinf = p1;
-
-			infbound[n+1] = supbound[n];
-
-			z = infbound[n] - vinf * (supbound[n]-infbound[n]) / (vsup-vinf);
-
-			//printf("Bounds : [ %f, %f ] with [ %f %f ] -> z = %f \n",infbound[n], supbound[n], vinf, vsup, z);
-
+		niter = 0;
+		while( vinf * vsup >= 0 && niter < NITERMAX ){
+			supbound += h;
+			vsup = eval_laguerre_rescaled(supbound, N, alpha, normfac);
+			niter++;
 		}
 
-		norm = (1.0/sqrt(PI))*exp(z/4)*pow(z,-0.25)*cos(2*sqrt(z+n*z/2)-PI/4.0);
+		niter = 0;
+		while( vinf * vsup < 0 && niter < NITERMAX ){
+			infbound += h;
+			vinf = eval_laguerre_rescaled(infbound, N, alpha, normfac);
+			niter++;
+		}
+		infbound -= h;
+		vinf = eval_laguerre_rescaled(infbound, N, alpha, normfac);
 
-		//printf(" %i ",n);
+		// Linear interpolation for root first estimation
+		z = infbound - vinf * (supbound-infbound) / (vsup-vinf);
+
+		// Prepare for next iteration
+		infbound = supbound;
+
+		//printf(" %i %f ", n, z);
+		//printf(" %1.1e ",normfac);
+		// Refine using Newton scheme
 		for (i = 1; i <= MAXIT; i++)
 		{
-			p1 = 1.0 / norm;
-			p2 = 0.0;
-			for (k = 1; k <= N; k++){
-			    p3 = p2;
-			    p2 = p1;
-			    p1 = ((2.0*k-1.0-z)*p2-(k-1.0)*p3)/k;
-			}
-			pp = (N*p1-N*p2)/z;
-			ppp = ((1-z)*pp + n*p1 )/(-z);
-			
+			p1 = eval_laguerre_rescaled(z, N, alpha, normfac);
+			p2 = eval_laguerre_rescaled(z, N-1, alpha, normfac);
+			// Derivative
+			pp = (N * p1 - N * p2) / z;
 			z1 = z;
-			
+			// Newton step
 			z = z1 - p1/pp; 
-			
-			/*if(isnan(z) || isinf(z)){
-				z = z1;
-				break;
-			}*/
-			//printf(" %f ", z);//%6.5e
-
-			p3 = p2;
-			p2 = p1;
-			pppp = ((2.0*N+1.0-z)*p2-N*p3) / exp(z/4);
-
-			// old : ((2.0*N+1.0-z)*p2-N*p3)/(N+1.0);
-			//printf(" %6.5e ", pppp);
-	   } 
+			//printf(" %f ", z);
+		}
+		//printf("\n");
+		// Store final root estimate
 		roots[n] = z;
-		//printf(" %6.5e ", pow(z,3.0) );
-		weights[n] =  pow( ((exp(z/4)*pow(z,1.5))/norm )/pppp,2.0) ;  
-		// old : (exp(z)*pow(z,3.0)/pow(norm,2.0)) / (pow(N+1,2.0)*pow(pppp,2.0)); 
-		//printf("  Root %i = %f with weight %f \n",n,roots[n],weights[n]);
+		weights[n] = (facalpha / pow(N+1, 2.0)) * z * pow( exp(z / 2.0) / eval_laguerre(z, N+1, alpha) , 2.0) ;
+		// Correct weights for classical Gauss-Laguerre quadrature with generalised polynomrials :
+		// weights[n] =  (facalpha / pow(N+1, 2.0)) * z / pow( eval_laguerre(z, N+1, alpha), 2.0) ;
 	}
 
+	for (n = 1; n < N-1; n++)
+		if( roots[n] <= roots[n-1] )
+			printf("Problem with %ith root! : %f < %f < %f\n", 
+				n, roots[n-1], roots[n], roots[n+1]);
+
 }
+
 
 /*!
  * Compute spherical Laguerre scaling factor tau.
@@ -165,37 +146,13 @@ double flag_spherlaguerre_tau(double R, int N)
 {
 	assert(R > 0.0);
 	assert(N > 1);
-	int k, i;
-	int MAXIT = 5;
-	const double C1 = 0.9084064; 
-	const double C2 = 0.05214976;
-	const double C3 = 0.002579930;
-	const double C4 = 0.003986126;
-	const double PI = 3.141592653589793;
-
-	const double anu = (4.0*N + 2.0);
-	const double rhs = 3*PI/anu;
-
-	const double r3 = pow(rhs, 1.0/3.0);
-	const double r2 = pow(r3, 2.0);
-	const double theta = r3*(C1+r2*(C2+r2*(C3+r2*C4)));
-	double tau = anu*pow(cos(theta), 2.0);
-	
-	double p1, p2, p3, pp, z1;
-
-	for (i=1; i<=MAXIT; i++){
-		p1 = 1.0;
-		p2 = 0.0;
-		for (k=1; k<=N; k++){
-			p3 = p2;
-			p2 = p1;
-			p1 = ((2.0*k-1.0-tau)*p2-(k-1.0)*p3)/k;
-		}
-		pp = (N*p1-N*p2)/tau;
-		z1 = tau;
-		tau = z1-p1/pp; 
-	}
-
+	const int alpha = 2;
+	double *roots = (double*)calloc(N+1, sizeof(double));
+	double *weights = (double*)calloc(N+1, sizeof(double));
+	flag_spherlaguerre_quadrature(roots, weights, N+1, alpha);
+	double tau = roots[N];
+	free(roots);
+	free(weights);
 	return R / tau;
 }
 
@@ -212,15 +169,15 @@ void flag_spherlaguerre_sampling(double *nodes, double *weights, double R, int N
 {
 	assert(R > 0.0);
 	assert(N > 1);
+	const int alpha = 2;
 
-	flag_spherlaguerre_quadrature(nodes, weights, N);
-    
-	double tau = R / nodes[N-1];
-	
+	flag_spherlaguerre_quadrature(nodes, weights, N+1, alpha);
+	double tau = R / nodes[N];
+
 	int n;
-	for (n=0; n<N; n++){
+	for (n=0; n<N+1; n++){
+		//weights[n] *= exp(nodes[n]);// * pow(tau, alpha + 1);
 		nodes[n] *= tau;
-		weights[n] *= tau;
 		//printf("Node %i = %f with weight %f \n",n,nodes[n],weights[n]);
 	}
 
@@ -237,8 +194,8 @@ void flag_spherlaguerre_sampling(double *nodes, double *weights, double R, int N
 void flag_allocate_spherlaguerre_sampling(double **nodes, double **weights, int N)
 {
 	assert(N > 1);
-	*nodes = (double*)calloc(N, sizeof(double));
-	*weights = (double*)calloc(N, sizeof(double));
+	*nodes = (double*)calloc(N+1, sizeof(double));
+	*weights = (double*)calloc(N+1, sizeof(double));
 	assert(nodes != NULL);
 	assert(weights != NULL);
 }
@@ -257,33 +214,32 @@ void flag_spherlaguerre_analysis(double *fn, const double *f, const double *node
 {
 	assert(N > 1);
 	int i, n;
+	const int alpha = 2;
 
-	const double R = nodes[N-1];
+	const double R = nodes[N];
 	const double tau = flag_spherlaguerre_tau(R, N);
 	double r, factor, lagu0, lagu1, lagu2;
 
-	for(i=0; i<N; i++)
+	for(i=0; i<N+1; i++)
 	{
-
 		r = nodes[i]/tau;
-		factor = f[i] * weights[i] * (1.0/r) * exp(-r/2.0) * (1.0/sqrt(tau));
+		factor = weights[i] * f[i] * exp(-r/2.0) ;
 
 		lagu0 = 1.0;
-		lagu1 = 1.0 - r;
-		//lagu2;
+		lagu1 = 1.0 - r + alpha;
 
-		fn[0] += factor * lagu0;
-		fn[1] += factor * lagu1;
+		fn[0] += factor * pow(factorial_range(1, alpha), -0.5) * lagu0;
+		fn[1] += factor * pow(factorial_range(1, 1+alpha), -0.5) * lagu1;
 
 		for (n = 2; n < N; n++) 
 		{ 
 			lagu2 = 
 				( 
-					((2 * n - 1) - r) * lagu1 - 
-					(n - 1) * lagu0
+					(alpha + 2 * n - 1 - r) * lagu1 - 
+					(alpha + n - 1) * lagu0
 				) / n;
  
-			fn[n] += factor * lagu2;
+			fn[n] += factor * pow(factorial_range(n+1, n+alpha), -0.5) * lagu2;
 
 			lagu0 = lagu1;
 			lagu1 = lagu2;
@@ -307,6 +263,7 @@ void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nod
 	assert(N > 1);
 	assert(Nnodes > 1);
 	int i, n;
+	const int alpha = 2;
 	complex double factor, lagu0, lagu1, lagu2, r;
 
 	const double R = nodes[Nnodes-1];
@@ -314,26 +271,24 @@ void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nod
 
 	for (i = 0; i < Nnodes; i++)
 	{
-  
 		r = nodes[i]/tau;
-		factor = (1.0/r) * exp(-r/2.0) * (1.0/sqrt(tau));
+		factor = exp(-r/2.0);
 
 		lagu0 = 1.0;
-		lagu1 = 1.0 - r;
-		//lagu2;
+		lagu1 = 1.0 - r + alpha;
 
-		f[i] += factor * lagu0 * fn[0];
-		f[i] += factor * lagu1 * fn[1];
+		f[i] += factor * pow(factorial_range(1, alpha), -0.5) * lagu0 * fn[0];
+		f[i] += factor * pow(factorial_range(1, alpha+1), -0.5) * lagu1 * fn[1];
 
 		for (n = 2; n < N; n++) 
 		{ 
 			lagu2 = 
 				( 
-					((2 * n - 1) - r) * lagu1 - 
-					(n - 1) * lagu0
+					(alpha + 2 * n - 1 - r) * lagu1 - 
+					(alpha + n - 1) * lagu0
 				) / n;
 
-			f[i] += factor * lagu2 * fn[n];
+			f[i] += factor * pow(factorial_range(n+1, n+alpha), -0.5) * lagu2 * fn[n];
 
 			lagu0 = lagu1;
 			lagu1 = lagu2;
@@ -359,41 +314,50 @@ void flag_mapped_spherlaguerre_analysis(complex double *fn, const complex double
 {
 	assert(N > 1);
 	assert(mapsize > 1);
-	int i, n, l;
-	complex double factor, lagu0, lagu1, lagu2, r;
+	int i, n, l, offset_i, offset_n;
+	double factor, lagu0, lagu1, lagu2, r;
+	const int alpha = 2;
 
-	const double R = nodes[N-1];
+	const double R = nodes[N];
 	const double tau = flag_spherlaguerre_tau(R, N);
+	double *temp = (double*)calloc(N, sizeof(double));
 
-    for(l=0; l<mapsize; l++)
+	for(i=0; i<N+1; i++)
 	{
-		for(i=0; i<N; i++)
-		{
-			r = nodes[i]/tau;
-			factor = f[l+i*mapsize] * weights[i] * (1.0/r) * exp(-r/2.0) * (1.0/sqrt(tau));
+		r = nodes[i]/tau;
+		factor = weights[i] * exp(-r/2.0);
 
-			lagu0 = 1.0;
-			lagu1 = 1.0 - r;
-			//lagu2;
+		lagu0 = 1.0;
+		lagu1 = 1.0 - r + alpha;
 
-			fn[l] += factor * lagu0;
-			fn[l+mapsize] += factor * lagu1;
+		temp[0] = factor * pow(factorial_range(1, alpha), -0.5) * lagu0;
+		temp[1] = factor * pow(factorial_range(2, 1+alpha), -0.5) * lagu1;
 
-			for (n = 2; n < N; n++) 
-			{ 
-				lagu2 = 
-					( 
-						((2 * n - 1) - r) * lagu1 - 
-						(n - 1) * lagu0
-					) / n;
-	 
-				fn[l+n*mapsize] += factor * lagu2;
-
-				lagu0 = lagu1;
-				lagu1 = lagu2;
+		for (n = 2; n < N; n++) 
+		{ 
+			lagu2 = 
+				( 
+					(alpha + 2 * n - 1 - r) * lagu1 - 
+					(alpha + n - 1) * lagu0
+				) / n;
+ 
+			temp[n] = factor * pow(factorial_range(n+1, n+alpha), -0.5) * lagu2;
+			lagu0 = lagu1;
+			lagu1 = lagu2;
+		}
+		offset_i = i * mapsize;
+		for (n = 0; n < N; n++) 
+		{ 
+			offset_n = n * mapsize;
+			for(l=0; l<mapsize; l++)
+			{
+				fn[l+offset_n] += f[l+offset_i] * temp[n];
 			}
 		}
 	}
+
+	free(temp);
+
 
 }
 
@@ -413,41 +377,52 @@ void flag_mapped_spherlaguerre_synthesis(complex double *f, const complex double
 	assert(N > 1);
 	assert(Nnodes > 1);
 	assert(mapsize > 1);
-	int i, n, l;
+	int i, n, l, offset_n, offset_i;
+	const int alpha = 2;
 
 	const double R = nodes[Nnodes-1];
 	const double tau = flag_spherlaguerre_tau(R, N);
 	double r;
-	complex double factor, lagu0, lagu1, lagu2;
+	double factor, lagu0, lagu1, lagu2;
+	double *temp = (double*)calloc(N, sizeof(double));;
 
-	for(l=0; l<mapsize; l++)
+	for (i = 0; i < Nnodes; i++)
 	{
-		for (i = 0; i < Nnodes; i++)
-		{
-			r = nodes[i]/tau;
-			factor = (1.0/r) * exp(-r/2.0) * (1.0/sqrt(tau));
+		r = nodes[i]/tau;
+		factor = exp(-r/2.0);
+		// was factor = (1.0/r) * exp(-r/2.0) * (1.0/sqrt(tau));
 
-			lagu0 = 1.0;
-			lagu1 = 1.0 - r;
-			//lagu2;
+		lagu0 = 1.0;
+		lagu1 = 1.0 - r + alpha;
 
-			f[l+i*mapsize] += factor * lagu0 * fn[l];
-			f[l+i*mapsize] += factor * lagu1 * fn[l+mapsize];
+		temp[0] = factor * pow(factorial_range(1, alpha), -0.5) * lagu0 ;
+		temp[1] = factor * pow(factorial_range(1, 1+alpha), -0.5) * lagu1;
 
-			for (n = 2; n < N; n++) 
-			{ 
-				lagu2 = 
-					( 
-						((2 * n - 1) - r) * lagu1 - 
-						(n - 1) * lagu0
-					) / n;
+		for (n = 2; n < N; n++) 
+		{ 
+			lagu2 = 
+				( 
+					(alpha + 2 * n - 1 - r) * lagu1 - 
+					(alpha + n - 1) * lagu0
+				) / n;
 
-				f[l+i*mapsize] += factor * lagu2 * fn[l+n*mapsize];
+			temp[n] = factor * pow(factorial_range(n+1, n+alpha), -0.5) * lagu2;
 
-				lagu0 = lagu1;
-				lagu1 = lagu2;
-			}
+			lagu0 = lagu1;
+			lagu1 = lagu2;
 		}
+
+		offset_i = i * mapsize;
+		for (n = 0; n < N; n++) 
+		{
+			offset_n = n * mapsize;
+			for(l=0; l<mapsize; l++)
+			{			
+				f[l+offset_i] += temp[n] * fn[l+offset_n];
+			}
+		}	
 	}
+	
+	free(temp);
 
 }

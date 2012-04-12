@@ -1,11 +1,8 @@
-function plot_laguerre_kernels(N, R, npoints)
+function flag_plot_laguerre_kernels(N, R, npoints)
 
 h = R/(npoints);
-nodes = (h:h:R);
-tau = flag_get_tau(N, R);
+nodes = (0:h:R);
 sampling = slag_sampling(N, R);
-
-
             
 nmax = N;%10;
 colors = colorrange(nmax);
@@ -31,14 +28,14 @@ for n = 1:nmax
     fn = zeros(1,N);
     fn(n) = 1.0;
     [f, nodes] = slag_synthesis(fn, 'N', N, 'Nodes', nodes);
-    p = plot(nodes, f/sqrt(tau));
+    p = plot(nodes, f);
     set(p,'Color',rand(1,3)*0.9,'LineWidth',6);
 end
 p=plot(sampling, 0*sampling,'.')
 set(p,'Color','black','LineWidth',2);
 plot(sampling, 0*sampling,'d','LineWidth',6,'MarkerSize',25,'MarkerEdgeColor','k',...
                 'MarkerFaceColor',[.4 1 .63])
-axis([0 R -2.5 2.5])
+axis([0 R -0.2 0.4])
 xlabel('Radius','FontSize',80)
 ylabel('Amplitude','FontSize',80)
 set(gca,'FontSize',80);

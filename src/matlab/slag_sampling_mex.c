@@ -61,18 +61,16 @@ void mexFunction( int nlhs, mxArray *plhs[],
     mexErrMsgIdAndTxt("slag_sampling_mex:InvalidInput:RLimitNonInt",
           "Radial limit R must be positive real.");
 
-  nodes = (double*)calloc(N, sizeof(double));
-
-  // Compute nodes
-  weights = (double*)calloc(N, sizeof(double));
+  nodes = (double*)calloc(N + 1, sizeof(double));
+  weights = (double*)calloc(N + 1, sizeof(double));
   flag_spherlaguerre_sampling(nodes, weights, R, N);
   free(weights);
 
   //printf("N = %i\n",N);
   iout = 0;
-  plhs[iout] = mxCreateDoubleMatrix(1, N, mxREAL);
+  plhs[iout] = mxCreateDoubleMatrix(1, N+1, mxREAL);
   nodes_out = mxGetPr(plhs[iout]);
-  for(n=0; n<N; n++)
+  for(n=0; n<N+1; n++)
    nodes_out[n] = nodes[n];
 
   free(nodes);

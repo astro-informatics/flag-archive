@@ -44,7 +44,7 @@ P = sz(2);
 if P > 1 
     dim = P ;
 else
-    dim = args.N ;
+    dim = args.N + 1 ;
 end
     
 f = zeros(dim, args.L, (2*args.L-1));

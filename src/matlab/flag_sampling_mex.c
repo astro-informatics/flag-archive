@@ -75,7 +75,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
           "Radial limit R must be positive double.");
 
   // MW sampling
-  nrs = N;
+  nrs = N + 1;
   nthetas = L;
   nphis = 2 * L - 1;
 

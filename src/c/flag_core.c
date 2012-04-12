@@ -35,7 +35,7 @@ void flag_allocate_f(complex double **f, int L, int N)
 	assert(L > 0);
 	assert(N > 1);
 	int frsize = ssht_fr_size_mw(L);
-	long totalsize = N*frsize;
+	long totalsize = (N+1) * frsize;
 	*f = (complex double*)calloc(totalsize, sizeof(complex double));
 	assert(f != NULL);
 }
@@ -53,7 +53,7 @@ void flag_allocate_f_real(double **f, int L, int N)
 	assert(L > 0);
 	assert(N > 1);
 	int frsize = ssht_fr_size_mw(L);
-	long totalsize = N*frsize;
+	long totalsize = (N+1) * frsize;
 	*f = (double*)calloc(totalsize, sizeof(double));
 	assert(f != NULL);
 }
@@ -109,7 +109,7 @@ int flag_f_size_mw(int L, int N)
 {// In case we want to extend to various sampling schemes
 	assert(L > 0);
 	assert(N > 1);
-	return ssht_fr_size_mw(L)*N;
+	return ssht_fr_size_mw(L) * (N+1);
 }
 
 /*!
@@ -127,30 +127,34 @@ void flag_analysis(complex double *flmn,
 {
 	assert(L > 0);
 	assert(N > 1);
+	const int alpha = 2;
 	int spin = 0;
 	int verbosity = 0;
-	int n, offset_lm, offset_r;
+	int l, i, n;
 	int flmsize = ssht_flm_size(L);
 	int frsize = ssht_fr_size_mw(L);
 	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
-
+	int offset_lm, offset_r;
+	
 	complex double *flmr;
-	flag_allocate_flmn(&flmr, L, N);
-
-	for (n = 0; n < N; n++){
-		//printf("> Analysis: layer %i on %i\n",n+1,N);
-		offset_lm = n * flmsize;
-		offset_r = n * frsize;
+	flag_allocate_flmn(&flmr, L, N+1);
+	
+	for (n = 0; n < N+1; n++){
+		//printf("> Analysis: layer %i on %i\n", n+1,N);
+		int offset_lm = n * flmsize;
+		int offset_r = n * frsize;
 		ssht_core_mw_forward_sov_conv_sym(flmr + offset_lm, f + offset_r, L, spin, dl_method, verbosity);
 	}
-
-
-	double *nodes = (double*)calloc(N, sizeof(double));
-	double *weights = (double*)calloc(N, sizeof(double));
+	
+	double *nodes = (double*)calloc(N+1, sizeof(double));
+	double *weights = (double*)calloc(N+1, sizeof(double));
 	assert(nodes != NULL);
 	assert(weights != NULL);
 	flag_spherlaguerre_sampling(nodes, weights, R, N);
+	//printf("> Mapped spherical Laguerre transform...");
+	fflush(NULL);
 	flag_mapped_spherlaguerre_analysis(flmn, flmr, nodes, weights, N, flmsize);
+	//printf("done\n");
 	free(nodes);
 	free(weights);
     free(flmr);
@@ -173,17 +177,21 @@ void flag_synthesis(complex double *f,
 {
 	assert(L > 0);
 	assert(N > 1);
+	assert(nodes != NULL);
+	const int alpha = 2;
 	int spin = 0;
 	int verbosity = 0;
-	int n, offset_lm, offset_r;
+	int l, i, n, offset_lm, offset_r;
 	int flmsize = ssht_flm_size(L);
 	int frsize = ssht_fr_size_mw(L);
 	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
 
 	complex double *flmr;
 	flag_allocate_flmn(&flmr, L, Nnodes);
+	//printf("> Mapped spherical Laguerre transform...");fflush(NULL);
 	flag_mapped_spherlaguerre_synthesis(flmr, flmn, nodes, Nnodes, N, flmsize);
-
+	//printf("done\n");
+	
 	for (n = 0; n < Nnodes; n++){
 		//printf("> Synthesis: layer %i on %i\n",n+1,N);
 		offset_lm = n * flmsize;
@@ -215,21 +223,24 @@ void flag_analysis_real(complex double *flmn,
 	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
 
 	complex double *flmr;
-	flag_allocate_flmn(&flmr, L, N);
+	flag_allocate_flmn(&flmr, L, N+1);
 
-	for (n = 0; n < N; n++){
+	for (n = 0; n < N+1; n++){
 		//printf("> Analysis: layer %i on %i\n",n+1,N);
 		offset_lm = n * flmsize;
 		offset_r = n * frsize;
 		ssht_core_mw_forward_sov_conv_sym_real(flmr + offset_lm, f + offset_r, L, dl_method, verbosity);
 	}
 
-	double *nodes = (double*)calloc(N, sizeof(double));
-	double *weights = (double*)calloc(N, sizeof(double));
+	double *nodes = (double*)calloc(N+1, sizeof(double));
+	double *weights = (double*)calloc(N+1, sizeof(double));
 	assert(nodes != NULL);
 	assert(weights != NULL);
 	flag_spherlaguerre_sampling(nodes, weights, R, N);
+	//printf("> Mapped spherical Laguerre transform...");
+	fflush(NULL);
 	flag_mapped_spherlaguerre_analysis(flmn, flmr, nodes, weights, N, flmsize);
+	//printf("done\n");
 	free(nodes);
 	free(weights);
     free(flmr);
@@ -258,8 +269,10 @@ void flag_synthesis_real(double *f,
 	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
 
 	complex double *flmr;
+	//printf("> Mapped spherical Laguerre transform...");fflush(NULL);
 	flag_allocate_flmn(&flmr, L, Nnodes);
 	flag_mapped_spherlaguerre_synthesis(flmr, flmn, nodes, Nnodes, N, flmsize);
+	//printf("done\n");
 
 	for (n = 0; n < Nnodes; n++){
 		//printf("> Synthesis: layer %i on %i\n",n+1,N);
