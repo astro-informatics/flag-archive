@@ -1,8 +1,10 @@
-// FLAG package
+ // FLAG package
 // Copyright (C) 2012 
 // Boris Leistedt & Jason McEwen
 
 #include "flag.h"
+
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
 
 double eval_laguerre(double z, int n, int alpha)
 {
@@ -61,7 +63,7 @@ void flag_spherlaguerre_quadrature(double *roots, double *weights, int N, int al
 	double infbound ;
 	double supbound ;
 	const int NITERMAX = 2000;
-	const int MAXIT = 150; 
+	const int MAXIT = 250; 
 	int niter, i, n;
 	int facalpha = factorial_range(N+1, N+alpha);
 
@@ -118,11 +120,15 @@ void flag_spherlaguerre_quadrature(double *roots, double *weights, int N, int al
 			// Newton step
 			z = z1 - p1/pp; 
 			//printf(" %f ", z);
+			if( cabs(z - z1) < 1e-16 ){
+				//printf("MAXIT = %i err = %2.2e\n",i,cabs(taubis-tau));
+				break;
+			}
 		}
 		//printf("\n");
 		// Store final root estimate
 		roots[n] = z;
-		weights[n] = (facalpha / pow(N+1, 2.0)) * z * pow( exp(z / 2.0) / eval_laguerre(z, N+1, alpha) , 2.0) ;
+		weights[n] = (facalpha / pow(N+1, 2.0)) * z * pow(  (exp(z / 4.0) / normfac) * (exp(z / 4.0) / eval_laguerre_rescaled(z, N+1, alpha, normfac)) , 2.0);
 		// Correct weights for classical Gauss-Laguerre quadrature with generalised polynomrials :
 		// weights[n] =  (facalpha / pow(N+1, 2.0)) * z / pow( eval_laguerre(z, N+1, alpha), 2.0) ;
 	}
@@ -147,12 +153,75 @@ double flag_spherlaguerre_tau(double R, int N)
 	assert(R > 0.0);
 	assert(N > 1);
 	const int alpha = 2;
+	double tau;
+	
+	/*
 	double *roots = (double*)calloc(N+1, sizeof(double));
 	double *weights = (double*)calloc(N+1, sizeof(double));
 	flag_spherlaguerre_quadrature(roots, weights, N+1, alpha);
-	double tau = roots[N];
+	double tau_bis = roots[N];
 	free(roots);
 	free(weights);
+	*/
+	
+	if( N < 5 ){
+
+		double *roots = (double*)calloc(N+1, sizeof(double));
+		double *weights = (double*)calloc(N+1, sizeof(double));
+		flag_spherlaguerre_quadrature(roots, weights, N+1, alpha);
+		tau = roots[N];
+		free(roots);
+		free(weights);
+
+	}else{
+
+		double infbound, supbound =  3.95 * N + 10;
+	 	double vinf, vsup, p1, p2, pp, taubis;
+	 	double h = (double)N/1000;
+	 	const int MAXIT = 250;
+	 	int i;
+
+		infbound = supbound;
+		double normfac = eval_laguerre(infbound, N+1, alpha);
+		double temp = eval_laguerre_rescaled(infbound, N+1, alpha, normfac);
+
+		vinf = temp;
+		vsup = temp;
+
+		while( vinf * vsup >= 0 && infbound > 0 ){
+			infbound -= h;
+			vinf = eval_laguerre_rescaled(infbound, N+1, alpha, normfac);
+		}
+
+		while( vinf * vsup < 0 && supbound > 0 ){
+			supbound -= h;
+			vsup = eval_laguerre_rescaled(supbound, N+1, alpha, normfac);
+		}
+		supbound += h;
+		vsup = eval_laguerre_rescaled(infbound, N, alpha, normfac);
+
+		// Linear interpolation for root first estimation
+		tau = infbound - vinf * (supbound-infbound) / (vsup-vinf);
+
+		for (i = 1; i <= MAXIT; i++)
+		{
+			p1 = eval_laguerre_rescaled(tau, N+1, alpha, normfac);
+			p2 = eval_laguerre_rescaled(tau, N, alpha, normfac);
+			// Derivative
+			pp = (N * p1 - N * p2) / tau;
+			taubis = tau;
+			// Newton step
+			tau = taubis - p1/pp; 
+			if( cabs(taubis - tau) < 1e-16 ){
+				//printf("MAXIT = %i err = %2.2e\n",i,cabs(taubis-tau));
+				break;
+			}
+		}
+	}
+
+	//printf("Tau = %4.4e\n",tau);
+	//printf("Taubis = %4.4e\n",tau_bis);
+
 	return R / tau;
 }
 
@@ -225,13 +294,12 @@ void flag_spherlaguerre_analysis(double *fn, const double *f, const double *node
 		r = nodes[i]/tau;
 		factor = weights[i] * f[i] * exp(-r/2.0) ;
 
-		lagu0 = 1.0;
-		lagu1 = 1.0 - r + alpha;
+		lagu0 = 0.0;
+		lagu1 = 1.0;
 
-		fn[0] += factor * pow(factorial_range(1, alpha), -0.5) * lagu0;
-		fn[1] += factor * pow(factorial_range(1, 1+alpha), -0.5) * lagu1;
+		fn[0] += factor * pow(factorial_range(1, alpha), -0.5) * lagu1;
 
-		for (n = 2; n < N; n++) 
+		for (n = 1; n < N; n++) 
 		{ 
 			lagu2 = 
 				( 
@@ -274,13 +342,12 @@ void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nod
 		r = nodes[i]/tau;
 		factor = exp(-r/2.0);
 
-		lagu0 = 1.0;
-		lagu1 = 1.0 - r + alpha;
+		lagu0 = 0.0;
+		lagu1 = 1.0;
 
-		f[i] += factor * pow(factorial_range(1, alpha), -0.5) * lagu0 * fn[0];
-		f[i] += factor * pow(factorial_range(1, alpha+1), -0.5) * lagu1 * fn[1];
+		f[i] += factor * pow(factorial_range(1, alpha), -0.5) * lagu1 * fn[0];
 
-		for (n = 2; n < N; n++) 
+		for (n = 1; n < N; n++) 
 		{ 
 			lagu2 = 
 				( 
@@ -321,19 +388,20 @@ void flag_mapped_spherlaguerre_analysis(complex double *fn, const complex double
 	const double R = nodes[N];
 	const double tau = flag_spherlaguerre_tau(R, N);
 	double *temp = (double*)calloc(N, sizeof(double));
+	double normfac;
 
 	for(i=0; i<N+1; i++)
 	{
+
 		r = nodes[i]/tau;
-		factor = weights[i] * exp(-r/2.0);
+		factor = weights[i] * exp(-r/4.0);
 
-		lagu0 = 1.0;
-		lagu1 = 1.0 - r + alpha;
+		lagu0 = 0.0;
+		lagu1 = 1.0 * exp(-r/4.0);
 
-		temp[0] = factor * pow(factorial_range(1, alpha), -0.5) * lagu0;
-		temp[1] = factor * pow(factorial_range(2, 1+alpha), -0.5) * lagu1;
+		temp[0] = factor * pow(factorial_range(1, alpha), -0.5) * lagu1;
 
-		for (n = 2; n < N; n++) 
+		for (n = 1; n < N; n++) 
 		{ 
 			lagu2 = 
 				( 
@@ -342,9 +410,11 @@ void flag_mapped_spherlaguerre_analysis(complex double *fn, const complex double
 				) / n;
  
 			temp[n] = factor * pow(factorial_range(n+1, n+alpha), -0.5) * lagu2;
+			
 			lagu0 = lagu1;
 			lagu1 = lagu2;
 		}
+
 		offset_i = i * mapsize;
 		for (n = 0; n < N; n++) 
 		{ 
@@ -384,21 +454,22 @@ void flag_mapped_spherlaguerre_synthesis(complex double *f, const complex double
 	const double tau = flag_spherlaguerre_tau(R, N);
 	double r;
 	double factor, lagu0, lagu1, lagu2;
-	double *temp = (double*)calloc(N, sizeof(double));;
+	double *temp = (double*)calloc(N, sizeof(double));
+	double normfac;
 
 	for (i = 0; i < Nnodes; i++)
 	{
+		normfac = 1.0;
 		r = nodes[i]/tau;
-		factor = exp(-r/2.0);
+		factor = exp(-r/4.0);
 		// was factor = (1.0/r) * exp(-r/2.0) * (1.0/sqrt(tau));
 
-		lagu0 = 1.0;
-		lagu1 = 1.0 - r + alpha;
+		lagu0 = 0.0;
+		lagu1 = 1.0 * exp(-r/4.0);
 
-		temp[0] = factor * pow(factorial_range(1, alpha), -0.5) * lagu0 ;
-		temp[1] = factor * pow(factorial_range(1, 1+alpha), -0.5) * lagu1;
+		temp[0] = factor * pow(factorial_range(1, alpha), -0.5) * lagu1 ;
 
-		for (n = 2; n < N; n++) 
+		for (n = 1; n < N; n++) 
 		{ 
 			lagu2 = 
 				( 
@@ -410,6 +481,7 @@ void flag_mapped_spherlaguerre_synthesis(complex double *f, const complex double
 
 			lagu0 = lagu1;
 			lagu1 = lagu2;
+
 		}
 
 		offset_i = i * mapsize;

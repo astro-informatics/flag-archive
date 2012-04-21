@@ -165,7 +165,7 @@ void flag_spherlaguerre_quadrature_test(int N)
 	const int alpha = 2;
 
 	flag_spherlaguerre_quadrature(roots, weights, N+1, alpha);
-	int n;
+	//int n;
 	//for (n=0; n<N+1; n++)
 	//	printf("Root %i = %f with weight %f \n",n,roots[n],weights[n]);
 
@@ -175,8 +175,17 @@ void flag_spherlaguerre_tau_test(int N)
 {
 	const double R = 1.0;
 	double tau = flag_spherlaguerre_tau(R, N);
-	//printf("Tau = %f",tau);
+	const int alpha = 2;
+
+	double *roots = (double*)calloc(N+1, sizeof(double));
+	double *weights = (double*)calloc(N+1, sizeof(double));
+	flag_spherlaguerre_quadrature(roots, weights, N+1, alpha);
+	double tau_bis = R / roots[N];
+	free(roots);
+	free(weights);
+
 	assert(tau != 0);
+	assert(cabs(tau_bis-tau) < 1e-14);
 }
 
 void flag_spherlaguerre_sampling_test(int N, double R)
@@ -280,6 +289,7 @@ void flag_spherlaguerre_transform_test(int N, double R)
 	   printf(" d=%2.2e r=%2.2e\n",fn[n]-fnrec[n],fn[n]/fnrec[n]);
 	}
 	*/
+	
 
 	free(f);
 	free(fn);
@@ -344,7 +354,7 @@ void flag_transform_furter_test(int L, int N, double R, int seed)
 	int flmsize = ssht_flm_size(L);
 	int frsize = ssht_fr_size_mw(L);
 	int i, n, offset_lm, offset_r;
-	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
+	ssht_dl_method_t dl_method = SSHT_DL_TRAPANI;
 
 	double *nodes = (double*)calloc(N+1, sizeof(double));
 	double *weights = (double*)calloc(N+1, sizeof(double));
@@ -499,7 +509,7 @@ void flag_sbesselslag_test(int N, double R, int seed)
  	double kmax = 0.5;
  	double Rmin = 0;
  	double Rmax = 2 * R;
- 	int ell = 2;
+ 	int ell = 1;
  	int Nnodes = 100;
 
  	//-------
@@ -511,7 +521,7 @@ void flag_sbesselslag_test(int N, double R, int seed)
  		kvalues[n] = kmin + (kmax - kmin)*(double)n/(double)Nk;
 
 	time_start = clock();
-	flag_spherlaguerre2spherbessel(flk, fn, kvalues, Nk, N, ell, tau);
+	//flag_spherlaguerre2spherbessel(flk, fn, kvalues, Nk, N, ell, tau);
 	time_end = clock();
 
 	//-------
@@ -529,6 +539,10 @@ void flag_sbesselslag_test(int N, double R, int seed)
 	time_start = clock();
 	flag_spherbessel_approx(flk_approx, f, kvalues, Nk, nodes, Nnodes, ell);
 	time_end = clock();
+
+	for (n = 0; n < Nk; n++){
+		//printf("> k = %f : flk_approx = %f  <->  flk = %f \n", kvalues[n], flk_approx[n], flk[n]);
+	}
 	
 	printf("  - Maximum abs error on reconstruction  : %6.5e\n", 
 		maxerr(flk_approx, flk, Nk));
@@ -555,6 +569,8 @@ void flag_transform_performance_test(double R, int NREPEAT, int NSCALE, int seed
 		
 		L *= 2;
 		N *= 2;
+
+		flag_spherlaguerre_tau_test(N);
 	
 		flag_allocate_flmn(&flmn, L, N);
 		
@@ -615,11 +631,11 @@ void flag_transform_performance_test(double R, int NREPEAT, int NSCALE, int seed
 
 int main(int argc, char *argv[]) 
 {
-	const int NREPEAT = 4;
+	const int NREPEAT = 10;
 	const int NSCALE = 5;
 	const int L = 32;
-	const int N = 32;
-	const double R = 1.0;
+	const int N = 2;
+	const double R = 420.0;
 	const int seed = (int)(10000.0*(double)clock()/(double)CLOCKS_PER_SEC);
 
 	/*
@@ -630,8 +646,9 @@ int main(int argc, char *argv[])
 	flag_spherlaguerre_quadrature(roots, weights, N+1, alpha);
 	for(i=0;i<N+1;i++)
 		printf("Root[%i] = %f with weight %5.5e\n",i,roots[i],weights[i]);
-	printf(" Limit = %f\n\n", N+2+(N-1)*sqrt(N+2));
+	printf(" Limit = %f\n\n", N+3+(N)*sqrt(N+3));
 	*/
+	
 
 	printf("==========================================================\n");
 	printf("PARAMETERS : ");
@@ -683,8 +700,8 @@ int main(int argc, char *argv[])
 
 	printf("----------------------------------------------------------\n");
 
-	//printf("> Testing 1D spherical Bessel transform...\n");
-	//flag_sbesselslag_test(N, R, seed);
+	printf("> Testing 1D spherical Bessel transform...\n");
+	flag_sbesselslag_test(N, R, seed);
 	fflush(NULL);
 
 	printf("==========================================================\n");

@@ -133,14 +133,14 @@ void flag_analysis(complex double *flmn,
 	int l, i, n;
 	int flmsize = ssht_flm_size(L);
 	int frsize = ssht_fr_size_mw(L);
-	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
+	ssht_dl_method_t dl_method = SSHT_DL_TRAPANI;
 	int offset_lm, offset_r;
 	
 	complex double *flmr;
 	flag_allocate_flmn(&flmr, L, N+1);
 	
 	for (n = 0; n < N+1; n++){
-		//printf("> Analysis: layer %i on %i\n", n+1,N);
+		//printf("> Analysis: layer %i on %i\n", n+1,N+1);
 		int offset_lm = n * flmsize;
 		int offset_r = n * frsize;
 		ssht_core_mw_forward_sov_conv_sym(flmr + offset_lm, f + offset_r, L, spin, dl_method, verbosity);
@@ -184,7 +184,7 @@ void flag_synthesis(complex double *f,
 	int l, i, n, offset_lm, offset_r;
 	int flmsize = ssht_flm_size(L);
 	int frsize = ssht_fr_size_mw(L);
-	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
+	ssht_dl_method_t dl_method = SSHT_DL_TRAPANI;
 
 	complex double *flmr;
 	flag_allocate_flmn(&flmr, L, Nnodes);
@@ -193,7 +193,7 @@ void flag_synthesis(complex double *f,
 	//printf("done\n");
 	
 	for (n = 0; n < Nnodes; n++){
-		//printf("> Synthesis: layer %i on %i\n",n+1,N);
+		//printf("> Synthesis: layer %i on %i\n",n+1,Nnodes);
 		offset_lm = n * flmsize;
 		offset_r = n * frsize;
 		ssht_core_mw_inverse_sov_sym(f + offset_r, flmr + offset_lm, L, spin, dl_method, verbosity);
@@ -220,7 +220,7 @@ void flag_analysis_real(complex double *flmn,
 	int n, offset_lm, offset_r;
 	int flmsize = ssht_flm_size(L);
 	int frsize = ssht_fr_size_mw(L);
-	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
+	ssht_dl_method_t dl_method = SSHT_DL_TRAPANI;
 
 	complex double *flmr;
 	flag_allocate_flmn(&flmr, L, N+1);
@@ -266,7 +266,7 @@ void flag_synthesis_real(double *f,
 	int n, offset_lm, offset_r;
 	int flmsize = ssht_flm_size(L);
 	int frsize = ssht_fr_size_mw(L);
-	ssht_dl_method_t dl_method = SSHT_DL_RISBO;
+	ssht_dl_method_t dl_method = SSHT_DL_TRAPANI;
 
 	complex double *flmr;
 	//printf("> Mapped spherical Laguerre transform...");fflush(NULL);

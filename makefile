@@ -87,7 +87,8 @@ FLAGOBJSMAT = $(FLAGOBJMAT)/flag_analysis_mex.o	\
 	$(FLAGOBJMAT)/slag_synthesis_mex.o	\
 	$(FLAGOBJMAT)/slag_analysis_mex.o	\
 	$(FLAGOBJMAT)/slag_sampling_mex.o	\
-	$(FLAGOBJMAT)/flag_get_tau_mex
+	$(FLAGOBJMAT)/flag_get_tau_mex.o	\
+	$(FLAGOBJMAT)/slag_gausslaguerre_quadrature_mex.o
 
 FLAGOBJSMEX = $(FLAGOBJMEX)/flag_analysis_mex.$(MEXEXT)	\
 	$(FLAGOBJMEX)/flag_synthesis_mex.$(MEXEXT)	\
@@ -95,7 +96,8 @@ FLAGOBJSMEX = $(FLAGOBJMEX)/flag_analysis_mex.$(MEXEXT)	\
 	$(FLAGOBJMEX)/slag_synthesis_mex.$(MEXEXT)	\
 	$(FLAGOBJMEX)/slag_analysis_mex.$(MEXEXT)	\
 	$(FLAGOBJMEX)/slag_sampling_mex.$(MEXEXT)	\
-	$(FLAGOBJMEX)/flag_get_tau_mex.$(MEXEXT)
+	$(FLAGOBJMEX)/flag_get_tau_mex.$(MEXEXT)	\
+	$(FLAGOBJMEX)/slag_gausslaguerre_quadrature_mex.$(MEXEXT)
 
 $(FLAGOBJ)/%.o: %.c
 	$(CC) $(OPT) $(FFLAGS) -c $< -o $@

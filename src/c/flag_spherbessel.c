@@ -137,7 +137,7 @@ double flag_mujlk(int j, int ell, double k, double tau)
 
 double j_ell(double X, int l)
 {
-    int L;
+    int L = l;
     double JL, AX, AX2;
     double LN2 = 0.6931471805599453094;
     double ONEMLN2 = 0.30685281944005469058277;
@@ -152,8 +152,8 @@ double j_ell(double X, int l)
     double COTB, COT3B, COT6B, SECB, SEC2B;
     double TRIGARG, EXPTERM, L3;
 
-    AX = abs(X);
-    AX2 = pow(AX, 2.0);
+    AX = pow(pow(X, 2.0), 0.5);
+    AX2 = pow(X, 2.0);
 
     switch(l){
       case 0 :
@@ -199,16 +199,17 @@ double j_ell(double X, int l)
              JL = (sin(AX) * ( - 1.0 + (210.0 - (4725.0 - 10395.0 / AX2) / AX2) / AX2)  +  
                   cos(AX) * ( - 21.0 + (1260.0 - 10395.0 / AX2) / AX2) / AX) / AX;
           break;
+
       default :
-    
+  
        NU = 0.50 + L;
        NU2 = pow(NU, 2.0);
        if(AX < 1.0 - 40)
           JL = 0.0;
-       else if( (AX2 / L) < 0.5){
+       else if( (AX2 / (double)L) < 0.5){
           JL = exp(L * log(AX / NU) - LN2 + NU * ONEMLN2 - (1.0 - (1.0 - 3.50 / NU2) / NU2 / 30.0) / 12.0 / NU)  
                 / NU * (1.0 - AX2 / (4.0 * NU + 4.0) * (1.0 - AX2 / (8.0 * NU + 16.0) * (1.0 - AX2 / (12.0 * NU + 36.0))));
-       }else if((pow(l, 2.0) / AX) < 5.0 - 1){
+       }else if((pow(L, 2.0) / AX) < 5.0 - 1){
           BETA = AX - PID2 * (L + 1);
           JL = (cos(BETA) * (1.0 - (NU2 - 0.250) * (NU2 - 2.250) / 8.0 / AX2 * (1.0 - (NU2 - 6.25) * (NU2 - 12.250) / 48.0 / AX2))  
                 - sin(BETA) * (NU2 - 0.250) / 2.0 / AX *  (1.0 - (NU2 - 2.250) * (NU2 - 6.250) / 24.0 / AX2 * (1.0 - (NU2 - 12.25) *   

@@ -5,7 +5,7 @@ nodes = (0:h:R);
 sampling = slag_sampling(N, R);
             
 nmax = N;%10;
-colors = colorrange(nmax);
+colors = rand(N,3)*0.9;
 % 
 % figure('Position',[1 1 500 500])
 % hold on
@@ -22,24 +22,60 @@ colors = colorrange(nmax);
 % xlabel('Radius')
 % title('Decaying Laguerre polynomials (weighted with exp-r)')
 
-figure('Position',[200 200 900 900])
+figure('Position',[200 200 600 1000])
+
+subplot(3,1,1)
 hold on
 for n = 1:nmax
     fn = zeros(1,N);
     fn(n) = 1.0;
     [f, nodes] = slag_synthesis(fn, 'N', N, 'Nodes', nodes);
     p = plot(nodes, f);
-    set(p,'Color',rand(1,3)*0.9,'LineWidth',6);
+    set(p,'Color',colors(n,:),'LineWidth',2);
 end
-p=plot(sampling, 0*sampling,'.')
+p=plot(sampling, 0*sampling,'.');
 set(p,'Color','black','LineWidth',2);
-plot(sampling, 0*sampling,'d','LineWidth',6,'MarkerSize',25,'MarkerEdgeColor','k',...
-                'MarkerFaceColor',[.4 1 .63])
-axis([0 R -0.2 0.4])
-xlabel('Radius','FontSize',80)
-ylabel('Amplitude','FontSize',80)
-set(gca,'FontSize',80);
-set(gca,'LineWidth',6);
-title('Spherical Laguerre Basis functions','FontSize',40)
+plot(sampling, 0*sampling,'o','LineWidth',2,'MarkerSize',10,'MarkerEdgeColor','k')
+axis([0 R -0.3 2.6])
+xlabel('x1','FontSize',10)
+ylabel('y1','FontSize',10)
+set(gca,'FontSize',10);
+set(gca,'LineWidth',2);
+
+subplot(3,1,2)
+hold on
+for n = 1:nmax
+    fn = zeros(1,N);
+    fn(n) = 1.0;
+    [f, nodes] = slag_synthesis(fn, 'N', N, 'Nodes', nodes);
+    p = plot(nodes, f);
+    set(p,'Color',colors(n,:),'LineWidth',2);
+end
+p=plot(sampling, 0*sampling,'.');
+set(p,'Color','black','LineWidth',2);
+plot(sampling, 0*sampling,'o','LineWidth',2,'MarkerSize',10,'MarkerEdgeColor','k')
+axis([0 R -0.19 0.19])
+xlabel('x2','FontSize',10)
+ylabel('y2','FontSize',10)
+set(gca,'FontSize',10);
+set(gca,'LineWidth',2);
+
+subplot(3,1,3)
+hold on
+for n = 1:nmax
+    fn = zeros(1,N);
+    fn(n) = 1.0;
+    [f, nodes] = slag_synthesis(fn, 'N', N, 'Nodes', nodes);
+    p = plot(nodes, f.*nodes);
+    set(p,'Color',colors(n,:),'LineWidth',2);
+end
+p=plot(sampling, 0*sampling,'.');
+set(p,'Color','black','LineWidth',2);
+plot(sampling, 0*sampling,'o','LineWidth',2,'MarkerSize',10,'MarkerEdgeColor','k')
+axis([0 R -0.029 0.029])
+xlabel('x3','FontSize',10)
+ylabel('y3','FontSize',10)
+set(gca,'FontSize',10);
+set(gca,'LineWidth',2);
 
 end
