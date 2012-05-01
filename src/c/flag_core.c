@@ -35,7 +35,7 @@ void flag_allocate_f(complex double **f, int L, int N)
 	assert(L > 0);
 	assert(N > 1);
 	int frsize = ssht_fr_size_mw(L);
-	long totalsize = (N+1) * frsize;
+	long totalsize = (N) * frsize;
 	*f = (complex double*)calloc(totalsize, sizeof(complex double));
 	assert(f != NULL);
 }
@@ -53,7 +53,7 @@ void flag_allocate_f_real(double **f, int L, int N)
 	assert(L > 0);
 	assert(N > 1);
 	int frsize = ssht_fr_size_mw(L);
-	long totalsize = (N+1) * frsize;
+	long totalsize = (N) * frsize;
 	*f = (double*)calloc(totalsize, sizeof(double));
 	assert(f != NULL);
 }
@@ -109,7 +109,7 @@ int flag_f_size_mw(int L, int N)
 {// In case we want to extend to various sampling schemes
 	assert(L > 0);
 	assert(N > 1);
-	return ssht_fr_size_mw(L) * (N+1);
+	return ssht_fr_size_mw(L) * (N);
 }
 
 /*!
@@ -137,17 +137,17 @@ void flag_analysis(complex double *flmn,
 	int offset_lm, offset_r;
 	
 	complex double *flmr;
-	flag_allocate_flmn(&flmr, L, N+1);
+	flag_allocate_flmn(&flmr, L, N);
 	
-	for (n = 0; n < N+1; n++){
+	for (n = 0; n < N; n++){
 		//printf("> Analysis: layer %i on %i\n", n+1,N+1);
 		int offset_lm = n * flmsize;
 		int offset_r = n * frsize;
 		ssht_core_mw_forward_sov_conv_sym(flmr + offset_lm, f + offset_r, L, spin, dl_method, verbosity);
 	}
 	
-	double *nodes = (double*)calloc(N+1, sizeof(double));
-	double *weights = (double*)calloc(N+1, sizeof(double));
+	double *nodes = (double*)calloc(N, sizeof(double));
+	double *weights = (double*)calloc(N, sizeof(double));
 	assert(nodes != NULL);
 	assert(weights != NULL);
 	flag_spherlaguerre_sampling(nodes, weights, R, N);
@@ -223,17 +223,17 @@ void flag_analysis_real(complex double *flmn,
 	ssht_dl_method_t dl_method = SSHT_DL_TRAPANI;
 
 	complex double *flmr;
-	flag_allocate_flmn(&flmr, L, N+1);
+	flag_allocate_flmn(&flmr, L, N);
 
-	for (n = 0; n < N+1; n++){
+	for (n = 0; n < N; n++){
 		//printf("> Analysis: layer %i on %i\n",n+1,N);
 		offset_lm = n * flmsize;
 		offset_r = n * frsize;
 		ssht_core_mw_forward_sov_conv_sym_real(flmr + offset_lm, f + offset_r, L, dl_method, verbosity);
 	}
 
-	double *nodes = (double*)calloc(N+1, sizeof(double));
-	double *weights = (double*)calloc(N+1, sizeof(double));
+	double *nodes = (double*)calloc(N, sizeof(double));
+	double *weights = (double*)calloc(N, sizeof(double));
 	assert(nodes != NULL);
 	assert(weights != NULL);
 	flag_spherlaguerre_sampling(nodes, weights, R, N);

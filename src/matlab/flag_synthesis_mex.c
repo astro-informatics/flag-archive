@@ -120,7 +120,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
       nodes[n] = nodes_real[n];
     Nnodes = nodes_m*nodes_n;
   }else{
-    Nnodes = N + 1;
+    Nnodes = N ;
     nodes = (double*)calloc(Nnodes, sizeof(double));
     weights  = (double*)calloc(Nnodes, sizeof(double));
     flag_spherlaguerre_sampling(nodes, weights, R, N);

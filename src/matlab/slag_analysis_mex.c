@@ -57,7 +57,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
     mexErrMsgIdAndTxt("slag_analysis_mex:InvalidInput:bandLimitNonInt",
 		      "Harmonic band-limit N must be positive integer.");
 
-  if (f_m * f_n != N + 1)
+  if (f_m * f_n != N)
     mexErrMsgIdAndTxt("slag_analysis_mex:InvalidInput:fnSize",
 		      "Invalid number of harmonic coefficients.");
 
@@ -74,8 +74,8 @@ void mexFunction( int nlhs, mxArray *plhs[],
     mexErrMsgIdAndTxt("slag_analysis_mex:InvalidInput:RLimitNonInt",
           "Radial limit R must be positive real.");
 
-  nodes = (double*)calloc(N + 1, sizeof(double));
-  weights = (double*)calloc(N + 1, sizeof(double));
+  nodes = (double*)calloc(N, sizeof(double));
+  weights = (double*)calloc(N, sizeof(double));
   flag_spherlaguerre_sampling(nodes, weights, R, N);
 
   // Run spherical Laguerre analysis

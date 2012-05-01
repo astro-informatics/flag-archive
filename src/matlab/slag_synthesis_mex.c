@@ -105,25 +105,25 @@ void mexFunction( int nlhs, mxArray *plhs[],
 
   }else{
 
-    f = (double*)calloc(N+1, sizeof(double));
+    f = (double*)calloc(N, sizeof(double));
 
-    weights = (double*)calloc(N+1, sizeof(double));
-    nodes = (double*)calloc(N+1, sizeof(double));
+    weights = (double*)calloc(N, sizeof(double));
+    nodes = (double*)calloc(N, sizeof(double));
     flag_spherlaguerre_sampling(nodes, weights, R, N);
     free(weights);
 
     // Run spherical Laguerre synthesis
-    flag_spherlaguerre_synthesis(f, fn, nodes, N+1, N);
+    flag_spherlaguerre_synthesis(f, fn, nodes, N, N);
 
     iout = 0;
-    plhs[iout] = mxCreateDoubleMatrix(1, N+1, mxREAL);
+    plhs[iout] = mxCreateDoubleMatrix(1, N, mxREAL);
     f_real = mxGetPr(plhs[iout]);
-    for(n=0; n<N+1; n++)
+    for(n=0; n<N; n++)
       f_real[n] = f[n];
     iout = 1;
-    plhs[iout] = mxCreateDoubleMatrix(1, N+1, mxREAL);
+    plhs[iout] = mxCreateDoubleMatrix(1, N, mxREAL);
     nodes_out = mxGetPr(plhs[iout]);
-    for(n=0; n<N+1; n++)
+    for(n=0; n<N; n++)
       nodes_out[n] = nodes[n];
 
   }

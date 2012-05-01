@@ -133,6 +133,15 @@ void flag_spherlaguerre_quadrature(double *roots, double *weights, int N, int al
 		// weights[n] =  (facalpha / pow(N+1, 2.0)) * z / pow( eval_laguerre(z, N+1, alpha), 2.0) ;
 	}
 
+	// Specific unstable solution
+	if( N == 2 && alpha == 2){
+		roots[0] = 2.0;
+		roots[1] = 6.0;
+		weights[0] = 2.770896037098993835 * pow(roots[0],2.0);
+		weights[1] = 5.603177687399098925 * pow(roots[1],2.0);
+	}
+
+	// Check order
 	for (n = 1; n < N-1; n++)
 		if( roots[n] <= roots[n-1] )
 			printf("Problem with %ith root! : %f < %f < %f\n", 
@@ -166,10 +175,10 @@ double flag_spherlaguerre_tau(double R, int N)
 	
 	if( N < 5 ){
 
-		double *roots = (double*)calloc(N+1, sizeof(double));
-		double *weights = (double*)calloc(N+1, sizeof(double));
-		flag_spherlaguerre_quadrature(roots, weights, N+1, alpha);
-		tau = roots[N];
+		double *roots = (double*)calloc(N, sizeof(double));
+		double *weights = (double*)calloc(N, sizeof(double));
+		flag_spherlaguerre_quadrature(roots, weights, N, alpha);
+		tau = roots[N-1];
 		free(roots);
 		free(weights);
 
@@ -182,31 +191,31 @@ double flag_spherlaguerre_tau(double R, int N)
 	 	int i;
 
 		infbound = supbound;
-		double normfac = eval_laguerre(infbound, N+1, alpha);
-		double temp = eval_laguerre_rescaled(infbound, N+1, alpha, normfac);
+		double normfac = eval_laguerre(infbound, N, alpha);
+		double temp = eval_laguerre_rescaled(infbound, N, alpha, normfac);
 
 		vinf = temp;
 		vsup = temp;
 
 		while( vinf * vsup >= 0 && infbound > 0 ){
 			infbound -= h;
-			vinf = eval_laguerre_rescaled(infbound, N+1, alpha, normfac);
+			vinf = eval_laguerre_rescaled(infbound, N, alpha, normfac);
 		}
 
 		while( vinf * vsup < 0 && supbound > 0 ){
 			supbound -= h;
-			vsup = eval_laguerre_rescaled(supbound, N+1, alpha, normfac);
+			vsup = eval_laguerre_rescaled(supbound, N, alpha, normfac);
 		}
 		supbound += h;
-		vsup = eval_laguerre_rescaled(infbound, N, alpha, normfac);
+		vsup = eval_laguerre_rescaled(infbound, N-1, alpha, normfac);
 
 		// Linear interpolation for root first estimation
 		tau = infbound - vinf * (supbound-infbound) / (vsup-vinf);
 
 		for (i = 1; i <= MAXIT; i++)
 		{
-			p1 = eval_laguerre_rescaled(tau, N+1, alpha, normfac);
-			p2 = eval_laguerre_rescaled(tau, N, alpha, normfac);
+			p1 = eval_laguerre_rescaled(tau, N, alpha, normfac);
+			p2 = eval_laguerre_rescaled(tau, N-1, alpha, normfac);
 			// Derivative
 			pp = (N * p1 - N * p2) / tau;
 			taubis = tau;
@@ -240,11 +249,11 @@ void flag_spherlaguerre_sampling(double *nodes, double *weights, double R, int N
 	assert(N > 1);
 	const int alpha = 2;
 
-	flag_spherlaguerre_quadrature(nodes, weights, N+1, alpha);
-	double tau = R / nodes[N];
+	flag_spherlaguerre_quadrature(nodes, weights, N, alpha);
+	double tau = R / nodes[N-1];
 
 	int n;
-	for (n=0; n<N+1; n++){
+	for (n=0; n<N; n++){
 		//weights[n] *= exp(nodes[n]);// * pow(tau, alpha + 1);
 		nodes[n] *= tau;
 		//printf("Node %i = %f with weight %f \n",n,nodes[n],weights[n]);
@@ -263,8 +272,8 @@ void flag_spherlaguerre_sampling(double *nodes, double *weights, double R, int N
 void flag_allocate_spherlaguerre_sampling(double **nodes, double **weights, int N)
 {
 	assert(N > 1);
-	*nodes = (double*)calloc(N+1, sizeof(double));
-	*weights = (double*)calloc(N+1, sizeof(double));
+	*nodes = (double*)calloc(N, sizeof(double));
+	*weights = (double*)calloc(N, sizeof(double));
 	assert(nodes != NULL);
 	assert(weights != NULL);
 }
@@ -285,11 +294,11 @@ void flag_spherlaguerre_analysis(double *fn, const double *f, const double *node
 	int i, n;
 	const int alpha = 2;
 
-	const double R = nodes[N];
+	const double R = nodes[N-1];
 	const double tau = flag_spherlaguerre_tau(R, N);
 	double r, factor, lagu0, lagu1, lagu2;
 
-	for(i=0; i<N+1; i++)
+	for(i=0; i<N; i++)
 	{
 		r = nodes[i]/tau;
 		factor = weights[i] * f[i] * exp(-r/2.0) ;
@@ -385,12 +394,12 @@ void flag_mapped_spherlaguerre_analysis(complex double *fn, const complex double
 	double factor, lagu0, lagu1, lagu2, r;
 	const int alpha = 2;
 
-	const double R = nodes[N];
+	const double R = nodes[N-1];
 	const double tau = flag_spherlaguerre_tau(R, N);
 	double *temp = (double*)calloc(N, sizeof(double));
 	double normfac;
 
-	for(i=0; i<N+1; i++)
+	for(i=0; i<N; i++)
 	{
 
 		r = nodes[i]/tau;
