@@ -5,6 +5,8 @@
 #ifndef FLAG_SPHERBESSEL
 #define FLAG_SPHERBESSEL
 
+#include <complex.h> 
+
 void flag_spherlaguerre2spherbessel(double *flk, const double *fn, double *kvalues, int Nk, int N, int ell, double tau);
 
 void flag_spherbessel_approx(double *flk, const double *f, double *kvalues, int Nk, double *nodes, int Nnodes, int ell);

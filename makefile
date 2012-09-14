@@ -34,13 +34,18 @@ ifeq ($(UNAME), Darwin)
   MEXFLAGS	= -cxx
 endif
 
+# === SSHT ===
+GSLLIB	= $(GSLDIR)/lib
+GSLINC	= $(GSLDIR)/include/gsl
+GSLLIBN= gsl
+
 # === FLAG ===
 FLAGDIR = .
-FLAGLIB = $(FLAGDIR)/lib/c
-FLAGINC = $(FLAGDIR)/include/c
-FLAGBIN = $(FLAGDIR)/bin/c
+FLAGLIB = $(FLAGDIR)/lib
+FLAGINC = $(FLAGDIR)/include
+FLAGBIN = $(FLAGDIR)/bin
 FLAGLIBN= flag
-FLAGSRC	= $(FLAGDIR)/src/c
+FLAGSRC	= $(FLAGDIR)/src/main/c
 FLAGOBJ = $(FLAGSRC)
 
 # === SSHT ===
@@ -55,30 +60,33 @@ FFTWLIBNM    = fftw3
 
 # ======================================== #
 
-FLAGSRCMAT	= $(FLAGDIR)/src/matlab
+FLAGSRCMAT	= $(FLAGDIR)/src/main/matlab
 FLAGOBJMAT  = $(FLAGSRCMAT)
 FLAGOBJMEX  = $(FLAGSRCMAT)
 
 vpath %.c $(FLAGSRC)
-vpath %.h $(FLAGSRC)
+vpath %.h $(FLAGINC)
 vpath %_mex.c $(FLAGSRCMAT)
 
-LDFLAGS = -L$(FFTWLIB) -l$(FFTWLIBNM) -L$(SSHTLIB) -l$(SSHTLIBN) -L$(FLAGLIB) -l$(FLAGLIBN) -lm -fopenmp
+LDFLAGS = -L$(FLAGLIB) -l$(FLAGLIBN) -L$(FFTWLIB) -l$(FFTWLIBNM) -L$(SSHTLIB) -l$(SSHTLIBN) -lm -lc -fopenmp
 
-LDFLAGSMEX = -I/usr/local/include -L$(FFTWLIB) -l$(FFTWLIBNM) -L$(SSHTLIB) -l$(SSHTLIBN) -L$(FLAGLIB) -l$(FLAGLIBN)
+LDFLAGSMEX = -L$(FLAGLIB) -l$(FLAGLIBN) -I/usr/local/include -L$(FFTWLIB) -l$(FFTWLIBNM) -L$(SSHTLIB) -l$(SSHTLIBN)
 
 FFLAGS  = -I$(FFTWINC) -I$(SSHTINC) -I$(FLAGINC)  -fopenmp
 
 FLAGOBJS= $(FLAGOBJ)/flag_core.o	\
 	  $(FLAGOBJ)/flag_sampling.o	\
 	  $(FLAGOBJ)/flag_io.o			\
-	  $(FLAGOBJ)/flag_spherlaguerre.o
+	  $(FLAGOBJ)/flag_spherlaguerre.o			\
+	  $(FLAGOBJ)/flag_spherbessel.o
 
-ifneq (,$(wildcard $(GSLDIR)/gsl_math.h))
+ifneq (,$(wildcard $(GSLINC)/gsl_sf.h))
 	FLAGOBJS+= $(FLAGOBJ)/flag_spherbessel.o
-	FFLAGS+= -I$(GSLDIR)
-	LDFLAGS+= -L$(GSLDIR)
-	LDFLAGSMEX+= -L$(GSLDIR)
+	FFLAGS+= -I$(GSLINC)
+	LDFLAGS+= -L$(GSLLIB)
+	LDFLAGS+= -l$(GSLLIBN)
+	LDFLAGSMEX+= -L$(GSLLIB)
+	LDFLAGSMEX+= -l$(GSLLIBN)
 endif
 
 FLAGOBJSMAT = $(FLAGOBJMAT)/flag_analysis_mex.o	\
@@ -128,7 +136,11 @@ $(FLAGLIB)/lib$(FLAGLIBN).a: $(FLAGOBJS)
 test: lib $(FLAGBIN)/flag_test
 $(FLAGBIN)/flag_test: $(FLAGOBJ)/flag_test.o $(FLAGLIB)/lib$(FLAGLIBN).a
 	$(CC) $(OPT) $< -o $(FLAGBIN)/flag_test $(LDFLAGS)
-	bin/c/flag_test
+
+.PHONY: fbtest
+fbtest: lib $(FLAGBIN)/flag_fbtest
+$(FLAGBIN)/flag_fbtest: $(FLAGOBJ)/flag_fbtest.o $(FLAGLIB)/lib$(FLAGLIBN).a
+	$(CC) $(OPT) $< -o $(FLAGBIN)/flag_fbtest $(LDFLAGS)
 
 .PHONY: about
 about: $(FLAGBIN)/flag_about
@@ -147,6 +159,7 @@ cleandoc:
 clean:	tidy cleandoc
 	rm -f $(FLAGLIB)/lib$(FLAGLIBN).a
 	rm -f $(FLAGOBJMEX)/*_mex.$(MEXEXT)
+	rm -f $(FLAGBIN)/flag_fbtest
 	rm -f $(FLAGBIN)/flag_test
 	rm -f $(FLAGBIN)/flag_about
 

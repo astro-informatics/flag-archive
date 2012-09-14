@@ -3,6 +3,15 @@
 // Boris Leistedt & Jason McEwen
 
 #include "flag.h"
+#include <math.h>
+#include <stdlib.h>
+#include <complex.h> 
+#include <fftw3.h> 
+#include <ssht.h>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+#include <time.h>
 
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 
@@ -481,69 +490,6 @@ void flag_transform_real_test(int L, int N, double R, int seed)
 }
 
 
-void flag_sbesselslag_test(int N, double R, int seed)
-{	
-	clock_t time_start, time_end;
-	double *fn = (double*)calloc(N, sizeof(double));
-	int n;
-	srand ( time(NULL) );
-	for (n=0; n<N; n++)
-		fn[n] = rand()/795079784.0;
- 	
- 	double tau = flag_spherlaguerre_tau(R, N);
-
- 	//-------
-
- 	int Nk = N;
- 	double kmin = 0.05;
- 	double kmax = 0.5;
- 	double Rmin = 0;
- 	double Rmax = 2 * R;
- 	int ell = 1;
- 	int Nnodes = 100;
-
- 	//-------
-
- 	double *flk = (double*)calloc(Nk, sizeof(double));
-
- 	double *kvalues = (double*)calloc(Nk, sizeof(double));
- 	for (n=0; n<Nk; n++)
- 		kvalues[n] = kmin + (kmax - kmin)*(double)n/(double)Nk;
-
-	time_start = clock();
-	//flag_spherlaguerre2spherbessel(flk, fn, kvalues, Nk, N, ell, tau);
-	time_end = clock();
-
-	//-------
-
-	double *f = (double*)calloc(Nnodes, sizeof(double));
-	double *nodes = (double*)calloc(Nnodes, sizeof(double));
- 	for (n=0; n<Nnodes; n++)
- 		nodes[n] = Rmin + (Rmax-Rmin) * (double)n / (double)Nnodes;
-	flag_spherlaguerre_synthesis(f, fn, nodes, Nnodes, N);
-
-	//-------
-
- 	double *flk_approx = (double*)calloc(Nk, sizeof(double));
-
-	time_start = clock();
-	flag_spherbessel_approx(flk_approx, f, kvalues, Nk, nodes, Nnodes, ell);
-	time_end = clock();
-
-	for (n = 0; n < Nk; n++){
-		//printf("> k = %f : flk_approx = %f  <->  flk = %f \n", kvalues[n], flk_approx[n], flk[n]);
-	}
-	
-	printf("  - Maximum abs error on reconstruction  : %6.5e\n", 
-		maxerr(flk_approx, flk, Nk));
-
-	free(f);
-	free(fn);
-	free(flk);
-	free(flk_approx);
-}
-
-
 void flag_transform_performance_test(double R, int NREPEAT, int NSCALE, int seed)
 {
 	complex double *f, *flmn, *flmnrec;
@@ -623,12 +569,12 @@ int main(int argc, char *argv[])
 {
 	const int NREPEAT = 4;
 	const int NSCALE = 5;
-	const int L = 2;
-	const int N = 2;
+	const int L = 4;
+	const int N = 8;
 	const double R = 420.0;
 	const int seed = (int)(10000.0*(double)clock()/(double)CLOCKS_PER_SEC);
 
-	
+	/*
 	double *roots = (double*)calloc(N, sizeof(double));
 	double *weights = (double*)calloc(N, sizeof(double));
 	int i;
@@ -636,7 +582,9 @@ int main(int argc, char *argv[])
 	flag_spherlaguerre_quadrature(roots, weights, N, alpha);
 	for(i=0;i<N;i++)
 		printf("Root[%i] = %f with weight %5.5e\n",i,roots[i],weights[i]);	
-	
+	free(roots);
+	free(weights);
+	*/
 
 	printf("==========================================================\n");
 	printf("PARAMETERS : ");
@@ -686,19 +634,13 @@ int main(int argc, char *argv[])
 	flag_transform_furter_test(L, N, R, seed);
 	fflush(NULL);
 
-	printf("----------------------------------------------------------\n");
-
-	printf("> Testing 1D spherical Bessel transform...\n");
-	flag_sbesselslag_test(N, R, seed);
-	fflush(NULL);
-
 	printf("==========================================================\n");
 
-	printf("> FLAG transform : performance and accuracy tests\n");
-	flag_transform_performance_test(R, NREPEAT, NSCALE, seed);
-	fflush(NULL);
+	//printf("> FLAG transform : performance and accuracy tests\n");
+	//flag_transform_performance_test(R, NREPEAT, NSCALE, seed);
+	//fflush(NULL);
 
-	printf("==========================================================\n");
+	//printf("==========================================================\n");
 
 	return 0;		
 }

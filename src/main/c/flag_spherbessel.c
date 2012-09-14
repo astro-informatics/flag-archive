@@ -4,6 +4,7 @@
 
 #include "flag.h"
 #include <gsl/gsl_math.h>
+#include <gsl/gsl_sf.h>
 
 /*!
  * Compute the ell-th order spherical Bessel transform from the SLAG transform.
@@ -31,32 +32,9 @@ void flag_spherlaguerre2spherbessel(double *flk, const double *fn, double *kvalu
 		}
 	}
 
+  free(sbesselslag);
+
 } 
-
-void flag_spherbessel_approx(double *flk, const double *f, double *kvalues, int Nk, double *nodes, int Nnodes, int ell)
-{
-  double deltar;
-	int k, r;
-
-	for(k = 0; k < Nk; k++){
-
-		flk[k] = 0.0;
-		for(r = 0; r < Nnodes; r++){
-
-      if(r == 0)
-        deltar = nodes[1]-nodes[0];
-      else if(r == Nnodes-1)
-        deltar = nodes[Nnodes-1]-nodes[Nnodes-2];
-      else
-        deltar = nodes[r+1]-nodes[r];
-
-			flk[k] += pow(r, 2.0) * j_ell( kvalues[k] * nodes[r], ell ) * deltar ;
-		}
-
-	}
-
-}
-
 
 /*!
  * Compute the Fourier-Bessel transform from the Fourier-Laguerre transform.
@@ -88,50 +66,108 @@ void flag_fourierlaguerre2fourierbessel(complex double *flmk, complex double *fl
  */
 void flag_sbesselslag(double *sbesselslag, int ell, double *kvalues, int Nk, int N, double tau)
 {
-	double *weights = (double*)calloc( N*(N+1)/2 , sizeof(double));
-
 	int k, n, j;
-	for(k = 0; k < Nk; k++){
-		for(n = 0; n < N; n++){
-			printf("\n n = %i \n", n);
-			for(j = n; j > 0; j--)
-				weights[j] = - n * weights[j-1] / (j*j);
-			weights[0] = 1;
-			for(j = 0; j <= n; j++){
-				printf(" %f ",weights[j]);
-				sbesselslag[n * Nk + k] += weights[n] * flag_mujlk(j + 1, ell, kvalues[k], tau) ;
-			}
-		}
-	}
-	free(weights);
+  double weight;
+
+  double *mulk_coefs  = (double*)calloc(N+2, sizeof(double));
+
+  for(k = 0; k < Nk; k++){
+    flag_mulk(mulk_coefs, N+2, ell, kvalues[k], tau);
+    for(n = 0; n < N; n++){
+      for(j = 0; j <= n; j++){
+        if( j == 0 ){
+          weight = (n + 1.0) * (n + 2.0) / 2.0;
+        }else{
+          weight = - (n - j + 1) * weight / (j * (j + 2));
+        }
+        sbesselslag[n * Nk + k] += sqrt(1.0/((n+1.0)*(n+2.0))) 
+          * weight * mulk_coefs[j+2] ;
+      }
+    }
+  }
+
+  free(mulk_coefs);
 
 }
 
 /*!
- * Compute moments of the weighted spherical Bessel functions.
- *
- * \param[in]  j j-th moment.
- * \param[in]  ell ell order of the spherical Bessel function.
- * \param[in]  k scale on which the transform is performed.
- * \param[in]  tau SLAG rescaling factor.
- * \retval flag_mujlk the final number.
+ * TODO TODO TODO TODO TODO TODO 
  */
-double flag_mujlk(int j, int ell, double k, double tau)
+void flag_mulk(double *mulk, int n, int ell, double k, double tau)
 {
-	double result;
 	double PI = 3.141592653589793;
+  int j;
+  double a, b, fac1, fac2, fac3, rec0, rec1, rec2;
+  double c = (double)ell + 1.5;
+  double ktilde = tau * k;
+  double d = - 4.0 * ktilde * ktilde;
+  double fac = pow(tau, 1.5) * sqrt(PI) * pow(ktilde, ell);
 
-	double a = (j + ell + 1) / 2.0;
-	double b = 1.0 + (j + ell) / 2.0;
-	double c = (double)ell + 1.5;
-	double ktilde = tau * k;
-	double d = -4.0 * ktilde * ktilde;
+/*
+  for(j = 0; j <= n; j++){
+    a = (ell + j + 1.0) / 2.0;
+    b = (ell + j) / 2.0 + 1.0;
+    rec0 = pow(1-d, -a) * gsl_sf_hyperg_2F1_renorm(a, c-b, c, d/(d-1));
+    printf("j=%i, 2F1(%f, %f, %f, %f) = %5.4f\n",j, a+j,b+j,c,d,rec0); fflush(NULL);  
+    mulk[j] = fac * ( gsl_sf_gamma(j+ell+1) ) * pow(2, j)  * rec0;
+    printf(">");fflush(NULL);
+  }
+*/
 
-	//result = tau * sqrt(PI) * pow(2, j) * pow(ktilde, ell) 
-	//	* gsl_sf_gamma(j + ell + 1) * gsl_sf_gamma(ell + 1.5) 
-	//	* gsl_sf_hyperg_2F1(a, b, c, d);
+  a = (ell + 1.0) / 2.0;
+  b = ell / 2.0 + 1.0;
+  for(j = 0; j <= n/2; j++){
+    //printf("j1=%i, 2F1(%f, %f, %f, %f) = ",j,a+j,b+j,c,d);fflush(NULL);
+    if( j == 0 ){
+      rec2 = pow(1-d, -b) * gsl_sf_hyperg_2F1_renorm(b, c-a, c, d/(d-1));
+      rec0 = rec2;
+      //printf("%3.3e\n",rec0);fflush(NULL);
+    }else if( j == 1 ){
+      rec1 = pow(1-d, -a-1) * gsl_sf_hyperg_2F1_renorm(a+1, c-b-1, c, d/(d-1));
+      rec0 = rec1;
+      //printf("%3.3e\n",rec0);fflush(NULL);
+    }else{
+      rec2 = rec1;
+      rec1 = rec0;
+      fac1 = (c-a-j+1)*(c-b-j+1)*(c-a-b-2*j+1) * rec2;
+      fac2 = (c-a-b-2*j+2)*( c*(a+b-c+2*j-2) + c - 2*(a+j-1)*(b+j-1) 
+            + d*( (a+b+2*j-2)*(c-a-b-2*j+2) + 2*(a+j-1)*(b+j-1) - c + 1 ) ) * rec1;
+      fac3 = ( (a+j-1)*(b+j-1)*(c-a-b-2*j+3)*(1-d)*(1-d) );
+      //printf("fac1=%5.4f, fac2=%5.4f, fac3=%5.4f\n",fac1,fac2,fac3);fflush(NULL);
+      rec0 = -1.0 * (fac1 + fac2) / fac3 ;
+      //printf("%3.3e\n",rec0);fflush(NULL);
+    }
+    mulk[2*j] = fac * gsl_sf_gamma(2*j+ell+1) * pow(2, 2*j)  * rec0;
+  }
 
-	return result;
+  // Odd
+  a = ell / 2.0 + 1.0;
+  b = (ell + 3) / 2.0;
+  for(j = 0; j <= n/2-1; j++){
+    //printf("j2=%i, 2F1(%f, %f, %f, %f) = ",j,a+j,b+j,c,d);fflush(NULL);
+    if( j == 0 ){
+      rec2 = pow(1-d, -b) * gsl_sf_hyperg_2F1_renorm(b, c-a, c, d/(d-1));
+      rec0 = rec2;
+      //printf("%3.3e\n",rec0);fflush(NULL);
+    }else if( j == 1 ){
+      rec1 = pow(1-d, -a-1) * gsl_sf_hyperg_2F1_renorm(a+1, c-b-1, c, d/(d-1));
+      rec0 = rec1;
+      //printf("%3.3e\n",rec0);fflush(NULL);
+    }else{
+      rec2 = rec1;
+      rec1 = rec0;
+      fac1 = (c-a-j+1)*(c-b-j+1)*(c-a-b-2*j+1) * rec2;
+      fac2 = (c-a-b-2*j+2)*( c*(a+b-c+2*j-2) + c - 2*(a+j-1)*(b+j-1) 
+            + d*( (a+b+2*j-2)*(c-a-b-2*j+2) + 2*(a+j-1)*(b+j-1) - c + 1 ) ) * rec1;
+      fac3 = ( (a+j-1)*(b+j-1)*(c-a-b-2*j+3)*(1-d)*(1-d) );
+      //printf("fac1=%5.4f, fac2=%5.4f, fac3=%5.4f\n",fac1,fac2,fac3);fflush(NULL);
+      rec0 = -1.0 * (fac1 + fac2) / fac3 ;
+      //printf("%3.3e\n",rec0);fflush(NULL);
+    }
+    mulk[2*j+1] = fac * gsl_sf_gamma(2*j+ell+2) * pow(2, 2*j+1)  * rec0;
+  }
+
+
 }
 
 

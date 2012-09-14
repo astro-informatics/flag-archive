@@ -3,6 +3,15 @@
 // Boris Leistedt & Jason McEwen
 
 #include "flag.h"
+#include <math.h>
+#include <stdlib.h>
+#include <complex.h> 
+#include <fftw3.h> 
+#include <ssht.h>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+#include <time.h>
 
 void flag_write_f_real(const double *f_real, int L, int N, char *outfile)
 {

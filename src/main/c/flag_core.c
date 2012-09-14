@@ -3,15 +3,13 @@
 // Boris Leistedt & Jason McEwen
 
 #include "flag.h"
+#include <math.h>
+#include <stdlib.h>
+#include <complex.h> 
+#include <fftw3.h> 
+#include <ssht.h>
+#include <assert.h>
 
-/*!
- * Allocate FLAG coefficients.
- *
- * \param[out]  flmn Fourier-Laguerre coefficients.
- * \param[in]  L Angular harmonic band-limit.
- * \param[in]  N Radial harmonic band-limit.
- * \retval none
- */
 void flag_allocate_flmn(complex double **flmn, int L, int N)
 {
 	assert(L > 0);
@@ -22,14 +20,6 @@ void flag_allocate_flmn(complex double **flmn, int L, int N)
 	assert(flmn != NULL);
 }
 
-/*!
- * Allocate sampled field (MW sampling, complex).
- *
- * \param[out]  f Sampled dataset (complex).
- * \param[in]  L Angular harmonic band-limit.
- * \param[in]  N Radial harmonic band-limit.
- * \retval none
- */
 void flag_allocate_f(complex double **f, int L, int N)
 {
 	assert(L > 0);
@@ -40,14 +30,6 @@ void flag_allocate_f(complex double **f, int L, int N)
 	assert(f != NULL);
 }
 
-/*!
- * Allocate sampled field (MW sampling, real).
- *
- * \param[out]  f Sampled dataset (real).
- * \param[in]  L Angular harmonic band-limit.
- * \param[in]  N Radial harmonic band-limit.
- * \retval none
- */
 void flag_allocate_f_real(double **f, int L, int N)
 {
 	assert(L > 0);
@@ -58,12 +40,6 @@ void flag_allocate_f_real(double **f, int L, int N)
 	assert(f != NULL);
 }
 
-/*!
- * Get size of a single layer in MW sampling.
- *
- * \param[in]  L Angular harmonic band-limit.
- * \retval L*(2*L-1) for MW sampling.
- */
 int ssht_fr_size_mw(int L)
 {// In case we want to extend to various sampling schemes.
 	assert(L > 0);
@@ -71,12 +47,6 @@ int ssht_fr_size_mw(int L)
 	return mapsize;
 }
 
-/*!
- * Get size of a single layer in harmonic space (L^2).
- *
- * \param[in]  L Angular harmonic band-limit.
- * \retval L^2
- */
 int ssht_flm_size(int L)
 {// In case we want to extend to various sampling schemes
 	assert(L > 0);
@@ -84,13 +54,6 @@ int ssht_flm_size(int L)
 	return mapsize;
 }
 
-/*!
- * Get size of the full FLAG decomposition.
- *
- * \param[in]  L Angular harmonic band-limit. 
- * \param[in]  N Radial harmonic band-limit.
- * \retval N*L^2
- */
 int flag_flmn_size(int L, int N)
 {// In case we want to extend to various sampling schemes
 	assert(L > 0);
@@ -98,13 +61,6 @@ int flag_flmn_size(int L, int N)
 	return ssht_flm_size(L)*N;
 }
 
-/*!
- * Get size of the full dataset for MW sampling.
- *
- * \param[in]  L Angular harmonic band-limit. 
- * \param[in]  N Radial harmonic band-limit.
- * \retval N*L*(2*L-1)
- */
 int flag_f_size_mw(int L, int N)
 {// In case we want to extend to various sampling schemes
 	assert(L > 0);
@@ -112,25 +68,16 @@ int flag_f_size_mw(int L, int N)
 	return ssht_fr_size_mw(L) * (N);
 }
 
-/*!
- * Perform Fourier-Laguerre analysis (MW sampling, complex signal).
- *
- * \param[out] flmn Fourier-Laguerre coefficients.
- * \param[in]  f Input dataset (MW sampling, complex signal)
- * \param[in]  L Angular harmonic band-limit. 
- * \param[in]  N Radial harmonic band-limit.
- * \retval none
- */
 void flag_analysis(complex double *flmn, 
 		const complex double *f, 
 		double R, int L, int N)
 {
 	assert(L > 0);
 	assert(N > 1);
-	const int alpha = 2;
+	//const int alpha = 2;
 	int spin = 0;
 	int verbosity = 0;
-	int l, i, n;
+	int n;
 	int flmsize = ssht_flm_size(L);
 	int frsize = ssht_fr_size_mw(L);
 	ssht_dl_method_t dl_method = SSHT_DL_TRAPANI;
@@ -141,8 +88,8 @@ void flag_analysis(complex double *flmn,
 	
 	for (n = 0; n < N; n++){
 		//printf("> Analysis: layer %i on %i\n", n+1,N+1);
-		int offset_lm = n * flmsize;
-		int offset_r = n * frsize;
+		offset_lm = n * flmsize;
+		offset_r = n * frsize;
 		ssht_core_mw_forward_sov_conv_sym(flmr + offset_lm, f + offset_r, L, spin, dl_method, verbosity);
 	}
 	
@@ -161,15 +108,6 @@ void flag_analysis(complex double *flmn,
 
 }
 
-/*!
- * Perform Fourier-Laguerre synthesis (MW sampling, complex signal).
- *
- * \param[out]  f Input dataset (MW sampling, complex signal)
- * \param[in] flmn Fourier-Laguerre coefficients.
- * \param[in]  L Angular harmonic band-limit. 
- * \param[in]  N Radial harmonic band-limit.
- * \retval none
- */
 void flag_synthesis(complex double *f, 
 		const complex double *flmn, 
 		const double *nodes, int Nnodes,
@@ -178,10 +116,10 @@ void flag_synthesis(complex double *f,
 	assert(L > 0);
 	assert(N > 1);
 	assert(nodes != NULL);
-	const int alpha = 2;
+	//const int alpha = 2;
 	int spin = 0;
 	int verbosity = 0;
-	int l, i, n, offset_lm, offset_r;
+	int n, offset_lm, offset_r;
 	int flmsize = ssht_flm_size(L);
 	int frsize = ssht_fr_size_mw(L);
 	ssht_dl_method_t dl_method = SSHT_DL_TRAPANI;
@@ -202,15 +140,6 @@ void flag_synthesis(complex double *f,
     free(flmr);
 }
 
-/*!
- * Perform Fourier-Laguerre analysis (MW sampling, real signal).
- *
- * \param[out] flmn Fourier-Laguerre coefficients.
- * \param[in]  f Input dataset (MW sampling, real signal)
- * \param[in]  L Angular harmonic band-limit. 
- * \param[in]  N Radial harmonic band-limit.
- * \retval none
- */
 void flag_analysis_real(complex double *flmn, 
 		const double *f, double R, int L, int N)
 {
@@ -246,15 +175,6 @@ void flag_analysis_real(complex double *flmn,
     free(flmr);
 }
 
-/*!
- * Perform Fourier-Laguerre synthesis (MW sampling, real signal).
- *
- * \param[out]  f Input dataset (MW sampling, real signal)
- * \param[in] flmn Fourier-Laguerre coefficients.
- * \param[in]  L Angular harmonic band-limit. 
- * \param[in]  N Radial harmonic band-limit.
- * \retval none
- */
 void flag_synthesis_real(double *f, 
 		const complex double *flmn, 
 		const double *nodes, int Nnodes, 

@@ -3,19 +3,13 @@
 // Boris Leistedt & Jason McEwen
 
 #include "flag.h"
+#include <math.h>
+#include <stdlib.h>
+#include <complex.h> 
+#include <fftw3.h> 
+#include <ssht.h>
+#include <assert.h>
 
-/*!
- * Allocate FLAG sampling.
- *
- * \param[out]  rs Radial coordinates.
- * \param[out]  thetas Theta angular coordinates.
- * \param[out]  phis Phi angular coordinates.
- * \param[out]  laguweights Laguerre radial weights for FLAG transform.
- * \param[in]  R Radial boundary / limit.
- * \param[in]  L Angular harmonic band-limit.
- * \param[in]  N Radial harmonic band-limit.
- * \retval none
- */
 void flag_allocate_sampling(double **rs, double **thetas, double **phis, double **laguweights, double R, int L, int N)
 {
   assert(L > 0);
@@ -60,14 +54,6 @@ void ssht_allocate_sampling(double **thetas, double **phis, int L)
 
 }
 
-/*!
- * Compute SSHT MW sampling.
- *
- * \param[out]  thetas Theta angular coordinates.
- * \param[out]  phis Phi angular coordinates.
- * \param[in]  L Angular harmonic band-limit.
- * \retval none
- */
 void ssht_sampling_mw(double *thetas, double *phis, int L)
 {
   assert(L > 0);
@@ -81,18 +67,6 @@ void ssht_sampling_mw(double *thetas, double *phis, int L)
 	  phis[p] = ssht_sampling_mw_p2phi(p, L);
 }
 
-/*!
- * Compute FLAG sampling.
- *
- * \param[out]  rs Radial coordinates.
- * \param[out]  thetas Theta angular coordinates.
- * \param[out]  phis Phi angular coordinates.
- * \param[out]  laguweights Laguerre radial weights for FLAG transform.
- * \param[in]  R Radial boundary / limit.
- * \param[in]  L Angular harmonic band-limit.
- * \param[in]  N Radial harmonic band-limit.
- * \retval none
- */
 void flag_sampling(double *rs, double *thetas, double *phis, double *laguweights, double R, int L, int N) 
 {
   assert(L > 0);
