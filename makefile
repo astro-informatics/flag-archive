@@ -153,7 +153,7 @@ doc:
 	$(DOXYGEN_PATH) $(FLAGDIR)/src/doxygen.config
 .PHONY: cleandoc
 cleandoc:
-	rm -rf $(FLAGDIR)/doc/html/*
+	rm -rf $(FLAGDIR)/doc/c/*
 
 .PHONY: clean
 clean:	tidy cleandoc
