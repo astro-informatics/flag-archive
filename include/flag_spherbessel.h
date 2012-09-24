@@ -15,7 +15,7 @@ void flag_fourierlaguerre2fourierbessel(complex double *flmk, complex double *fl
 
 void flag_sbesselslag(double *sbesselslag, int ell, double *kvalues, int Nk, int N, double tau);
 
-double flag_mujlk(int j, int ell, double k, double tau);
+void flag_mulk(double *mulk, int n, int ell, double k, double tau);
 
 double j_ell(double X, int l);
 

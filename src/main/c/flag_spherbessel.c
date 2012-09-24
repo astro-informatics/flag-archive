@@ -179,7 +179,7 @@ double j_ell(double X, int l)
     double ROOTPI12 = 21.269446210866192327578;
     double GAMMA1 = 2.6789385347077476336556;
     double GAMMA2 = 1.3541179394264004169452;
-    double PI = 3.141592653589793238463;
+    //double PI = 3.141592653589793238463;
     double NU, NU2, BETA, BETA2, COSB;
     double SX, SX2;
     double COTB, COT3B, COT6B, SECB, SEC2B;
