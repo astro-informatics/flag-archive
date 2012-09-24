@@ -115,7 +115,7 @@ void flag_random_flmn_real(complex double *flmn, int L, int N, int seed)
 
 void print_f(const complex double *f,int L, int N)
 {	
-	int mapsize = ssht_fr_size_mw(L);
+	int mapsize = (2*L-1)*L;
 	int n, j;
 	for(n=0;n<N+1;n++){
 		printf("\n -- Layer %i -- \n", n);
@@ -128,7 +128,7 @@ void print_f(const complex double *f,int L, int N)
 
 void print_f_real(const double *f,int L, int N)
 {	
-	int mapsize = ssht_fr_size_mw(L);
+	int mapsize = (2*L-1)*L;
 	int n, j;
 	for(n=0;n<N+1;n++){
 		printf("\n -- Layer %i -- \n", n);
@@ -360,7 +360,7 @@ void flag_transform_furter_test(int L, int N, double R, int seed)
 	clock_t time_start, time_end, t_for, t_back;
 	int flmsize = ssht_flm_size(L);
 	int frsize = ssht_fr_size_mw(L);
-	int i, n, offset_lm, offset_r;
+	int n, offset_lm, offset_r;
 	ssht_dl_method_t dl_method = SSHT_DL_TRAPANI;
 
 	double *nodes = (double*)calloc(N, sizeof(double));
@@ -567,10 +567,10 @@ void flag_transform_performance_test(double R, int NREPEAT, int NSCALE, int seed
 
 int main(int argc, char *argv[]) 
 {
-	const int NREPEAT = 4;
-	const int NSCALE = 5;
-	const int L = 4;
-	const int N = 8;
+	//const int NREPEAT = 4;
+	//const int NSCALE = 5;
+	const int L = 32;
+	const int N = 32;
 	const double R = 420.0;
 	const int seed = (int)(10000.0*(double)clock()/(double)CLOCKS_PER_SEC);
 

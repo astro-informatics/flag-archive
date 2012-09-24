@@ -46,7 +46,9 @@ FLAGINC = $(FLAGDIR)/include
 FLAGBIN = $(FLAGDIR)/bin
 FLAGLIBN= flag
 FLAGSRC	= $(FLAGDIR)/src/main/c
+FLAGTESTSRC	= $(FLAGDIR)/src/test/c
 FLAGOBJ = $(FLAGSRC)
+FLAGTESTOBJ = $(FLAGTESTSRC)
 
 # === SSHT ===
 SSHTLIB	= $(SSHTDIR)/lib/c
@@ -65,6 +67,7 @@ FLAGOBJMAT  = $(FLAGSRCMAT)
 FLAGOBJMEX  = $(FLAGSRCMAT)
 
 vpath %.c $(FLAGSRC)
+vpath %.c $(FLAGTESTSRC)
 vpath %.h $(FLAGINC)
 vpath %_mex.c $(FLAGSRCMAT)
 
@@ -110,6 +113,9 @@ FLAGOBJSMEX = $(FLAGOBJMEX)/flag_analysis_mex.$(MEXEXT)	\
 $(FLAGOBJ)/%.o: %.c
 	$(CC) $(OPT) $(FFLAGS) -c $< -o $@
 
+$(FLAGTESTOBJ)/%.o: %.c
+	$(CC) $(OPT) $(FFLAGS) -c $< -o $@
+
 $(FLAGOBJMAT)/%_mex.o: %_mex.c $(FLAGLIB)/lib$(FLAGLIBN).a
 	$(CC) $(OPT) $(FFLAGS) -c $< -o $@ -I${MLABINC} 
 
@@ -134,12 +140,12 @@ $(FLAGLIB)/lib$(FLAGLIBN).a: $(FLAGOBJS)
 
 .PHONY: test
 test: lib $(FLAGBIN)/flag_test
-$(FLAGBIN)/flag_test: $(FLAGOBJ)/flag_test.o $(FLAGLIB)/lib$(FLAGLIBN).a
+$(FLAGBIN)/flag_test: $(FLAGTESTOBJ)/flag_test.o $(FLAGLIB)/lib$(FLAGLIBN).a
 	$(CC) $(OPT) $< -o $(FLAGBIN)/flag_test $(LDFLAGS)
 
 .PHONY: fbtest
 fbtest: lib $(FLAGBIN)/flag_fbtest
-$(FLAGBIN)/flag_fbtest: $(FLAGOBJ)/flag_fbtest.o $(FLAGLIB)/lib$(FLAGLIBN).a
+$(FLAGBIN)/flag_fbtest: $(FLAGTESTOBJ)/flag_fbtest.o $(FLAGLIB)/lib$(FLAGLIBN).a
 	$(CC) $(OPT) $< -o $(FLAGBIN)/flag_fbtest $(LDFLAGS)
 
 .PHONY: about
