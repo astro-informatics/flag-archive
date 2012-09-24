@@ -49,11 +49,18 @@ harmonics, sphere, transforms, fourier, fast, algorithms, mcewen, leistedt, wave
 <div id="sidebar">
 
 
+<h2>Installation notes</h2>
+
+<ul>
+<li><a href="c_doc.html">C library</a></li>
+<li><a href="matlab_doc.html">Matlab interfaces</a></li>
+</ul>
+
 <h2>Source documentation</h2>
 
 <ul>
-<li><a href="c/files.html">C source documentation</a></li>
-<li><a href="matlab/index.html">Matlab source documentation</a></li>
+<li><a href="c/files.html">C documentation</a></li>
+<li><a href="matlab/index.html">Matlab documentation</a></li>
 </ul>
 
 <h2>Brief release notes</h2>
@@ -125,11 +132,29 @@ harmonics, sphere, transforms, fourier, fast, algorithms, mcewen, leistedt, wave
   functions, with brief descriptions, is given here:
 
   <pre>
+  <a href="../src/main/matlab/flag_analysis.m">flag_analysis</a>
+  Compute the Fourier-Laguerre transform of a 3D signal sampled on the ball.
 
-  <a href="../src/main/matlab/flag_axisym_analysis.m">flag_axisym_analysis</a>
-  Compute exact wavelet transform of a signal sampled on the sphere (MW sampling)
+  <a href="../src/main/matlab/flag_synthesis.m">flag_synthesis</a>
+  Reconstruct a 3D signal on the ball from its Fourier-Laguerre transform.
 
-  </pre>
+  <a href="../src/main/matlab/flag_sampling.m">flag_sampling</a>
+  Compute the exact sampling scheme on the ball.
+
+  <a href="../src/main/matlab/flag_plot_sampling.m">flag_plot_sampling</a>
+  Plot the exact sampling scheme on the ball.
+
+  <a href="../src/main/matlab/slag_analysis.m">slag_analysis</a>
+  Compute the spherical Laguerre transform of a 1D signal on the radial half-line.
+
+  <a href="../src/main/matlab/slag_synthesis.m">slag_synthesis</a>
+  Reconstruct a 1D signal on the radial half-line from its spherical Laguerre transform.
+
+  <a href="../src/main/matlab/slag_sampling.m">slag_sampling</a>
+  Compute the exact sampling scheme on the radial half-line.
+
+  <a href="../src/main/matlab/slag_gausslaguerre_quadrature.m">slag_gausslaguerre_quadrature</a>
+  Compute the nodes of the exact quadrature of the radial half-line. </pre>
 
   <p> To access the documentation for each function in Matlab, simply
   run:
@@ -144,8 +169,7 @@ harmonics, sphere, transforms, fourier, fast, algorithms, mcewen, leistedt, wave
 
   <pre>
   <a href="../src/main/matlab/flag_fulltest.m">flag_fulltest</a>
-  Run and test all functionalties of the wavelet transform (MW sampling)
-  </pre>
+  Run and test all functionalties of the wavelet transform (MW sampling)</pre>
 
  <p> To access the documentation for each demo in Matlab, simply
   run:
