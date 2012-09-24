@@ -4,6 +4,9 @@
 // Boris Leistedt & Jason McEwen
 
 #include "flag.h"
+#include <math.h>
+#include <stdlib.h>
+#include <complex.h> 
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_sf.h>
 
@@ -74,12 +77,14 @@ void flag_sbesselslag(double *sbesselslag, int ell, double *kvalues, int Nk, int
 
   for(k = 0; k < Nk; k++){
     flag_mulk(mulk_coefs, N+2, ell, kvalues[k], tau);
+    //for(j = 0; j <= N; j++)
+    //  printf("mu(k=%f, j=%i) = %f\n",kvalues[k],j,mulk_coefs[j]);
     for(n = 0; n < N; n++){
       for(j = 0; j <= n; j++){
         if( j == 0 ){
-          weight = (n + 1.0) * (n + 2.0) / 2.0;
+          weight = 4 * gsl_sf_fact(ell + 2) * (n + 1.0) * (n + 2.0) / 2.0;
         }else{
-          weight = - (n - j + 1) * weight / (j * (j + 2));
+          weight = - 2 * (ell + j + 2) * (n - j + 1) * weight / (j * (j + 2));
         }
         sbesselslag[n * Nk + k] += sqrt(1.0/((n+1.0)*(n+2.0))) 
           * weight * mulk_coefs[j+2] ;
@@ -102,72 +107,63 @@ void flag_mulk(double *mulk, int n, int ell, double k, double tau)
   double c = (double)ell + 1.5;
   double ktilde = tau * k;
   double d = - 4.0 * ktilde * ktilde;
-  double fac = pow(tau, 1.5) * sqrt(PI) * pow(ktilde, ell);
+  double fac = pow(tau, 3.0) * sqrt(PI) * pow(ktilde, ell);
 
-/*
-  for(j = 0; j <= n; j++){
-    a = (ell + j + 1.0) / 2.0;
-    b = (ell + j) / 2.0 + 1.0;
-    rec0 = pow(1-d, -a) * gsl_sf_hyperg_2F1_renorm(a, c-b, c, d/(d-1));
-    printf("j=%i, 2F1(%f, %f, %f, %f) = %5.4f\n",j, a+j,b+j,c,d,rec0); fflush(NULL);  
-    mulk[j] = fac * ( gsl_sf_gamma(j+ell+1) ) * pow(2, j)  * rec0;
-    printf(">");fflush(NULL);
-  }
-*/
-
+  // Even
   a = (ell + 1.0) / 2.0;
   b = ell / 2.0 + 1.0;
   for(j = 0; j <= n/2; j++){
-    //printf("j1=%i, 2F1(%f, %f, %f, %f) = ",j,a+j,b+j,c,d);fflush(NULL);
+    //printf("j1=%i, 2F1(%f, %f, %f, %f) = ",2*j,a+j,b+j,c,d);fflush(NULL);
     if( j == 0 ){
-      rec2 = pow(1-d, -b) * gsl_sf_hyperg_2F1_renorm(b, c-a, c, d/(d-1));
-      rec0 = rec2;
+      rec1 = ( atan(sqrt(-d)) / sqrt(-d) ) / gsl_sf_gamma(c) ; // pow(1-d, -b) * gsl_sf_hyperg_2F1_renorm(b, c-a, c, d/(d-1)) ; //* gsl_sf_fact(2*j+ell) * pow(2, 2*j);
+      rec0 = rec1;
       //printf("%3.3e\n",rec0);fflush(NULL);
     }else if( j == 1 ){
-      rec1 = pow(1-d, -a-1) * gsl_sf_hyperg_2F1_renorm(a+1, c-b-1, c, d/(d-1));
-      rec0 = rec1;
+      rec0 = pow(d-1,-2.0) / gsl_sf_gamma(c) ;//;// pow(1-d, -a-1) * gsl_sf_hyperg_2F1_renorm(a+1, c-b-1, c, d/(d-1)) ; //* gsl_sf_fact(2*j+ell) * pow(2, 2*j);
       //printf("%3.3e\n",rec0);fflush(NULL);
     }else{
       rec2 = rec1;
       rec1 = rec0;
-      fac1 = (c-a-j+1)*(c-b-j+1)*(c-a-b-2*j+1) * rec2;
-      fac2 = (c-a-b-2*j+2)*( c*(a+b-c+2*j-2) + c - 2*(a+j-1)*(b+j-1) 
-            + d*( (a+b+2*j-2)*(c-a-b-2*j+2) + 2*(a+j-1)*(b+j-1) - c + 1 ) ) * rec1;
-      fac3 = ( (a+j-1)*(b+j-1)*(c-a-b-2*j+3)*(1-d)*(1-d) );
+      fac1 = (c-a-j+1)*(c-b-j+1)*(c-a-b-2*j+1) * rec2 ; //* 16*(2*j+ell)*(2*j+ell-1)*(2*j+ell-2)*(2*j+ell-3);
+      fac2 = (c-a-b-2*j+2)*( c*(a+b-c+2*j-2) + c - 2.0*(a+j-1)*(b+j-1) 
+            + d*( (a+b+2*j-2)*(c-a-b-2*j+2) + 2.0*(a+j-1)*(b+j-1) - c + 1 ) ) * rec1 ; //* 4*(2*j+ell)*(2*j+ell-1);
+      fac3 = ( (a+j-1)*(b+j-1)*(c-a-b-2*j+3)*(1.0-d)*(1.0-d) );
       //printf("fac1=%5.4f, fac2=%5.4f, fac3=%5.4f\n",fac1,fac2,fac3);fflush(NULL);
       rec0 = -1.0 * (fac1 + fac2) / fac3 ;
       //printf("%3.3e\n",rec0);fflush(NULL);
     }
-    mulk[2*j] = fac * gsl_sf_gamma(2*j+ell+1) * pow(2, 2*j)  * rec0;
+    mulk[2*j] = fac * rec0; //* gsl_sf_gamma(2*j+ell+1) * pow(2, 2*j)
   }
 
   // Odd
   a = ell / 2.0 + 1.0;
   b = (ell + 3) / 2.0;
   for(j = 0; j <= n/2-1; j++){
-    //printf("j2=%i, 2F1(%f, %f, %f, %f) = ",j,a+j,b+j,c,d);fflush(NULL);
+    //printf("j2=%i, 2F1(%f, %f, %f, %f) = ",2*j+1,a+j,b+j,c,d);fflush(NULL);
     if( j == 0 ){
-      rec2 = pow(1-d, -b) * gsl_sf_hyperg_2F1_renorm(b, c-a, c, d/(d-1));
-      rec0 = rec2;
+      rec1 = pow(1-d, -1.0) / gsl_sf_gamma(c) ;//pow(1-d, -b) * gsl_sf_hyperg_2F1_renorm(b, c-a, c, d/(d-1)) ; //* gsl_sf_fact(2*j+ell+1) * pow(2, 2*j+1);
+      rec0 = rec1;
       //printf("%3.3e\n",rec0);fflush(NULL);
     }else if( j == 1 ){
-      rec1 = pow(1-d, -a-1) * gsl_sf_hyperg_2F1_renorm(a+1, c-b-1, c, d/(d-1));
-      rec0 = rec1;
+      rec0 = ((d+3)/(3*pow(1-d, 3.0))) / gsl_sf_gamma(c);//pow(1-d, -a-1) * gsl_sf_hyperg_2F1_renorm(a+1, c-b-1, c, d/(d-1)) ; //* gsl_sf_fact(2*j+ell+1) * pow(2, 2*j+1);
       //printf("%3.3e\n",rec0);fflush(NULL);
     }else{
       rec2 = rec1;
       rec1 = rec0;
-      fac1 = (c-a-j+1)*(c-b-j+1)*(c-a-b-2*j+1) * rec2;
-      fac2 = (c-a-b-2*j+2)*( c*(a+b-c+2*j-2) + c - 2*(a+j-1)*(b+j-1) 
-            + d*( (a+b+2*j-2)*(c-a-b-2*j+2) + 2*(a+j-1)*(b+j-1) - c + 1 ) ) * rec1;
-      fac3 = ( (a+j-1)*(b+j-1)*(c-a-b-2*j+3)*(1-d)*(1-d) );
+      fac1 = (c-a-j+1)*(c-b-j+1)*(c-a-b-2*j+1) * rec2 ; //* 16*(2*j+ell)*(2*j+ell-1)*(2*j+ell-2)*(2*j+ell-3);
+      fac2 = (c-a-b-2*j+2)*( c*(a+b-c+2*j-2) + c - 2.0*(a+j-1)*(b+j-1) 
+            + d*( (a+b+2*j-2)*(c-a-b-2*j+2) + 2.0*(a+j-1)*(b+j-1) - c + 1 ) ) * rec1 ; //* 4*(2*j+ell)*(2*j+ell-1);
+      fac3 = ( (a+j-1)*(b+j-1)*(c-a-b-2*j+3)*(1.0-d)*(1.0-d) ); 
       //printf("fac1=%5.4f, fac2=%5.4f, fac3=%5.4f\n",fac1,fac2,fac3);fflush(NULL);
       rec0 = -1.0 * (fac1 + fac2) / fac3 ;
-      //printf("%3.3e\n",rec0);fflush(NULL);
+      printf("%3.3e\n",rec0);fflush(NULL);
     }
-    mulk[2*j+1] = fac * gsl_sf_gamma(2*j+ell+2) * pow(2, 2*j+1)  * rec0;
+    mulk[2*j+1] = fac * rec0;//* gsl_sf_gamma(2*j+ell+2) * pow(2, 2*j+1)
   }
 
+  for(j = 0; j <= n; j++){
+    printf("j=%i, mulk(%f, %f, %f, %f) = %f\n",j,(ell+j+1)/2.0,(ell+j)/2.0+1,c,d,mulk[j]);fflush(NULL);
+  }
 
 }
 

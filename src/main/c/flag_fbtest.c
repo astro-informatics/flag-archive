@@ -3,6 +3,15 @@
 // Boris Leistedt & Jason McEwen
 
 #include "flag.h"
+#include <math.h>
+#include <stdlib.h>
+#include <complex.h> 
+#include <fftw3.h> 
+#include <ssht.h>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+#include <time.h>
 
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 
@@ -143,7 +152,7 @@ void print_flmn(const complex double *flmn,int L, int N)
 	printf("\n");
 }
 
-void flag_sbesselslag_test_simple(int N, double R, int seed)
+void flag_sbesselslag_test_simple(int Nk, int N, double R, int seed)
 {	
 	clock_t time_start, time_end;
 	int n, i;
@@ -153,7 +162,6 @@ void flag_sbesselslag_test_simple(int N, double R, int seed)
 	int ell = 0;
 	int Nnodes = N;
 	int Ninte = 40000;
- 	int Nk = N;
  	double kmin = 0.05;
  	double kmax = 0.5;
  	double rmin = 0;
@@ -293,8 +301,9 @@ int main(int argc, char *argv[])
 	const int NREPEAT = 4;
 	const int NSCALE = 5;
 	const int L = 4;
-	const int N = 8;
-	const double R = 420.0;
+	const int N = 4;
+	const int Nk = 4;
+	const double R = 100.0;
 	const int seed = (int)(10000.0*(double)clock()/(double)CLOCKS_PER_SEC);
 
 	printf("==========================================================\n");
@@ -303,7 +312,7 @@ int main(int argc, char *argv[])
 	printf("----------------------------------------------------------\n");
 
 	printf("> Testing 1D spherical Bessel transform...\n");
-	flag_sbesselslag_test_simple(N, R, seed);
+	flag_sbesselslag_test_simple(Nk, N, R, seed);
 	fflush(NULL);
 
 	printf("==========================================================\n");

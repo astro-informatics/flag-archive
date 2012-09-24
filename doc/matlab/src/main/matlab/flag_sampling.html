@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of flag_sampling</title>
+  <meta name="keywords" content="flag_sampling">
+  <meta name="description" content="flag_sampling - Compute Fourier-Laguerre sampling scheme">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">src</a> &gt; <a href="#">main</a> &gt; <a href="index.html">matlab</a> &gt; flag_sampling.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for src/main/matlab&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>flag_sampling
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>flag_sampling - Compute Fourier-Laguerre sampling scheme</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [rs, thetas, phis] = flag_sampling(L, P, R) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> flag_sampling - Compute Fourier-Laguerre sampling scheme
+
+ Default usage :
+
+   [rs, thetas, phis] = flag_sampling(L, P, R)
+
+ where L and P are the harmonic band-limits, 
+ R is the radial limit,
+ Output :
+   rs is a real vector of size P
+   thetas is a real vector of size L
+   phis is a real vector of size 2*L-1
+ Sampling scheme for theta/phi : McEwen &amp; Wiaux (2011)
+
+ FLAG package to perform 3D Fourier-Laguerre Analysis
+ Copyright (C) 2012  Boris Leistedt &amp; Jason McEwen
+ See LICEPSE.txt for license details</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="flag_pixelizedeltas.html" class="code" title="function f = flag_pixelizedeltas( triarray, L, N, R )">flag_pixelizedeltas</a>	</li><li><a href="flag_plot_sampling.html" class="code" title="function flag_plot_sampling(L, P, R)">flag_plot_sampling</a>	</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [rs, thetas, phis] = flag_sampling(L, P, R)</a>
+0002 
+0003 <span class="comment">% flag_sampling - Compute Fourier-Laguerre sampling scheme</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Default usage :</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%   [rs, thetas, phis] = flag_sampling(L, P, R)</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% where L and P are the harmonic band-limits,</span>
+0010 <span class="comment">% R is the radial limit,</span>
+0011 <span class="comment">% Output :</span>
+0012 <span class="comment">%   rs is a real vector of size P</span>
+0013 <span class="comment">%   thetas is a real vector of size L</span>
+0014 <span class="comment">%   phis is a real vector of size 2*L-1</span>
+0015 <span class="comment">% Sampling scheme for theta/phi : McEwen &amp; Wiaux (2011)</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">% FLAG package to perform 3D Fourier-Laguerre Analysis</span>
+0018 <span class="comment">% Copyright (C) 2012  Boris Leistedt &amp; Jason McEwen</span>
+0019 <span class="comment">% See LICEPSE.txt for license details</span>
+0020 
+0021 p = inputParser;
+0022 p.addRequired(<span class="string">'L'</span>, @isnumeric);          
+0023 p.addRequired(<span class="string">'P'</span>, @isnumeric);   
+0024 p.addRequired(<span class="string">'R'</span>, @isnumeric); 
+0025 p.parse(L, P, R);
+0026 args = p.Results;
+0027 
+0028 [rs, thetas, phis] = flag_sampling_mex(L, P, R);
+0029        
+0030 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 24-Sep-2012 11:29:24 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

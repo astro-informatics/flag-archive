@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of flag_fulltest</title>
+  <meta name="keywords" content="flag_fulltest">
+  <meta name="description" content="flag_fulltest - Run all tests">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">src</a> &gt; <a href="#">main</a> &gt; <a href="index.html">matlab</a> &gt; flag_fulltest.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for src/main/matlab&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>flag_fulltest
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>flag_fulltest - Run all tests</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> flag_fulltest - Run all tests
+
+ FLAG package to perform 3D Fourier-Laguerre Analysis
+ Copyright (C) 2012  Boris Leistedt &amp; Jason McEwen
+ See LICENSE.txt for license details</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="flag_analysis.html" class="code" title="function flmp = flag_analysis(f, varargin)">flag_analysis</a>	flag_analysis - Compute Fourier-Laguerre Analysis</li><li><a href="flag_synthesis.html" class="code" title="function f = flag_synthesis(flmp, varargin)">flag_synthesis</a>	flag_synthesis - Compute Fourier-Laguerre Synthesis</li><li><a href="slag_analysis.html" class="code" title="function fn = slag_analysis(f, varargin)">slag_analysis</a>	slag_analysis - Compute 1D spherical Laguerre Analysis</li><li><a href="slag_sampling.html" class="code" title="function nodes = slag_sampling(P, R)">slag_sampling</a>	slag_sampling - Compute 1D spherical Laguerre Sampling scheme</li><li><a href="slag_synthesis.html" class="code" title="function [f, nodes] = slag_synthesis(fn, varargin)">slag_synthesis</a>	slag_synthesis - Compute 1D spherical Laguerre Synthesis</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% flag_fulltest - Run all tests</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% FLAG package to perform 3D Fourier-Laguerre Analysis</span>
+0004 <span class="comment">% Copyright (C) 2012  Boris Leistedt &amp; Jason McEwen</span>
+0005 <span class="comment">% See LICENSE.txt for license details</span>
+0006 
+0007 clear all;
+0008 close all;
+0009 
+0010 <span class="comment">% Main parameters</span>
+0011 L = 32
+0012 P = 32
+0013 R = 10.0    
+0014 
+0015 <span class="comment">% Generate random 3D FLAG decomposition</span>
+0016 flmn = zeros(P, L^2);
+0017 flmn = rand(size(flmn)) + sqrt(-1)*rand(size(flmn));
+0018 flmn = 2.*(flmn - (1+sqrt(-1))./2);
+0019 
+0020 <span class="comment">% Test exactness for default FLAG transform</span>
+0021 f = <a href="flag_synthesis.html" class="code" title="function f = flag_synthesis(flmp, varargin)">flag_synthesis</a>(flmn);
+0022 flmn_rec = <a href="flag_analysis.html" class="code" title="function flmp = flag_analysis(f, varargin)">flag_analysis</a>(f);
+0023 flag_default_transform_error = max(max(abs(flmn-flmn_rec)))
+0024 
+0025 <span class="comment">% Test exactness for complex FLAG transform</span>
+0026 f = <a href="flag_synthesis.html" class="code" title="function f = flag_synthesis(flmp, varargin)">flag_synthesis</a>(flmn, <span class="string">'L'</span>, L, <span class="string">'P'</span>, P);
+0027 flmn_rec = <a href="flag_analysis.html" class="code" title="function flmp = flag_analysis(f, varargin)">flag_analysis</a>(f, <span class="string">'L'</span>, L, <span class="string">'P'</span>, P);
+0028 flag_custom_transform_error = max(max(abs(flmn-flmn_rec)))
+0029 
+0030 nodes = <a href="slag_sampling.html" class="code" title="function nodes = slag_sampling(P, R)">slag_sampling</a>(P, R);
+0031 <span class="comment">% Test exactness for complex FLAG transform on the same grid</span>
+0032 f = <a href="flag_synthesis.html" class="code" title="function f = flag_synthesis(flmp, varargin)">flag_synthesis</a>(flmn, <span class="string">'L'</span>, L, <span class="string">'P'</span>, P, <span class="string">'Nodes'</span>, nodes);
+0033 flmn_rec = <a href="flag_analysis.html" class="code" title="function flmp = flag_analysis(f, varargin)">flag_analysis</a>(f, <span class="string">'L'</span>, L, <span class="string">'P'</span>, P, <span class="string">'R'</span>, R);
+0034 flag_grid_transform_error = max(max(abs(flmn-flmn_rec)))
+0035 
+0036 nodes = <a href="slag_sampling.html" class="code" title="function nodes = slag_sampling(P, R)">slag_sampling</a>(P, R);
+0037 <span class="comment">% Test exactness for complex FLAG transform on the same grid</span>
+0038 f = <a href="flag_synthesis.html" class="code" title="function f = flag_synthesis(flmp, varargin)">flag_synthesis</a>(flmn, <span class="string">'R'</span>, R);
+0039 flmn_rec = <a href="flag_analysis.html" class="code" title="function flmp = flag_analysis(f, varargin)">flag_analysis</a>(f, <span class="string">'R'</span>, R);
+0040 flag_bound_transform_error = max(max(abs(flmn-flmn_rec)))
+0041 
+0042 <span class="comment">% Impose reality on flms.</span>
+0043 <span class="keyword">for</span> en = 1:P
+0044    <span class="keyword">for</span> el = 0:L-1
+0045       ind = el*el + el + 1;
+0046       flmn(en,ind) = real(flmn(en,ind));
+0047       <span class="keyword">for</span> m = 1:el
+0048          ind_pm = el*el + el + m + 1;
+0049          ind_nm = el*el + el - m + 1;
+0050          flmn(en,ind_nm) = (-1)^m * conj(flmn(en,ind_pm));
+0051       <span class="keyword">end</span>  
+0052    <span class="keyword">end</span>
+0053 <span class="keyword">end</span>
+0054 <span class="comment">% Test exactness of real FLAG transform</span>
+0055 f = <a href="flag_synthesis.html" class="code" title="function f = flag_synthesis(flmp, varargin)">flag_synthesis</a>(flmn, <span class="string">'L'</span>, L, <span class="string">'P'</span>, P, <span class="string">'reality'</span>, true);
+0056 flmn_rec = <a href="flag_analysis.html" class="code" title="function flmp = flag_analysis(f, varargin)">flag_analysis</a>(f, <span class="string">'L'</span>, L, <span class="string">'P'</span>, P, <span class="string">'reality'</span>, true);
+0057 flag_real_transform_error = max(max(abs(flmn-flmn_rec)))
+0058 
+0059 <span class="comment">% Generate random 1D SLAG decomposition</span>
+0060 fn = rand(1,P);
+0061 
+0062 <span class="comment">% Test exactness of SLAG transform</span>
+0063 [f, nodes] = <a href="slag_synthesis.html" class="code" title="function [f, nodes] = slag_synthesis(fn, varargin)">slag_synthesis</a>(fn);
+0064 fn_rec = <a href="slag_analysis.html" class="code" title="function fn = slag_analysis(f, varargin)">slag_analysis</a>(f);
+0065 slag_default_transform_error = max(max(abs(fn-fn_rec)))
+0066 
+0067 <span class="comment">% Test exactness of SLAG transform</span>
+0068 [f, nodes] = <a href="slag_synthesis.html" class="code" title="function [f, nodes] = slag_synthesis(fn, varargin)">slag_synthesis</a>(fn, <span class="string">'P'</span>, P, <span class="string">'R'</span>, R);
+0069 fn_rec = <a href="slag_analysis.html" class="code" title="function fn = slag_analysis(f, varargin)">slag_analysis</a>(f, <span class="string">'P'</span>, P, <span class="string">'R'</span>, R);
+0070 slag_custom_transform_error = max(max(abs(fn-fn_rec)))
+0071 
+0072 nodes2 = <a href="slag_sampling.html" class="code" title="function nodes = slag_sampling(P, R)">slag_sampling</a>(P, R);
+0073 <span class="keyword">if</span> (max(abs(nodes-nodes2))) ~= 0
+0074     print(<span class="string">'Problem with sampling scheme'</span>);
+0075 <span class="keyword">end</span>
+0076 [f2, nodes] = <a href="slag_synthesis.html" class="code" title="function [f, nodes] = slag_synthesis(fn, varargin)">slag_synthesis</a>(fn, <span class="string">'P'</span>, P, <span class="string">'Nodes'</span>, nodes);
+0077 <span class="keyword">if</span> max(max(abs(f-f2))) ~= 0
+0078     print(<span class="string">'Problem with transform when nodes is specified'</span>);
+0079 <span class="keyword">end</span>
+0080</pre></div>
+<hr><address>Generated on Mon 24-Sep-2012 11:29:24 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -76,7 +76,7 @@ Private release of <strong>FLAG</strong> 0.9.
 <a name="introduction"><h2>Introduction</h2></a>
 
 
-  <p>The <strong>FLAG</strong> code implements the Fourier-Laguerre Transform, a novel 3D transform exploiting an exact quadrature rule of spherical space to construct an exact harmonic transform on the ball. 
+  <p>The <strong>FLAG</strong> code implements the Fourier-Laguerre Transform, a novel 3D transform exploiting an exact quadrature rule of the ball to construct an exact harmonic transform in 3D spherical coordinates. 
   The angular part of the Fourier-Laguerre transform uses the <a href="http://www.mrao.cam.ac.uk/~jdm57/publications.html#mcewen:fssht">
   MW sampling</a> (<a href="http://arxiv.org/abs/1110.6298">ArXiv</a>  | <a href="http://dx.doi.org/10.1109/TSP.2011.2166394">DOI</a>) and the exact spherical harmonic transform implemented in
   the <a href="http://www.mrao.cam.ac.uk/~jdm57/ssht/index.html">SSHT</a> code. The radial sampling scheme arises from an exact quadrature of the radial half-line using 
@@ -110,8 +110,7 @@ Private release of <strong>FLAG</strong> 0.9.
   We also provide an implementation of the analytic formula connecting the spherical Laguerre and the spherical Bessel transform. 
   If a function a band-limited in the former, the latter can be calculated exactly. Consequently the Fourier-Bessel decomposition 
   of a function which is band-limited in the Fourier-Laguerre basis can also be calculated exactly, 
-  without the use of any numerical integration routines. In <strong>FLAG</strong> this option requires the
-  <strong>GSL</strong>-GNU Math library.
+  without the use of any numerical integration routines.
 </p>
 
 <br>
