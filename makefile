@@ -130,7 +130,7 @@ default: lib test about tidy
 matlab: lib $(FLAGOBJSMEX) about
 
 .PHONY: all
-all: lib matlab doc test about tidy
+all: lib matlab test about tidy
 
 .PHONY: lib
 lib: $(FLAGLIB)/lib$(FLAGLIBN).a
