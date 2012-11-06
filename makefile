@@ -34,9 +34,9 @@ ifeq ($(UNAME), Darwin)
   MEXFLAGS	= -cxx
 endif
 
-# === SSHT ===
+# === GSL ===
 GSLLIB	= $(GSLDIR)/lib
-GSLINC	= $(GSLDIR)/include/gsl
+GSLINC	= $(GSLDIR)/include
 GSLLIBN= gsl
 
 # === FLAG ===
@@ -80,10 +80,9 @@ FFLAGS  = -I$(FFTWINC) -I$(SSHTINC) -I$(FLAGINC)  -fopenmp
 FLAGOBJS= $(FLAGOBJ)/flag_core.o	\
 	  $(FLAGOBJ)/flag_sampling.o	\
 	  $(FLAGOBJ)/flag_io.o			\
-	  $(FLAGOBJ)/flag_spherlaguerre.o			\
-	  $(FLAGOBJ)/flag_spherbessel.o
+	  $(FLAGOBJ)/flag_spherlaguerre.o
 
-ifneq (,$(wildcard $(GSLINC)/gsl_sf.h))
+ifneq (,$(wildcard $(GSLINC)/gsl/gsl_sf.h))
 	FLAGOBJS+= $(FLAGOBJ)/flag_spherbessel.o
 	FFLAGS+= -I$(GSLINC)
 	LDFLAGS+= -L$(GSLLIB)
@@ -172,6 +171,7 @@ clean:	tidy cleandoc
 .PHONY: tidy
 tidy:
 	rm -f $(FLAGOBJ)/*.o
+	rm -f $(FLAGTESTOBJ)/*.o
 	rm -f $(FLAGOBJMEX)/*.o
 	rm -f *~ 
 

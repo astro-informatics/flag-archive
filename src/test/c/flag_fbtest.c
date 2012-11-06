@@ -161,11 +161,11 @@ void flag_sbesselslag_test_simple(int Nk, int N, double R, int seed)
 
 	int ell = 0;
 	int Nnodes = N;
-	int Ninte = 40000;
+	int Ninte = 20000;
  	double kmin = 0.05;
  	double kmax = 0.5;
  	double rmin = 0;
- 	double rmax = 5000;
+ 	double rmax = 2000;
 
 
 	//------- Input function : f(r) = 1 / r^2
@@ -176,7 +176,7 @@ void flag_sbesselslag_test_simple(int Nk, int N, double R, int seed)
 	flag_spherlaguerre_sampling(nodes, weights, R, N);
 
 	for (n=0; n<Nnodes; n++)
- 		f[n] = 1.0 / pow(nodes[n],2.0);
+ 		f[n] = pow(nodes[n], -2.0);
 
 	double *fn = (double*)calloc(N, sizeof(double));
 	flag_spherlaguerre_analysis(fn, f, nodes, weights, N);
@@ -219,7 +219,7 @@ void flag_sbesselslag_test_simple(int Nk, int N, double R, int seed)
 	//-------
 
 	for (n = 0; n < Nk; n++){
-		printf("> k = %f : anal = %f / inte = %f / slag = %f\n", kvalues[n], flk_anal[n], flk_int[n], flk_slag[n]);
+		printf("> k = %f : inte = %f / anal = %f  / slag = %f\n", kvalues[n], flk_int[n], flk_anal[n], flk_slag[n]);
 	}
 	for (n = 0; n < Nk; n++){
 		printf("> k = %f : slag / anal = %f \n", kvalues[n], flk_slag[n] / flk_anal[n]);
@@ -234,65 +234,54 @@ void flag_sbesselslag_test_simple(int Nk, int N, double R, int seed)
 }
 
 
-void flag_sbesselslag_test_rand(int N, double R, int seed)
+void flag_sbesselslag_test_jlK(double Kval, int ell, int Nk, int N, double R, int seed)
 {	
-	clock_t time_start, time_end;
-	double *fn = (double*)calloc(N, sizeof(double));
-	int n;
-	srand ( time(NULL) );
+	
+	// Input function : f(r) = j_ell(Kr)
+	double *f = (double*)calloc(N, sizeof(double));
+	double *nodes = (double*)calloc(N, sizeof(double));
+	double *weights = (double*)calloc(N, sizeof(double));
+	flag_spherlaguerre_sampling(nodes, weights, R, N);
+	int n;  
 	for (n=0; n<N; n++)
-		fn[n] = rand()/795079784.0;
- 	
+ 		f[n] = j_ell(Kval * nodes[n], ell);
+
+ 	// SLAG analysis
+	double *fn = (double*)calloc(N, sizeof(double));
+	flag_spherlaguerre_analysis(fn, f, nodes, weights, N);
  	double tau = flag_spherlaguerre_tau(R, N);
+ 
+	// Check the SLAG coefficients
+	double *fn_bis = (double*)calloc(N, sizeof(double));
+	flag_sbesselslag(fn_bis, ell, &Kval, 1, N, tau);
+	for (n = 0; n < N; n++){
+		fn_bis[n] = fn_bis[n] * pow(tau, -3.0);
+		printf("> n = %i : fn = %f  <->  fn_bis = %f  <-> ratio = %f\n", n, fn[n], fn_bis[n], fn_bis[n]/fn[n]);
+	}
 
- 	//-------
+ 	// Approximate reconstruction
+ 	double *f_rec = (double*)calloc(N, sizeof(double));
+	flag_spherlaguerre_synthesis(f_rec, fn, nodes, N, N);
 
- 	int Nk = N;
+ 	// SBessel transform
  	double kmin = 0.05;
- 	double kmax = 0.5;
- 	double Rmin = 0;
- 	double Rmax = 2 * R;
- 	int ell = 0;
- 	int Nnodes = 100;
-
- 	//-------
-
- 	double *flk = (double*)calloc(Nk, sizeof(double));
-
+ 	double kmax = 0.3;
  	double *kvalues = (double*)calloc(Nk, sizeof(double));
  	for (n=0; n<Nk; n++)
  		kvalues[n] = kmin + (kmax - kmin)*(double)n/(double)Nk;
-
-	time_start = clock();
+ 	double *flk = (double*)calloc(Nk, sizeof(double));
 	//flag_spherlaguerre2spherbessel(flk, fn, kvalues, Nk, N, ell, tau);
-	time_end = clock();
-
-	//-------
-
-	double *f = (double*)calloc(Nnodes, sizeof(double));
-	double *nodes = (double*)calloc(Nnodes, sizeof(double));
- 	for (n=0; n<Nnodes; n++)
- 		nodes[n] = Rmin + (Rmax-Rmin) * (double)n / (double)Nnodes;
-	flag_spherlaguerre_synthesis(f, fn, nodes, Nnodes, N);
-
-	//-------
-
- 	double *flk_approx = (double*)calloc(Nk, sizeof(double));
-
-	time_start = clock();
-	time_end = clock();
 
 	for (n = 0; n < Nk; n++){
-		//printf("> k = %f : flk_approx = %f  <->  flk = %f \n", kvalues[n], flk_approx[n], flk[n]);
+	//	printf("> k = %f : flk = %f\n", kvalues[n], flk[n]);
 	}
 	
-	printf("  - Maximum abs error on reconstruction  : %6.5e\n", 
-		maxerr(flk_approx, flk, Nk));
 
 	free(f);
+	free(f_rec);
 	free(fn);
+	free(fn_bis);
 	free(flk);
-	free(flk_approx);
 }
 
 
@@ -300,10 +289,12 @@ int main(int argc, char *argv[])
 {
 	const int NREPEAT = 4;
 	const int NSCALE = 5;
+	const double Kval = 0.15;
+	const int ell = 0;
 	const int L = 4;
-	const int N = 4;
-	const int Nk = 4;
-	const double R = 100.0;
+	const int N = 32;
+	const int Nk = 5;
+	const double R = 200.0;
 	const int seed = (int)(10000.0*(double)clock()/(double)CLOCKS_PER_SEC);
 
 	printf("==========================================================\n");
@@ -312,7 +303,7 @@ int main(int argc, char *argv[])
 	printf("----------------------------------------------------------\n");
 
 	printf("> Testing 1D spherical Bessel transform...\n");
-	flag_sbesselslag_test_simple(Nk, N, R, seed);
+	flag_sbesselslag_test_jlK(Kval, ell, Nk, N, R, seed);
 	fflush(NULL);
 
 	printf("==========================================================\n");
