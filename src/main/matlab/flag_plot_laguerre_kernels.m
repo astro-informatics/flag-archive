@@ -23,8 +23,8 @@ colors = rand(P,3)*0.9;
 % title('Decaying Laguerre polynomials (weighted with exp-r)')
 
 figure('Position',[200 200 600 1000])
-
 subplot(3,1,1)
+title('Spherical Laguerre transform : basis functions', 'FontSize', 20);
 hold on
 for n = 1:nmax
     fn = zeros(1,P);
@@ -43,6 +43,7 @@ set(gca,'FontSize',10);
 set(gca,'LineWidth',2);
 
 subplot(3,1,2)
+title('Spherical Laguerre transform : basis functions (zoomed)', 'FontSize', 20);
 hold on
 for n = 1:nmax
     fn = zeros(1,P);
@@ -61,6 +62,7 @@ set(gca,'FontSize',10);
 set(gca,'LineWidth',2);
 
 subplot(3,1,3)
+title('Spherical Laguerre transform : basis functions multiplied by r', 'FontSize', 20);
 hold on
 for n = 1:nmax
     fn = zeros(1,P);

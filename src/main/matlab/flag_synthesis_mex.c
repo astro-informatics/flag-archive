@@ -130,10 +130,10 @@ void mexFunction( int nlhs, mxArray *plhs[],
 
   if (reality) {
   	fr = (double*)calloc(ntheta*nphi*Nnodes, sizeof(double));
-  	flag_synthesis_real(fr, flmn, nodes, Nnodes, L, N);
+  	flag_core_synthesis_real(fr, flmn, nodes, Nnodes, L, N);
   } else {
   	 f = (complex double*)calloc(ntheta*nphi*Nnodes, sizeof(complex double));
-  	 flag_synthesis(f, flmn, nodes, Nnodes, L, N); 
+  	 flag_core_synthesis(f, flmn, nodes, Nnodes, L, N); 
   }
 
 

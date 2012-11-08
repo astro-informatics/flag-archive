@@ -19,8 +19,10 @@ end
 c = numel(x):-1:1;
 
 figure('Position',[1 1 600 600])
+title('Fourier-Laguerre transform: 3D sampling theorem', 'FontSize', 20);
 h = scatter3(x,y,z,0.5*s,c,'filled');
 set(gca, 'visible', 'off'); 
 view(60,30);
 zoom(1.5);
+
 end

@@ -79,7 +79,6 @@ FFLAGS  = -I$(FFTWINC) -I$(SSHTINC) -I$(FLAGINC)  -fopenmp
 
 FLAGOBJS= $(FLAGOBJ)/flag_core.o	\
 	  $(FLAGOBJ)/flag_sampling.o	\
-	  $(FLAGOBJ)/flag_io.o			\
 	  $(FLAGOBJ)/flag_spherlaguerre.o
 
 ifneq (,$(wildcard $(GSLINC)/gsl/gsl_sf.h))

@@ -26,27 +26,7 @@ enum ssht_methods {
  * \param[in]  N Radial harmonic band-limit.
  * \retval none
  */
-void flag_allocate_sampling(double **rs, double **thetas, double **phis, double **laguweights, double R, int L, int N);
-
-/*!
- * Allocate SSHT sampling.
- *
- * \param[out]  thetas Theta angular coordinates.
- * \param[out]  phis Phi angular coordinates.
- * \param[in]  L Angular harmonic band-limit.
- * \retval none
- */
-void ssht_allocate_sampling(double **thetas, double **phis, int L);
-
-/*!
- * Compute SSHT MW sampling.
- *
- * \param[out]  thetas Theta angular coordinates.
- * \param[out]  phis Phi angular coordinates.
- * \param[in]  L Angular harmonic band-limit.
- * \retval none
- */
-void ssht_sampling_mw(double *thetas, double *phis, int L);
+void flag_sampling_allocate(double **rs, double **thetas, double **phis, double **laguweights, double R, int L, int N);
 
 /*!
  * Compute FLAG sampling.

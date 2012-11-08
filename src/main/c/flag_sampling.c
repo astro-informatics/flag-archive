@@ -10,16 +10,7 @@
 #include <ssht.h>
 #include <assert.h>
 
-void flag_allocate_sampling(double **rs, double **thetas, double **phis, double **laguweights, double R, int L, int N)
-{
-  assert(L > 0);
-  assert(N > 1);
-  assert(R > 0.0);
-	ssht_allocate_sampling(thetas, phis, L);
-	flag_allocate_spherlaguerre_sampling(rs, laguweights, N);
-}
-
-void ssht_allocate_sampling(double **thetas, double **phis, int L)
+void allocate_ssht_sampling(double **thetas, double **phis, int L)
 {
   assert(L > 0);
 	int nphi, ntheta;
@@ -52,6 +43,15 @@ void ssht_allocate_sampling(double **thetas, double **phis, int L)
 	  *thetas = (double*)calloc(ntheta, sizeof(double));
 	  *phis = (double*)calloc(nphi, sizeof(double));
 
+}
+
+void flag_sampling_allocate(double **rs, double **thetas, double **phis, double **laguweights, double R, int L, int N)
+{
+  assert(L > 0);
+  assert(N > 1);
+  assert(R > 0.0);
+  allocate_ssht_sampling(thetas, phis, L);
+  flag_spherlaguerre_allocate_sampling(rs, laguweights, N);
 }
 
 void ssht_sampling_mw(double *thetas, double *phis, int L)

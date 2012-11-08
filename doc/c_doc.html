@@ -21,8 +21,6 @@ harmonics, sphere, transforms, fourier, fast, algorithms, mcewen, leistedt, wave
   <a href="index.html">Introduction</a> |
   <a href="index.html#routines">FLAG</a> |
   <a href="index.html#installation">Installation</a> |
-  <a href="c_doc.html">C</a> |
-  <a href="matlab_doc.html">Matlab</a> |
   <a href="index.html#download">Download</a> |
   <a href="index.html#referencing">Referencing</a> |  
   <a href="index.html#version">Version</a> |
@@ -36,8 +34,8 @@ harmonics, sphere, transforms, fourier, fast, algorithms, mcewen, leistedt, wave
 	<img src="images/logo.jpg" width="140" height="140" border=0> 
       </td>
       <td width=500 align="left" valign="center">
-	<h1 class="title">FLAG<span class="fade">1.0</span></h1>
-	<p id="slogantitle">Installing and using the C library</p>
+	<h1 class="title">FLAG<span class="fade">1.0b1</span></h1>
+	<p id="slogantitle">Exact Fourier-Laguerre transform on the ball</p>
       </td>			
     </tr>
   </table>
@@ -49,18 +47,25 @@ harmonics, sphere, transforms, fourier, fast, algorithms, mcewen, leistedt, wave
 <div id="sidebar">
 
 
+<h2>Installation and usage</h2>
+
+<ul>
+<li><a href="c_doc.html">C library</a></li>
+<li><a href="matlab_doc.html">Matlab interfaces</a></li>
+</ul>
+
 <h2>Source documentation</h2>
 
 <ul>
-<li><a href="c/files.html">C source documentation</a></li>
-<li><a href="matlab/index.html">Matlab source documentation</a></li>
+<li><a href="c/files.html">C documentation</a></li>
+<li><a href="matlab/index.html">Matlab documentation</a></li>
 </ul>
 
 
 <h2>Brief release notes</h2>
 
 <ul>
-<li><strong>Version 1.0</strong><br />
+<li><strong>Version 1.0b1</strong><br />
 	<ul>
 	<li>Fourier-Laguerre transform operational and tested.</li>
 	</ul>
@@ -73,15 +78,9 @@ harmonics, sphere, transforms, fourier, fast, algorithms, mcewen, leistedt, wave
 <!--------------------------- CONTENT --------------------------->
 <div id="content">
 
-<!--------------------------------------------------------------->
-<a name="introduction"><h2>Introduction</h2></a>
-
-  <p> <strong>FLAG</strong> provides user-friendly routines for performing the Fourier-Laguerre transform of real and complex signals on the ball.</p> 
-
-<br>
 
 <!--------------------------------------------------------------->  
-<a name="installation"><h2>Installation</h2></a>
+<a name="installation"><h2>Installing and using the C library</h2></a>
 
   <p> The core functionalities of <strong>FLAG</strong> are written in C and self-documented. The C library only requires <strong>SSHT</strong> and <strong>FFTW</strong>. The optional spherical Bessel and Fourier-Bessel routines require the <strong>GSL</strong> library. Several examples, tests and demos are provided to demonstrate the usability of the C library.</p>
 

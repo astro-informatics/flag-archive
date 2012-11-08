@@ -1,6 +1,7 @@
 function flag_plot_lagunodes( P, R )
 
 figure('Position',[200 200 800 700])
+title('Spherical Laguerre transform: sampling theorem', 'FontSize', 20);
 hold on
 xlabel('x','FontSize',20)
 ylabel('y','FontSize',20)

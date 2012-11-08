@@ -117,9 +117,9 @@ void mexFunction( int nlhs, mxArray *plhs[],
   nphi = 2 * L - 1;
   flmn = (complex double*)calloc(L*L*N, sizeof(complex double));
   if (reality) {
-    flag_analysis_real(flmn, fr, R, L, N);
+    flag_core_analysis_real(flmn, fr, R, L, N);
   } else {
-    flag_analysis(flmn, f, R, L, N); 
+    flag_core_analysis(flmn, f, R, L, N); 
   }
 
   // Copy flm to output
