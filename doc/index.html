@@ -80,11 +80,9 @@ Public release of <strong>FLAG</strong> 1.0b1
 <a name="introduction"><h2>Introduction</h2></a>
 
 
-  <p>The <strong>FLAG</strong> code implements the Fourier-Laguerre Transform, a novel 3D transform exploiting an exact quadrature rule of the ball to construct an exact harmonic transform in 3D spherical coordinates. 
-  The angular part of the Fourier-Laguerre transform uses the <a href="http://www.mrao.cam.ac.uk/~jdm57/publications.html#mcewen:fssht">
-  MW sampling theorem</a> (<a href="http://arxiv.org/abs/1110.6298">ArXiv</a>  | <a href="http://dx.doi.org/10.1109/TSP.2011.2166394">DOI</a>) and the exact spherical harmonic transform implemented in
-  the <a href="http://www.mrao.cam.ac.uk/~jdm57/ssht/index.html">SSHT</a> code. The radial sampling scheme arises from an exact quadrature of the radial half-line using 
-  damped Laguerre polynomials. 
+  <p><a href="http://www.mrao.cam.ac.uk/~jdm57/flag">FLAG</a> is a fast implementation of the <a href="#referencing">Fourier-Laguerre Transform</a> (<a href="http://arxiv.org/abs/1205.0792">ArXiv</a> | <a href="http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=6280687">DOI</a>), a novel 3D transform exploiting an exact quadrature rule of the ball to construct an exact harmonic transform in 3D spherical coordinates. 
+  The angular part of the Fourier-Laguerre transform uses the <a href="http://www.mrao.cam.ac.uk/~jdm57/publications.html#mcewen:fssht"> MW sampling theorem</a> (<a href="http://arxiv.org/abs/1110.6298">ArXiv</a>  | <a href="http://dx.doi.org/10.1109/TSP.2011.2166394">DOI</a>) and the exact spherical harmonic transform implemented in
+  the <a href="http://www.mrao.cam.ac.uk/~jdm57/ssht/index.html">SSHT</a> code. The radial sampling scheme arises from an exact quadrature of the radial half-line using damped Laguerre polynomials. The radial transform can in fact be used to compute the 
 
   <p>
   This page outlines the main features of <strong>FLAG</strong>, installation details as well as the core functionalties and interfaces.  References, version, and license information then follows.
@@ -92,13 +90,13 @@ Public release of <strong>FLAG</strong> 1.0b1
   <strong>FLAG</strong> requires the <a
  href="http://www.mrao.cam.ac.uk/~jdm57/ssht/index.html">SSHT</a> and <a
  href="http://www.fftw.org/">FFTW</a> libraries. The optional spherical Bessel features require <a
- href="???">GSL</a>. 
+ href="http://www.gnu.org/software/gsl/">GSL</a>. 
 </p>
 
 <br>
 
 <!--------------------------------------------------------------->  
-<a name="routines"><h2>Wavelet transform on the sphere</h2></a>
+<a name="routines"><h2>Harmonic transform on the ball</h2></a>
 
 
   <p>The angular part of <strong>FLAG</strong> uses <a href="http://www.mrao.cam.ac.uk/~jdm57/ssht/index.html">SSHT</a>, a
@@ -129,11 +127,9 @@ Public release of <strong>FLAG</strong> 1.0b1
 
   <p> <strong>FLAG</strong> requires the <a
  href="http://www.mrao.cam.ac.uk/~jdm57/ssht/index.html">SSHT</a> and <a
- href="http://www.fftw.org/">FFTW</a> packages.  Obviously suitable C and Fortran 90 compilers will be required to build the respective
- implementations.  Both C and Matlab mex compilers will be required
- to build the Matlab interface.
- <br> Linking with <a
- href="???">GSL</a> adds the spherical Bessel and Fourier-Bessel features. </p>
+ href="http://www.fftw.org/">FFTW</a> packages. C and Matlab mex compilers will be required
+ to build the C library and Matlab interface. Linking with <a
+ href="http://www.gnu.org/software/gsl/">GSL</a> adds the spherical Bessel and Fourier-Bessel features. </p>
 
   <h4>Compiling</h4>
 
@@ -169,12 +165,10 @@ Public release of <strong>FLAG</strong> 1.0b1
 <a name="referencing"><h2>Referencing</h2></a>
 
   <p> If you use <strong>FLAG</strong> for work that results in
-  publication, please reference this site (<a
-   href="http://www.jasonmcewen.org/">http://www.jasonmcewen.org/</a>)
+  publication, please reference <a href="http://www.flaglets.org/">http://www.flaglets.org/</a>)
   and our related academic paper:
 
-<blockquote> B. Leistedt and J. D. McEwen, <a href="http://arxiv.org/abs/1205.0792">Exact wavelets on the ball</a>,  IEEE Trans. Sig. Proc., 60, 2012 (<a href="http://arxiv.org/abs/1205.0792">ArXiv</a>
- | <a href="???">DOI</a>). </blockquote>
+<blockquote> B. Leistedt and J. D. McEwen, <a href="http://arxiv.org/abs/1205.0792">Exact wavelets on the ball</a>,  IEEE Trans. Sig. Proc., 60, 2012 (<a href="http://arxiv.org/abs/1205.0792">ArXiv</a> | <a href="http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=6280687">DOI</a>). </blockquote>
 
 <blockquote> J. D. McEwen and
  Y. Wiaux, <a href="http://www.mrao.cam.ac.uk/~jdm57/publications.html#mcewen:fssht">A

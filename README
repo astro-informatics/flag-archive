@@ -1,33 +1,64 @@
 
+                             FLAG CODE 
+		http://www.mrao.cam.ac.uk/~jdm57/flag
+              Fast Fourier-Laguerre transform on the ball
+	   Exact spherical Bessel and Fourier-Bessel transforms
+  ----------------------------------------------------------------
 
-//-------------------------------------------------------------//
-// C example : testing exactness of FLAG transform
+DESCRIPTION
+     The FLAG code provides functionality to perform fast and exact
+     Fourier-Laguerre and Fourier-Bessel transforms on the ball.
 
-#include "flag.h"
+VERSION
+     Release 1.0b1, November 2012
 
-// Allocate three arrays
-complex double *f, *flmn, *flmnrec;
-flag_allocate_f(&f, L, N);
-flag_allocate_flmn(&flmn, L, N);
-flag_allocate_flmn(&flmnrec, L, N);
+AUTHORS
+     B. Leistedt (www.ixkael.com/blog)
+     J. D. McEwen (www.jasonmcewen.org)
 
-// f_lmn is randomly generated
-const int seed = (int)(10000.0*clock()/(double)CLOCKS_PER_SEC);
-flag_random_flmn(flmn, L, N, seed);
+REFERENCES
+     B. Leistedt and J. D. McEwen,
+     Exact Wavelets on the Ball, 
+     IEEE Trans. Sig. Proc., 60, 2012 (arXiv:1205.0792)
+     
+     J. D. McEwen and Y. Wiaux, A novel sampling theorem on the
+     sphere, IEEE Trans. Sig. Proc., 59, 2011 (arXiv:1110.6298).
 
-// The corresponding band-limited function is constructed
-flag_synthesis(f, flmn, L, N);
+DOCUMENTATION
+     See doc/index.html
 
-// It is re-decomposed
-flag_analysis(flmnrec, f, L, N);
+INSTALLATION
+     See documentation
 
-// Reconstruction error should be ~e-14 (the transform is exact)
-printf("  - Maximum abs error on reconstruction  : %6.5e\n", 
-    maxerr_cplx(flmn, flmnrec, flag_flmn_size(L, N)));
+REQUIREMENTS
+     SSHT (http://www.mrao.cam.ac.uk/~jdm57/ssht/index.html)
+     FFTW (http://www.fftw.org/)
 
-// Deallocate
-free(f);
-free(flmn);
-free(flmnrec);
+DOWNLOAD
+     http://www.mrao.cam.ac.uk/~jdm57/flag
 
-//-------------------------------------------------------------//
+SUPPORT
+     Please email the authors.
+
+NOTE
+     The package is in beta and is still under development.
+     Please report problems/bugs by email to: boris.leistedt@gmail.com
+
+LICENSE
+     FLAG package to perform fast wavelet transform on the sphere<br>
+     Copyright (C) 2012 Boris Leistedt & Jason McEwen
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details (LICENSE.txt).
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, 
+     MA  02110-1301, USA.
