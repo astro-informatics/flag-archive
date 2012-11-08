@@ -39,14 +39,12 @@ This function is called by:
 </ul>
 <!-- crossreference -->
 
-<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
-<ul style="list-style-image:url(../../../matlabicon.gif)">
-<li><a href="#_sub1" class="code">function res = pochhammer(m, k)</a></li><li><a href="#_sub2" class="code">function res = myhypergeom(ell, j, z)</a></li></ul>
+
 
 <h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
 <div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function flag_bessel_demo(N, Nk)</a>
 0002 
-0003 R = 100;
+0003 R = 200;
 0004 ell = 0; <span class="comment">% Careful! only true for ell=0!</span>
 0005 kmin=0.05;
 0006 kmax=0.5;
@@ -64,73 +62,54 @@ This function is called by:
 0018 
 0019 flk_true = sqrt(pi/2) ./ kvalues;
 0020 
-0021 flk = zeros(size(flk_true));
-0022 <span class="keyword">for</span> k = 1:numel(kvalues)
-0023     ktilde = tau * kvalues(k);
-0024     z = -4*ktilde^2;
-0025     jlpk = zeros(1,N);
-0026     mujlk = zeros(1,N+2);
-0027     <span class="keyword">for</span> j = 0:numel(fn)+1
-0028        hypervalue = hypergeom([(j+ell+1)/2.0, (j+ell)/2.0+1], ell+1.5, -4*ktilde^2) / gamma(ell+1.5);
-0029        <span class="comment">%[j, (j+ell+1)/2.0, (j+ell)/2.0+1, ell+1.5, -4*ktilde^2, hypervalue]</span>
-0030        mujlk(1,j+1) = sqrt(pi) * ktilde^ell * tau^3 * hypervalue;
-0031     <span class="keyword">end</span>
-0032     kvalues(k)
-0033     mujlk
-0034     <span class="keyword">for</span> p = 0:numel(fn)-1
-0035         cjp = 2 * factorial(ell+2) * (p+1)*(p+2);
-0036         jlpk(1,p+1) = ((p+1)*(p+2))^(-0.5) * cjp * mujlk(3);
-0037         <span class="keyword">for</span> j = 1:p
-0038             cjp = -(p-j+1)/(j*(j+2)) * (j+ell+2) * 2 * cjp;
-0039             jlpk(1,p+1) = jlpk(1,p+1) + ((p+1)*(p+2))^(-0.5) * cjp * mujlk(j+3);
-0040         <span class="keyword">end</span>
-0041     <span class="keyword">end</span>
-0042     flk(k) = sqrt(2/pi) * sum( fn .* jlpk );
-0043 <span class="keyword">end</span>
-0044 
-0045 flk_true
-0046 flk
-0047 flk_true./flk
-0048 
-0049 <span class="keyword">end</span>
-0050 
-0051 <a name="_sub1" href="#_subfunctions" class="code">function res = pochhammer(m, k)</a>
-0052     res = gamma(m+k) / gamma(k);
-0053 <span class="keyword">end</span>
-0054 
-0055 <a name="_sub2" href="#_subfunctions" class="code">function res = myhypergeom(ell, j, z)</a>
-0056 
-0057 <span class="keyword">if</span> mod(ell+j,2) == 1 <span class="comment">% l+j impair</span>
-0058     
-0059     n = (ell + j + 1) / 2;
-0060     b = (ell + j) / 2 + 1;
-0061     m = (j - ell - 1) / 2;
-0062     c = ell + 1.5;
-0063     bmn = (ell - j) / 2;
-0064     res = 0;
-0065     <span class="keyword">for</span> k = 0:m
-0066         [ ell, j, z, <a href="#_sub1" class="code" title="subfunction res = pochhammer(m, k)">pochhammer</a>(-m, k) <a href="#_sub1" class="code" title="subfunction res = pochhammer(m, k)">pochhammer</a>(bmn, k) z^k <a href="#_sub1" class="code" title="subfunction res = pochhammer(m, k)">pochhammer</a>(c,k) factorial(k)]
-0067        res = res + <a href="#_sub1" class="code" title="subfunction res = pochhammer(m, k)">pochhammer</a>(-m, k) * <a href="#_sub1" class="code" title="subfunction res = pochhammer(m, k)">pochhammer</a>(bmn, k) * z^k / (<a href="#_sub1" class="code" title="subfunction res = pochhammer(m, k)">pochhammer</a>(c,k)*factorial(k)) ;
-0068     <span class="keyword">end</span>
-0069     res = res * (1-z)^(-j);
-0070         
-0071 <span class="keyword">else</span> <span class="comment">% l+j pair</span>
-0072     
-0073     n = (ell + j) / 2 + 1;
-0074     b = (ell + j + 1) / 2;
-0075     m = (j - ell) / 2 - 1;
-0076     c = ell + 1.5;
-0077     bmn = (ell - j + 1) / 2;
-0078      
-0079     res = 0;
-0080     <span class="keyword">for</span> k = 0:m
-0081        res = res + <a href="#_sub1" class="code" title="subfunction res = pochhammer(m, k)">pochhammer</a>(-m, k) * <a href="#_sub1" class="code" title="subfunction res = pochhammer(m, k)">pochhammer</a>(bmn, k) * z^k / (<a href="#_sub1" class="code" title="subfunction res = pochhammer(m, k)">pochhammer</a>(c,k)*factorial(k)) ;
-0082     <span class="keyword">end</span>
-0083     res = res * (1-z)^(-j);
-0084     
-0085 <span class="keyword">end</span>
-0086 
-0087 <span class="keyword">end</span></pre></div>
-<hr><address>Generated on Mon 24-Sep-2012 11:29:24 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+0021 
+0022 <span class="comment">%syms r;</span>
+0023 Rmax = 5000;
+0024 
+0025 flk_num = zeros(size(flk_true));
+0026 flk = zeros(size(flk_true));
+0027 <span class="keyword">for</span> k = 1:numel(kvalues)
+0028     ktilde = tau * kvalues(k);
+0029     z = -4*ktilde^2;
+0030     jlpk = zeros(1,N);
+0031     mujlk = zeros(1,N+2);
+0032     mujlk_bis = zeros(1,N+2);
+0033     <span class="keyword">for</span> j = 0:numel(fn)+1
+0034        hypervalue = hypergeom([(j+ell+1)/2.0, (j+ell)/2.0+1], ell+1.5, -4*ktilde^2) / gamma(ell+1.5);
+0035        <span class="comment">%[j, (j+ell+1)/2.0, (j+ell)/2.0+1, ell+1.5, -4*ktilde^2, hypervalue]</span>
+0036        <span class="comment">%fbis = exp(-r/(2*tau)) * r^j * sin(kvalues(k)*r) / (kvalues(k)*r);</span>
+0037        <span class="comment">%mujlk_bis(1,j+1) =  vpa(int(fbis, r, 0, Rmax)) * tau^(-j+2.0);</span>
+0038        mujlk(1,j+1) = sqrt(pi) * ktilde^ell * tau^3 * hypervalue;
+0039     <span class="keyword">end</span>
+0040     <span class="comment">%kvalues(k)</span>
+0041     <span class="comment">%tau</span>
+0042     <span class="comment">%mujlk</span>
+0043     <span class="keyword">for</span> p = 0:numel(fn)-1
+0044         cjp = 2 * factorial(ell+2) * (p+1)*(p+2);
+0045         jlpk(1,p+1) = ((p+1)*(p+2))^(-0.5) * cjp * mujlk(3);
+0046         <span class="keyword">for</span> j = 1:p
+0047             cjp = -(p-j+1)/(j*(j+2)) * (j+ell+2) * 2 * cjp; 
+0048             jlpk(1,p+1) = jlpk(1,p+1) + ((p+1)*(p+2))^(-0.5) * cjp * mujlk(j+3);
+0049         <span class="keyword">end</span>
+0050     <span class="keyword">end</span>
+0051     jlpk_bis = zeros(1,N);
+0052     <span class="keyword">for</span> p = 0:numel(fn)-1
+0053         kp = @(r) exp(-r./(2.*tau)) .* r.^2 .* mfun(<span class="string">'L'</span>, p, 2, r./tau) .* sin(kvalues(k).*r) ./ (kvalues(k).*r);
+0054         jlpk_bis(1,p+1) = ((p+1)*(p+2))^(-0.5) .* quad(kp,0,Rmax);
+0055     <span class="keyword">end</span>
+0056     jlpk
+0057     jlpk_bis
+0058     flk(k) = sqrt(2/pi) * sum( fn .* jlpk );
+0059     <span class="comment">%fbis = @(r) sin(kvalues(k).*r) ./ (kvalues(k).*r);</span>
+0060     <span class="comment">%flk_num(k) = sqrt(2/pi) * quad(fbis, 0, Rmax);</span>
+0061 <span class="keyword">end</span>
+0062 
+0063 flk_true
+0064 flk
+0065 <span class="comment">%flk_num</span>
+0066 flk_true./flk
+0067 
+0068 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 08-Nov-2012 10:12:16 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>
