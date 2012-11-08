@@ -160,7 +160,7 @@ cleandoc:
 	rm -rf $(FLAGDIR)/doc/c/*
 
 .PHONY: clean
-clean:	tidy cleandoc
+clean:	tidy
 	rm -f $(FLAGLIB)/lib$(FLAGLIBN).a
 	rm -f $(FLAGOBJMEX)/*_mex.$(MEXEXT)
 	rm -f $(FLAGBIN)/flag_fbtest
