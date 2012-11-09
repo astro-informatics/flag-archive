@@ -1,0 +1,64 @@
+
+                             FLAG CODE 
+		http://www.mrao.cam.ac.uk/~jdm57/flag
+              Fast Fourier-Laguerre transform on the ball
+	   Exact spherical Bessel and Fourier-Bessel transforms
+  ----------------------------------------------------------------
+
+DESCRIPTION
+     The FLAG code provides functionality to perform fast and exact
+     Fourier-Laguerre and Fourier-Bessel transforms on the ball.
+
+VERSION
+     Release 1.0b1, November 2012
+
+AUTHORS
+     B. Leistedt (www.ixkael.com/blog)
+     J. D. McEwen (www.jasonmcewen.org)
+
+REFERENCES
+     B. Leistedt and J. D. McEwen,
+     Exact Wavelets on the Ball, 
+     IEEE Trans. Sig. Proc., 60, 2012 (arXiv:1205.0792)
+     
+     J. D. McEwen and Y. Wiaux, A novel sampling theorem on the
+     sphere, IEEE Trans. Sig. Proc., 59, 2011 (arXiv:1110.6298).
+
+DOCUMENTATION
+     See doc/index.html
+
+INSTALLATION
+     See documentation
+
+REQUIREMENTS
+     SSHT (http://www.mrao.cam.ac.uk/~jdm57/ssht/index.html)
+     FFTW (http://www.fftw.org/)
+
+DOWNLOAD
+     http://www.mrao.cam.ac.uk/~jdm57/flag
+
+SUPPORT
+     Please email the authors.
+
+NOTE
+     The package is in beta and is still under development.
+     Please report problems/bugs by email to: boris.leistedt@gmail.com
+
+LICENSE
+     FLAG package to perform fast wavelet transform on the sphere<br>
+     Copyright (C) 2012 Boris Leistedt & Jason McEwen
+
+     This program is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License
+     as published by the Free Software Foundation; either version 2
+     of the License, or (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details (LICENSE.txt).
+
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, 
+     MA  02110-1301, USA.

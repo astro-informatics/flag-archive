@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of flag_bessel_demo</title>
+  <meta name="keywords" content="flag_bessel_demo">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">src</a> &gt; <a href="#">main</a> &gt; <a href="index.html">matlab</a> &gt; flag_bessel_demo.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for src/main/matlab&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>flag_bessel_demo
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function flag_bessel_demo(N, Nk) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="flag_get_tau.html" class="code" title="function tau = flag_get_tau(P, R)">flag_get_tau</a>	flag_get_tau - Compute scaling factor of SLAG transform</li><li><a href="slag_analysis.html" class="code" title="function fn = slag_analysis(f, varargin)">slag_analysis</a>	slag_analysis - Compute 1D spherical Laguerre Analysis</li><li><a href="slag_sampling.html" class="code" title="function nodes = slag_sampling(P, R)">slag_sampling</a>	slag_sampling - Compute 1D spherical Laguerre Sampling scheme</li><li><a href="slag_synthesis.html" class="code" title="function [f, nodes] = slag_synthesis(fn, varargin)">slag_synthesis</a>	slag_synthesis - Compute 1D spherical Laguerre Synthesis</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function flag_bessel_demo(N, Nk)</a>
+0002 
+0003 R = 200;
+0004 ell = 0; <span class="comment">% Careful! only true for ell=0!</span>
+0005 kmin=0.05;
+0006 kmax=0.5;
+0007 kh=(kmax-kmin)/Nk;
+0008 kvalues = kmin:kh:kmax;
+0009 
+0010 tau = <a href="flag_get_tau.html" class="code" title="function tau = flag_get_tau(P, R)">flag_get_tau</a>(N, R);
+0011 nodes = <a href="slag_sampling.html" class="code" title="function nodes = slag_sampling(P, R)">slag_sampling</a>(N, R);
+0012 <span class="comment">%nodes = nodes/tau</span>
+0013 <span class="comment">%tau=1;</span>
+0014 
+0015 f = nodes.^(-2);
+0016 fn = <a href="slag_analysis.html" class="code" title="function fn = slag_analysis(f, varargin)">slag_analysis</a>(f);
+0017 frec = <a href="slag_synthesis.html" class="code" title="function [f, nodes] = slag_synthesis(fn, varargin)">slag_synthesis</a>(fn);
+0018 
+0019 flk_true = sqrt(pi/2) ./ kvalues;
+0020 
+0021 
+0022 <span class="comment">%syms r;</span>
+0023 Rmax = 5000;
+0024 
+0025 flk_num = zeros(size(flk_true));
+0026 flk = zeros(size(flk_true));
+0027 <span class="keyword">for</span> k = 1:numel(kvalues)
+0028     ktilde = tau * kvalues(k);
+0029     z = -4*ktilde^2;
+0030     jlpk = zeros(1,N);
+0031     mujlk = zeros(1,N+2);
+0032     mujlk_bis = zeros(1,N+2);
+0033     <span class="keyword">for</span> j = 0:numel(fn)+1
+0034        hypervalue = hypergeom([(j+ell+1)/2.0, (j+ell)/2.0+1], ell+1.5, -4*ktilde^2) / gamma(ell+1.5);
+0035        <span class="comment">%[j, (j+ell+1)/2.0, (j+ell)/2.0+1, ell+1.5, -4*ktilde^2, hypervalue]</span>
+0036        <span class="comment">%fbis = exp(-r/(2*tau)) * r^j * sin(kvalues(k)*r) / (kvalues(k)*r);</span>
+0037        <span class="comment">%mujlk_bis(1,j+1) =  vpa(int(fbis, r, 0, Rmax)) * tau^(-j+2.0);</span>
+0038        mujlk(1,j+1) = sqrt(pi) * ktilde^ell * tau^3 * hypervalue;
+0039     <span class="keyword">end</span>
+0040     <span class="comment">%kvalues(k)</span>
+0041     <span class="comment">%tau</span>
+0042     <span class="comment">%mujlk</span>
+0043     <span class="keyword">for</span> p = 0:numel(fn)-1
+0044         cjp = 2 * factorial(ell+2) * (p+1)*(p+2);
+0045         jlpk(1,p+1) = ((p+1)*(p+2))^(-0.5) * cjp * mujlk(3);
+0046         <span class="keyword">for</span> j = 1:p
+0047             cjp = -(p-j+1)/(j*(j+2)) * (j+ell+2) * 2 * cjp; 
+0048             jlpk(1,p+1) = jlpk(1,p+1) + ((p+1)*(p+2))^(-0.5) * cjp * mujlk(j+3);
+0049         <span class="keyword">end</span>
+0050     <span class="keyword">end</span>
+0051     jlpk_bis = zeros(1,N);
+0052     <span class="keyword">for</span> p = 0:numel(fn)-1
+0053         kp = @(r) exp(-r./(2.*tau)) .* r.^2 .* mfun(<span class="string">'L'</span>, p, 2, r./tau) .* sin(kvalues(k).*r) ./ (kvalues(k).*r);
+0054         jlpk_bis(1,p+1) = ((p+1)*(p+2))^(-0.5) .* quad(kp,0,Rmax);
+0055     <span class="keyword">end</span>
+0056     jlpk
+0057     jlpk_bis
+0058     flk(k) = sqrt(2/pi) * sum( fn .* jlpk );
+0059     <span class="comment">%fbis = @(r) sin(kvalues(k).*r) ./ (kvalues(k).*r);</span>
+0060     <span class="comment">%flk_num(k) = sqrt(2/pi) * quad(fbis, 0, Rmax);</span>
+0061 <span class="keyword">end</span>
+0062 
+0063 flk_true
+0064 flk
+0065 <span class="comment">%flk_num</span>
+0066 flk_true./flk
+0067 
+0068 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 08-Nov-2012 10:12:16 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>
