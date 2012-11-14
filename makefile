@@ -93,7 +93,7 @@ endif
 FLAGOBJSMAT = $(FLAGOBJMAT)/flag_analysis_mex.o	\
 	$(FLAGOBJMAT)/flag_synthesis_mex.o	\
 	$(FLAGOBJMAT)/flag_sampling_mex.o	\
-	$(FLAGOBJMAT)/spherbessel_basis_mex.o	\
+	$(FLAGOBJMAT)/flag_sbessel_basis_mex.o	\
 	$(FLAGOBJMAT)/slag_basis_mex.o	\
 	$(FLAGOBJMAT)/slag_synthesis_mex.o	\
 	$(FLAGOBJMAT)/slag_analysis_mex.o	\
@@ -104,7 +104,7 @@ FLAGOBJSMAT = $(FLAGOBJMAT)/flag_analysis_mex.o	\
 FLAGOBJSMEX = $(FLAGOBJMEX)/flag_analysis_mex.$(MEXEXT)	\
 	$(FLAGOBJMEX)/flag_synthesis_mex.$(MEXEXT)	\
 	$(FLAGOBJMEX)/flag_sampling_mex.$(MEXEXT)	\
-	$(FLAGOBJMEX)/spherbessel_basis_mex.$(MEXEXT)	\
+	$(FLAGOBJMEX)/flag_sbessel_basis_mex.$(MEXEXT)	\
 	$(FLAGOBJMEX)/slag_basis_mex.$(MEXEXT)	\
 	$(FLAGOBJMEX)/slag_synthesis_mex.$(MEXEXT)	\
 	$(FLAGOBJMEX)/slag_analysis_mex.$(MEXEXT)	\

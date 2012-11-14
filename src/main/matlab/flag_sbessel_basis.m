@@ -1,11 +1,11 @@
-function f = spherbessel_basis(ell, nodes)
+function f = flag_sbessel_basis(ell, nodes)
 
-% spherbessel_basis - Compute spherical Bessel basis function
+% flag_sbessel_basis - Compute spherical Bessel basis function
 % of order ell on a grid of values nodes.
 %
 % Default usage :
 %
-%   f = spherbessel_basis(ell, nodes)
+%   f = flag_sbessel_basis(ell, nodes)
 %
 % where N is the order of the spherical Bessel mode,
 % nodes is the radial grig on which to compute the basis function,
@@ -14,6 +14,6 @@ function f = spherbessel_basis(ell, nodes)
 % Copyright (C) 2012  Boris Leistedt & Jason McEwen
 % See LICENSE.txt for license details
 
-f = spherbessel_basis_mex(ell, nodes);
+f = flag_sbessel_basis_mex(ell, nodes);
   
 end

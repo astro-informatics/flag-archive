@@ -99,10 +99,9 @@ void flag_spherlaguerre_mapped_synthesis(complex double *f, const complex double
  * Compute the spherical-Laguerre basis functions on a grid of radii
  *
  * \param[out]  KN Synthesised basis function.
- * \param[in]  N SLAG order of the basis function.
+ * \param[in]  N SLAG band-limit.
  * \param[in]  nodes Radii where the function must be calculated.
  * \param[in]  Nnodes Number of radii.
- * \param[in]  tau Scaling factor.
  * \retval none
  */
 void flag_spherlaguerre_basis(double *KN, const int N, const double *nodes, int Nnodes, double tau);

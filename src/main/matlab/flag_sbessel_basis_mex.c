@@ -10,7 +10,7 @@
  * This function for internal use only.
  *
  * Usage: 
- *   j_ell(radii) = spherbessel_basis_mex(ell, nodes);
+ *   j_ell(radii) = flag_sbessel_basis_mex(ell, nodes);
  *
  */
 void mexFunction( int nlhs, mxArray *plhs[],
@@ -24,11 +24,11 @@ void mexFunction( int nlhs, mxArray *plhs[],
 
   // Check number of arguments
   if(nrhs!=2) {
-    mexErrMsgIdAndTxt("spherbessel_basis_mex:InvalidInput:nrhs",
+    mexErrMsgIdAndTxt("flag_sbessel_basis_mex:InvalidInput:nrhs",
           "Require three inputs.");
   }
   if(nlhs!=1) {
-    mexErrMsgIdAndTxt("spherbessel_basis_mex:InvalidOutput:nlhs",
+    mexErrMsgIdAndTxt("flag_sbessel_basis_mex:InvalidOutput:nlhs",
           "Require one output.");
   }
 
@@ -37,12 +37,12 @@ void mexFunction( int nlhs, mxArray *plhs[],
   if( !mxIsDouble(prhs[iin]) || 
       mxIsComplex(prhs[iin]) || 
       mxGetNumberOfElements(prhs[iin])!=1 ) {
-    mexErrMsgIdAndTxt("spherbessel_basis_mex:InvalidInput:Nmode",
+    mexErrMsgIdAndTxt("flag_sbessel_basis_mex:InvalidInput:Nmode",
 		      "spherical Laguerre N must be integer.");
   }
   ell = (int)mxGetScalar(prhs[iin]);
   if (mxGetScalar(prhs[iin]) > (double)ell || ell < 0)
-    mexErrMsgIdAndTxt("spherbessel_basis_mex:InvalidInput:NmodeNonInt",
+    mexErrMsgIdAndTxt("flag_sbessel_basis_mex:InvalidInput:NmodeNonInt",
 		      "spherical Bessel ell must be positive integer.");
 
   // Parse nodes

@@ -462,14 +462,14 @@ void flag_spherlaguerre_basis(double *KN, const int N, const double *nodes, int 
 		
 		} else {
 		
-			for (n = 1; n <= N; n++) 
+			for (n = 1; n < N; n++) 
 			{ 
 				lagu2 = ( (alpha + 2 * n - 1 - r) * lagu1 - 
 						(alpha + n - 1) * lagu0 ) / n;
 				lagu0 = lagu1;
 				lagu1 = lagu2;
+				KN[ i * N + n ] = factor * pow(factorial_range(n+1, n+alpha), -0.5) * lagu2;
 			}
-			KN[i] = factor * pow(factorial_range(N+1, N+alpha), -0.5) * lagu2;
 
 		}
 		

@@ -17,7 +17,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
                   int nrhs, const mxArray *prhs[])
 {
 
-  int n, i, N, nodes_m, nodes_n;
+  int n, i, N, Nnodes, nodes_m, nodes_n;
   double tau;
   double *f_real, *nodes_in;
   double *KN = NULL, *nodes = NULL;
@@ -50,7 +50,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
   iin = 1;
   nodes_m = mxGetM(prhs[iin]);
   nodes_n = mxGetN(prhs[iin]);
-  int Nnodes = nodes_m*nodes_n;
+  Nnodes = nodes_m*nodes_n;
   nodes_in = mxGetPr(prhs[iin]);
   nodes = (double*)calloc(Nnodes, sizeof(double));
   for (i=0; i<Nnodes; i++)
@@ -69,14 +69,15 @@ void mexFunction( int nlhs, mxArray *plhs[],
     mexErrMsgIdAndTxt("slag_basis_mex:InvalidInput:RLimitNonInt",
           "Scale factor tau must be positive real.");
   
-  KN = (double*)calloc(Nnodes, sizeof(double));
+  KN = (double*)calloc(Nnodes*N, sizeof(double));
   flag_spherlaguerre_basis(KN, N, nodes, Nnodes, tau);
 
   iout = 0;
-  plhs[iout] = mxCreateDoubleMatrix(nodes_m, nodes_n, mxREAL);
+  plhs[iout] = mxCreateDoubleMatrix(Nnodes, N, mxREAL);
   f_real = mxGetPr(plhs[iout]);
-  for(n=0; n<nodes_m*nodes_n; n++)
-    f_real[n] = KN[n];
+  for(n=0; n<N; n++)
+    for(i=0; i<Nnodes; i++)
+      f_real[n*Nnodes+i] = KN[i*N+n];
     
   free(KN);
   free(nodes);
