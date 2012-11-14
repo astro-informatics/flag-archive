@@ -4,7 +4,7 @@
 <head>
   <title>Description of slag_basis</title>
   <meta name="keywords" content="slag_basis">
-  <meta name="description" content="slag_basis_mex - Compute spherical Laguerre basis function">
+  <meta name="description" content="slag_basis_mex - Compute the spherical Laguerre basis functions">
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
   <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
   <meta name="robots" content="index, follow">
@@ -21,20 +21,21 @@
 </h1>
 
 <h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
-<div class="box"><strong>slag_basis_mex - Compute spherical Laguerre basis function</strong></div>
+<div class="box"><strong>slag_basis_mex - Compute the spherical Laguerre basis functions</strong></div>
 
 <h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
 <div class="box"><strong>function f = slag_basis(N, nodes, tau) </strong></div>
 
 <h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
-<div class="fragment"><pre class="comment"> slag_basis_mex - Compute spherical Laguerre basis function
- of order N on a grid of values nodes (with rescaling factor tau)
+<div class="fragment"><pre class="comment"> slag_basis_mex - Compute the spherical Laguerre basis functions
+ up to order N on a grid of radii nodes (with rescaling factor tau)
 
  Default usage :
 
    f = slag_basis(N, nodes, tau)
+   plot(f)
 
- where N is the order of the spherical Laguerre mode,
+ where N is the maximum order/mode of the spherical Laguerre functions,
  nodes is the radial grig on which to compute the basis function,
  tau is the rescaling factor.
 
@@ -57,24 +58,25 @@ This function is called by:
 <h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
 <div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function f = slag_basis(N, nodes, tau)</a>
 0002 
-0003 <span class="comment">% slag_basis_mex - Compute spherical Laguerre basis function</span>
-0004 <span class="comment">% of order N on a grid of values nodes (with rescaling factor tau)</span>
+0003 <span class="comment">% slag_basis_mex - Compute the spherical Laguerre basis functions</span>
+0004 <span class="comment">% up to order N on a grid of radii nodes (with rescaling factor tau)</span>
 0005 <span class="comment">%</span>
 0006 <span class="comment">% Default usage :</span>
 0007 <span class="comment">%</span>
 0008 <span class="comment">%   f = slag_basis(N, nodes, tau)</span>
-0009 <span class="comment">%</span>
-0010 <span class="comment">% where N is the order of the spherical Laguerre mode,</span>
-0011 <span class="comment">% nodes is the radial grig on which to compute the basis function,</span>
-0012 <span class="comment">% tau is the rescaling factor.</span>
-0013 <span class="comment">%</span>
-0014 <span class="comment">% FLAG package to perform 3D Fourier-Laguerre Analysis</span>
-0015 <span class="comment">% Copyright (C) 2012  Boris Leistedt &amp; Jason McEwen</span>
-0016 <span class="comment">% See LICENSE.txt for license details</span>
-0017 
-0018 f = slag_basis_mex(N, nodes, tau);
-0019   
-0020 <span class="keyword">end</span></pre></div>
-<hr><address>Generated on Wed 14-Nov-2012 15:10:36 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+0009 <span class="comment">%   plot(f)</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% where N is the maximum order/mode of the spherical Laguerre functions,</span>
+0012 <span class="comment">% nodes is the radial grig on which to compute the basis function,</span>
+0013 <span class="comment">% tau is the rescaling factor.</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% FLAG package to perform 3D Fourier-Laguerre Analysis</span>
+0016 <span class="comment">% Copyright (C) 2012  Boris Leistedt &amp; Jason McEwen</span>
+0017 <span class="comment">% See LICENSE.txt for license details</span>
+0018 
+0019 f = slag_basis_mex(N, nodes, tau);
+0020   
+0021 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Wed 14-Nov-2012 17:56:30 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>
