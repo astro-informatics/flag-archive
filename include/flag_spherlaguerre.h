@@ -49,7 +49,7 @@ void flag_spherlaguerre_analysis(double *fn, const double *f, const double *node
 /*!
  * Perform spherical Laguerre synthesis.
  *
- * \param[out]  f Synthetised dataset.
+ * \param[out]  f Synthesised dataset.
  * \param[in]  fn Input SLAG coefficients.
  * \param[in]  nodes Nodes of the sampling.
  * \param[in]  N Harmonic band-limit.
@@ -85,7 +85,7 @@ void flag_spherlaguerre_mapped_analysis(complex double *fn, const complex double
  * Perform spherical Laguerre synthesis.
  * 3D mapped version - suitable for FLAG transform.
  *
- * \param[out]  f Synthetised dataset.
+ * \param[out]  f Synthesised dataset.
  * \param[in]  fn Input SLAG coefficients.
  * \param[in]  nodes Nodes of the sampling.
  * \param[in]  mapsize Size of each layer (L^2 in FLAG).
@@ -93,5 +93,18 @@ void flag_spherlaguerre_mapped_analysis(complex double *fn, const complex double
  * \retval none
  */
 void flag_spherlaguerre_mapped_synthesis(complex double *f, const complex double *fn, const double *nodes, int Nnodes, int N, int mapsize);
+
+
+/*!
+ * Compute the spherical-Laguerre basis functions on a grid of radii
+ *
+ * \param[out]  KN Synthesised basis function.
+ * \param[in]  N SLAG order of the basis function.
+ * \param[in]  nodes Radii where the function must be calculated.
+ * \param[in]  Nnodes Number of radii.
+ * \param[in]  tau Scaling factor.
+ * \retval none
+ */
+void flag_spherlaguerre_basis(double *KN, const int N, const double *nodes, int Nnodes, double tau);
 
 #endif

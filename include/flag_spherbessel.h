@@ -17,6 +17,4 @@ void flag_sbesselslag(double *sbesselslag, int ell, double *kvalues, int Nk, int
 
 void flag_mulk(double *mulk, int n, int ell, double k, double tau);
 
-double j_ell(double X, int l);
-
 #endif

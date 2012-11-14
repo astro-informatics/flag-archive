@@ -97,6 +97,18 @@ void flag_core_analysis_real(complex double *flmn, const double *f, double R, in
  * \param[in]  N Radial harmonic band-limit.
  * \retval none
  */
- void flag_core_synthesis_real(double *f, const complex double *flmn, const double *nodes, int Nnodes, int L, int N);
+void flag_core_synthesis_real(double *f, const complex double *flmn, const double *nodes, int Nnodes, int L, int N);
+
+/*!
+ * Compute the spherical-Bessel basis functions on a grid of radii
+ *
+ * \param[out]  jell Synthesised basis function.
+ * \param[in]  ell order-multipole of the basis function.
+ * \param[in]  nodes Radii where the function must be calculated.
+ * \param[in]  Nnodes Number of radii.
+ * \retval none
+ */
+void flag_spherbessel_basis(double *jell, const int ell, const double *nodes, int Nnodes);
+
 
 #endif

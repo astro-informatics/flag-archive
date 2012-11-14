@@ -12,6 +12,7 @@
 
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 
+
 double eval_laguerre(double z, int n, int alpha)
 {
 	int k;
@@ -436,5 +437,42 @@ void flag_spherlaguerre_mapped_synthesis(complex double *f, const complex double
 	}
 	
 	free(temp);
+
+}
+
+
+void flag_spherlaguerre_basis(double *KN, const int N, const double *nodes, int Nnodes, double tau)
+{
+	assert(Nnodes > 0);
+	int i, n;
+	const int alpha = 2;
+	double factor, lagu0, lagu1, lagu2, r;
+
+	for (i = 0; i < Nnodes; i++)
+	{
+		r = nodes[i]/tau;
+		factor = exp(-r/2.0);
+
+		lagu0 = 0.0;
+		lagu1 = 1.0;
+
+		if (N == 0 ){
+
+			KN[i] = factor * pow(factorial_range(1, alpha), -0.5) * lagu1;
+		
+		} else {
+		
+			for (n = 1; n <= N; n++) 
+			{ 
+				lagu2 = ( (alpha + 2 * n - 1 - r) * lagu1 - 
+						(alpha + n - 1) * lagu0 ) / n;
+				lagu0 = lagu1;
+				lagu1 = lagu2;
+			}
+			KN[i] = factor * pow(factorial_range(N+1, N+alpha), -0.5) * lagu2;
+
+		}
+		
+	}
 
 }
