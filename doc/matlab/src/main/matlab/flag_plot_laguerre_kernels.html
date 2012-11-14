@@ -36,7 +36,7 @@ This function calls:
 <li><a href="slag_sampling.html" class="code" title="function nodes = slag_sampling(P, R)">slag_sampling</a>	slag_sampling - Compute 1D spherical Laguerre Sampling scheme</li><li><a href="slag_synthesis.html" class="code" title="function [f, nodes] = slag_synthesis(fn, varargin)">slag_synthesis</a>	slag_synthesis - Compute 1D spherical Laguerre Synthesis</li></ul>
 This function is called by:
 <ul style="list-style-image:url(../../../matlabicon.gif)">
-</ul>
+<li><a href="flag_demo1.html" class="code" title="function flag_demo1">flag_demo1</a>	</li></ul>
 <!-- crossreference -->
 
 
@@ -67,8 +67,8 @@ This function is called by:
 0023 <span class="comment">% title('Decaying Laguerre polynomials (weighted with exp-r)')</span>
 0024 
 0025 figure(<span class="string">'Position'</span>,[200 200 600 1000])
-0026 
-0027 subplot(3,1,1)
+0026 subplot(3,1,1)
+0027 title(<span class="string">'Spherical Laguerre transform : basis functions'</span>, <span class="string">'FontSize'</span>, 20);
 0028 hold on
 0029 <span class="keyword">for</span> n = 1:nmax
 0030     fn = zeros(1,P);
@@ -87,42 +87,44 @@ This function is called by:
 0043 set(gca,<span class="string">'LineWidth'</span>,2);
 0044 
 0045 subplot(3,1,2)
-0046 hold on
-0047 <span class="keyword">for</span> n = 1:nmax
-0048     fn = zeros(1,P);
-0049     fn(n) = 1.0;
-0050     [f, nodes] = <a href="slag_synthesis.html" class="code" title="function [f, nodes] = slag_synthesis(fn, varargin)">slag_synthesis</a>(fn, <span class="string">'P'</span>, P, <span class="string">'Nodes'</span>, nodes);
-0051     p = plot(nodes, f);
-0052     set(p,<span class="string">'Color'</span>,colors(n,:),<span class="string">'LineWidth'</span>,2);
-0053 <span class="keyword">end</span>
-0054 p=plot(sampling, 0*sampling,<span class="string">'.'</span>);
-0055 set(p,<span class="string">'Color'</span>,<span class="string">'black'</span>,<span class="string">'LineWidth'</span>,2);
-0056 plot(sampling, 0*sampling,<span class="string">'o'</span>,<span class="string">'LineWidth'</span>,2,<span class="string">'MarkerSize'</span>,10,<span class="string">'MarkerEdgeColor'</span>,<span class="string">'k'</span>)
-0057 axis([0 R -0.2 0.2])
-0058 xlabel(<span class="string">'x2'</span>,<span class="string">'FontSize'</span>,10)
-0059 ylabel(<span class="string">'y2'</span>,<span class="string">'FontSize'</span>,10)
-0060 set(gca,<span class="string">'FontSize'</span>,10);
-0061 set(gca,<span class="string">'LineWidth'</span>,2);
-0062 
-0063 subplot(3,1,3)
-0064 hold on
-0065 <span class="keyword">for</span> n = 1:nmax
-0066     fn = zeros(1,P);
-0067     fn(n) = 1.0;
-0068     [f, nodes] = <a href="slag_synthesis.html" class="code" title="function [f, nodes] = slag_synthesis(fn, varargin)">slag_synthesis</a>(fn, <span class="string">'P'</span>, P, <span class="string">'Nodes'</span>, nodes);
-0069     p = plot(nodes, f.*nodes);
-0070     set(p,<span class="string">'Color'</span>,colors(n,:),<span class="string">'LineWidth'</span>,2);
-0071 <span class="keyword">end</span>
-0072 p=plot(sampling, 0*sampling,<span class="string">'.'</span>);
-0073 set(p,<span class="string">'Color'</span>,<span class="string">'black'</span>,<span class="string">'LineWidth'</span>,2);
-0074 plot(sampling, 0*sampling,<span class="string">'o'</span>,<span class="string">'LineWidth'</span>,2,<span class="string">'MarkerSize'</span>,10,<span class="string">'MarkerEdgeColor'</span>,<span class="string">'k'</span>)
-0075 axis([0 R -0.029 0.029])
-0076 xlabel(<span class="string">'x3'</span>,<span class="string">'FontSize'</span>,10)
-0077 ylabel(<span class="string">'y3'</span>,<span class="string">'FontSize'</span>,10)
-0078 set(gca,<span class="string">'FontSize'</span>,10);
-0079 set(gca,<span class="string">'LineWidth'</span>,2);
-0080 
-0081 <span class="keyword">end</span></pre></div>
-<hr><address>Generated on Thu 08-Nov-2012 10:12:16 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+0046 title(<span class="string">'Spherical Laguerre transform : basis functions (zoomed)'</span>, <span class="string">'FontSize'</span>, 20);
+0047 hold on
+0048 <span class="keyword">for</span> n = 1:nmax
+0049     fn = zeros(1,P);
+0050     fn(n) = 1.0;
+0051     [f, nodes] = <a href="slag_synthesis.html" class="code" title="function [f, nodes] = slag_synthesis(fn, varargin)">slag_synthesis</a>(fn, <span class="string">'P'</span>, P, <span class="string">'Nodes'</span>, nodes);
+0052     p = plot(nodes, f);
+0053     set(p,<span class="string">'Color'</span>,colors(n,:),<span class="string">'LineWidth'</span>,2);
+0054 <span class="keyword">end</span>
+0055 p=plot(sampling, 0*sampling,<span class="string">'.'</span>);
+0056 set(p,<span class="string">'Color'</span>,<span class="string">'black'</span>,<span class="string">'LineWidth'</span>,2);
+0057 plot(sampling, 0*sampling,<span class="string">'o'</span>,<span class="string">'LineWidth'</span>,2,<span class="string">'MarkerSize'</span>,10,<span class="string">'MarkerEdgeColor'</span>,<span class="string">'k'</span>)
+0058 axis([0 R -0.2 0.2])
+0059 xlabel(<span class="string">'x2'</span>,<span class="string">'FontSize'</span>,10)
+0060 ylabel(<span class="string">'y2'</span>,<span class="string">'FontSize'</span>,10)
+0061 set(gca,<span class="string">'FontSize'</span>,10);
+0062 set(gca,<span class="string">'LineWidth'</span>,2);
+0063 
+0064 subplot(3,1,3)
+0065 title(<span class="string">'Spherical Laguerre transform : basis functions multiplied by r'</span>, <span class="string">'FontSize'</span>, 20);
+0066 hold on
+0067 <span class="keyword">for</span> n = 1:nmax
+0068     fn = zeros(1,P);
+0069     fn(n) = 1.0;
+0070     [f, nodes] = <a href="slag_synthesis.html" class="code" title="function [f, nodes] = slag_synthesis(fn, varargin)">slag_synthesis</a>(fn, <span class="string">'P'</span>, P, <span class="string">'Nodes'</span>, nodes);
+0071     p = plot(nodes, f.*nodes);
+0072     set(p,<span class="string">'Color'</span>,colors(n,:),<span class="string">'LineWidth'</span>,2);
+0073 <span class="keyword">end</span>
+0074 p=plot(sampling, 0*sampling,<span class="string">'.'</span>);
+0075 set(p,<span class="string">'Color'</span>,<span class="string">'black'</span>,<span class="string">'LineWidth'</span>,2);
+0076 plot(sampling, 0*sampling,<span class="string">'o'</span>,<span class="string">'LineWidth'</span>,2,<span class="string">'MarkerSize'</span>,10,<span class="string">'MarkerEdgeColor'</span>,<span class="string">'k'</span>)
+0077 axis([0 R -0.029 0.029])
+0078 xlabel(<span class="string">'x3'</span>,<span class="string">'FontSize'</span>,10)
+0079 ylabel(<span class="string">'y3'</span>,<span class="string">'FontSize'</span>,10)
+0080 set(gca,<span class="string">'FontSize'</span>,10);
+0081 set(gca,<span class="string">'LineWidth'</span>,2);
+0082 
+0083 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Wed 14-Nov-2012 15:10:36 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>

@@ -36,7 +36,7 @@ This function calls:
 <li><a href="flag_sampling.html" class="code" title="function [rs, thetas, phis] = flag_sampling(L, P, R)">flag_sampling</a>	flag_sampling - Compute Fourier-Laguerre sampling scheme</li></ul>
 This function is called by:
 <ul style="list-style-image:url(../../../matlabicon.gif)">
-</ul>
+<li><a href="flag_demo1.html" class="code" title="function flag_demo1">flag_demo1</a>	</li></ul>
 <!-- crossreference -->
 
 
@@ -63,11 +63,13 @@ This function is called by:
 0019 c = numel(x):-1:1;
 0020 
 0021 figure(<span class="string">'Position'</span>,[1 1 600 600])
-0022 h = scatter3(x,y,z,0.5*s,c,<span class="string">'filled'</span>);
-0023 set(gca, <span class="string">'visible'</span>, <span class="string">'off'</span>); 
-0024 view(60,30);
-0025 zoom(1.5);
-0026 <span class="keyword">end</span></pre></div>
-<hr><address>Generated on Thu 08-Nov-2012 10:12:16 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+0022 title(<span class="string">'Fourier-Laguerre transform: 3D sampling theorem'</span>, <span class="string">'FontSize'</span>, 20);
+0023 h = scatter3(x,y,z,0.5*s,c,<span class="string">'filled'</span>);
+0024 set(gca, <span class="string">'visible'</span>, <span class="string">'off'</span>); 
+0025 view(60,30);
+0026 zoom(1.5);
+0027 
+0028 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Wed 14-Nov-2012 15:10:36 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>

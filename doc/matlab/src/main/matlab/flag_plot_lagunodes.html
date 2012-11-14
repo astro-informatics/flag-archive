@@ -36,7 +36,7 @@ This function calls:
 <li><a href="slag_sampling.html" class="code" title="function nodes = slag_sampling(P, R)">slag_sampling</a>	slag_sampling - Compute 1D spherical Laguerre Sampling scheme</li></ul>
 This function is called by:
 <ul style="list-style-image:url(../../../matlabicon.gif)">
-</ul>
+<li><a href="flag_demo1.html" class="code" title="function flag_demo1">flag_demo1</a>	</li></ul>
 <!-- crossreference -->
 
 
@@ -45,21 +45,22 @@ This function is called by:
 <div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function flag_plot_lagunodes( P, R )</a>
 0002 
 0003 figure(<span class="string">'Position'</span>,[200 200 800 700])
-0004 hold on
-0005 xlabel(<span class="string">'x'</span>,<span class="string">'FontSize'</span>,20)
-0006 ylabel(<span class="string">'y'</span>,<span class="string">'FontSize'</span>,20)
-0007 nodes = R;
-0008 <span class="keyword">for</span> i=2:P
-0009     nodes = <a href="slag_sampling.html" class="code" title="function nodes = slag_sampling(P, R)">slag_sampling</a>(i, R);
-0010     y = i * nodes ./ nodes ;
-0011     plot( nodes, y, <span class="string">'--'</span>, <span class="string">'LineWidth'</span>,5, <span class="string">'Color'</span>, <span class="string">'black'</span> )
-0012     plot( nodes, y, <span class="string">'o'</span>,<span class="string">'MarkerSize'</span>,13, <span class="string">'LineWidth'</span>,5, <span class="string">'Color'</span>, <span class="string">'black'</span> )
-0013 <span class="keyword">end</span>
-0014 axis([0 R 1 P+1])
-0015 set(gca,<span class="string">'FontSize'</span>,42);
-0016 set(gca,<span class="string">'LineWidth'</span>,5);
-0017 
-0018 <span class="keyword">end</span></pre></div>
-<hr><address>Generated on Thu 08-Nov-2012 10:12:16 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+0004 title(<span class="string">'Spherical Laguerre transform: sampling theorem'</span>, <span class="string">'FontSize'</span>, 20);
+0005 hold on
+0006 xlabel(<span class="string">'x'</span>,<span class="string">'FontSize'</span>,20)
+0007 ylabel(<span class="string">'y'</span>,<span class="string">'FontSize'</span>,20)
+0008 nodes = R;
+0009 <span class="keyword">for</span> i=2:P
+0010     nodes = <a href="slag_sampling.html" class="code" title="function nodes = slag_sampling(P, R)">slag_sampling</a>(i, R);
+0011     y = i * nodes ./ nodes ;
+0012     plot( nodes, y, <span class="string">'--'</span>, <span class="string">'LineWidth'</span>,5, <span class="string">'Color'</span>, <span class="string">'black'</span> )
+0013     plot( nodes, y, <span class="string">'o'</span>,<span class="string">'MarkerSize'</span>,13, <span class="string">'LineWidth'</span>,5, <span class="string">'Color'</span>, <span class="string">'black'</span> )
+0014 <span class="keyword">end</span>
+0015 axis([0 R 1 P+1])
+0016 set(gca,<span class="string">'FontSize'</span>,42);
+0017 set(gca,<span class="string">'LineWidth'</span>,5);
+0018 
+0019 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Wed 14-Nov-2012 15:10:36 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>

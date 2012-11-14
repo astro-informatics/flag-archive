@@ -76,7 +76,7 @@ void flag_random_f(complex double *f, int L, int N, int seed)
 {
 	int i;
 	srand( time(NULL) );
-	for (i=0; i<flag_f_size_mw(L, N); i++){
+	for (i=0; i<flag_core_f_size_mw(L, N); i++){
 		f[i] = (2.0*ran2_dp(seed) - 1.0) + I * (2.0*ran2_dp(seed) - 1.0);
 	}
 }
@@ -85,7 +85,7 @@ void flag_random_flmn(complex double *flmn, int L, int N, int seed)
 {
 	int i;
 	srand( time(NULL) );
-	for (i=0; i<flag_flmn_size(L, N); i++){
+	for (i=0; i<flag_core_flmn_size(L, N); i++){
 		flmn[i] = (2.0*ran2_dp(seed) - 1.0) + I * (2.0*ran2_dp(seed) - 1.0);//rand()/795079784.0;
 	}
 }
@@ -256,7 +256,7 @@ void flag_sbesselslag_test_jlK(double Kval, int ell, int Nk, int N, double R, in
 	flag_sbesselslag(fn_bis, ell, &Kval, 1, N, tau);
 	for (n = 0; n < N; n++){
 		fn_bis[n] = fn_bis[n] * pow(tau, -3.0);
-		printf("> n = %i : fn = %f  <->  fn_bis = %f  <-> ratio = %f\n", n, fn[n], fn_bis[n], fn_bis[n]/fn[n]);
+		printf("> n = %i : fn = %f  <->  fn_bis = %f  <-> ratio = %16.2e\n", n, fn[n], fn_bis[n], fn_bis[n]/fn[n]);
 	}
 
  	// Approximate reconstruction
@@ -292,7 +292,7 @@ int main(int argc, char *argv[])
 	const double Kval = 0.15;
 	const int ell = 0;
 	const int L = 4;
-	const int N = 32;
+	const int N = 31;
 	const int Nk = 5;
 	const double R = 200.0;
 	const int seed = (int)(10000.0*(double)clock()/(double)CLOCKS_PER_SEC);

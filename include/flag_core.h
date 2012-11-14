@@ -99,6 +99,12 @@ void flag_core_analysis_real(complex double *flmn, const double *f, double R, in
  */
 void flag_core_synthesis_real(double *f, const complex double *flmn, const double *nodes, int Nnodes, int L, int N);
 
+
+/*!
+ * Compute the spherical-Bessel function of order l at X
+ */
+double j_ell(double X, int l);
+
 /*!
  * Compute the spherical-Bessel basis functions on a grid of radii
  *
