@@ -84,7 +84,7 @@ void flag_sbesselslag(double *sbesselslag, int ell, double *kvalues, int Nk, int
         if( j == 0 ){
           weight =  pow(2, 2) * gsl_sf_fact(ell + 2) * (n + 1.0) * (n + 2.0) / 2.0 ; // 
         }else{
-          weight = - 2 * (n - j + 1) * weight / ((j + 2)); //  
+          weight = - 2 * (ell + 2 + j) * (n - j + 1) * weight / (j * (j + 2)); //  
         }
         //sbesselslag[n * Nk + k] += pow((n+1)*(n+2), -0.5) * weight * mulk_coefs[j+2] ;
         printf(" %3.0e ",weight);

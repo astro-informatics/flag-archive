@@ -444,6 +444,7 @@ void flag_spherlaguerre_mapped_synthesis(complex double *f, const complex double
 void flag_spherlaguerre_basis(double *KN, const int N, const double *nodes, int Nnodes, double tau)
 {
 	assert(Nnodes > 0);
+	assert(N > 0);
 	int i, n;
 	const int alpha = 2;
 	double factor, lagu0, lagu1, lagu2, r;
@@ -456,11 +457,9 @@ void flag_spherlaguerre_basis(double *KN, const int N, const double *nodes, int 
 		lagu0 = 0.0;
 		lagu1 = 1.0;
 
-		if (N == 0 ){
+		KN[i * N] = factor * pow(factorial_range(1, alpha), -0.5) * lagu1;
 
-			KN[i] = factor * pow(factorial_range(1, alpha), -0.5) * lagu1;
-		
-		} else {
+		if ( N > 1 ) {
 		
 			for (n = 1; n < N; n++) 
 			{ 
