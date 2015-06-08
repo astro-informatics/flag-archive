@@ -7,6 +7,7 @@
 
 #include <complex.h> 
 
+
 /*!
  * Allocate FLAG coefficients.
  *
@@ -76,6 +77,10 @@ void flag_core_analysis(complex double *flmn, const complex double *f, double R,
  * \retval none
  */
  void flag_core_synthesis(complex double *f, const complex double *flmn, const double *nodes, int Nnodes, int L, int N);
+
+void flag_core_fourierbessel_analysis(complex double *flmn, const complex double *f, double R, int L, int N);
+void flag_core_fourierbessel_synthesis(complex double *f, const complex double *flmn, const double *nodes, int Nnodes, int L, int N);
+
 
 /*!
  * Perform Fourier-Laguerre analysis (MW sampling, real signal).

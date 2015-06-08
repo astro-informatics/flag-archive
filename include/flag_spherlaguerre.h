@@ -2,7 +2,7 @@
 #ifndef FLAG_SPHERLAGUERRE
 #define FLAG_SPHERLAGUERRE
 
-#include <complex.h> 
+#include <complex.h>
 
 /*!
  * Compute Gauss-Laguerre quadrature (nodes and weights).
@@ -34,6 +34,8 @@ double flag_spherlaguerre_tau(double R, int N);
  */
 void flag_spherlaguerre_sampling(double *nodes, double *weights, double R, int N);
 
+void flag_spherbessel_sampling(double *nodes, double *weights, double R, int N);
+
 /*!
  * Perform spherical Laguerre analysis.
  *
@@ -56,6 +58,9 @@ void flag_spherlaguerre_analysis(double *fn, const double *f, const double *node
  * \retval none
  */
 void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nodes, int Nnodes, int N);
+
+void flag_spherlaguerre_synthesis_gen(double *f, const double *fn, const double *nodes, int Nnodes, int N, int alpha);
+
 
 /*!
  * Allocate spherical Laguerre sampling scheme.

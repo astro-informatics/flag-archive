@@ -1,12 +1,12 @@
 // FLAG package
-// Copyright (C) 2012 
+// Copyright (C) 2012
 // Boris Leistedt & Jason McEwen
 
 #include "flag.h"
 #include <math.h>
 #include <stdlib.h>
-#include <complex.h> 
-#include <fftw3.h> 
+#include <complex.h>
+#include <fftw3.h>
 #include <ssht.h>
 #include <assert.h>
 
@@ -68,13 +68,13 @@ void flag_core_allocate_f_real(double **f, int L, int N)
 	assert(f != NULL);
 }
 
-void flag_core_analysis(complex double *flmn, 
-		const complex double *f, 
+void flag_core_analysis(complex double *flmn,
+		const complex double *f,
 		double R, int L, int N)
 {
 	assert(L > 0);
 	assert(N > 1);
-	//const int alpha = 2;
+	//const int alpha = ALPHA;
 	int spin = 0;
 	int verbosity = 0;
 	int n;
@@ -82,17 +82,17 @@ void flag_core_analysis(complex double *flmn,
 	int frsize = ssht_fr_size_mw(L);
 	ssht_dl_method_t dl_method = SSHT_DL_TRAPANI;
 	int offset_lm, offset_r;
-	
+
 	complex double *flmr;
 	flag_core_allocate_flmn(&flmr, L, N);
-	
+
 	for (n = 0; n < N; n++){
 		//printf("> Analysis: layer %i on %i\n", n+1,N+1);
 		offset_lm = n * flmsize;
 		offset_r = n * frsize;
 		ssht_core_mw_forward_sov_conv_sym(flmr + offset_lm, f + offset_r, L, spin, dl_method, verbosity);
 	}
-	
+
 	double *nodes = (double*)calloc(N, sizeof(double));
 	double *weights = (double*)calloc(N, sizeof(double));
 	assert(nodes != NULL);
@@ -108,15 +108,15 @@ void flag_core_analysis(complex double *flmn,
 
 }
 
-void flag_core_synthesis(complex double *f, 
-		const complex double *flmn, 
+void flag_core_synthesis(complex double *f,
+		const complex double *flmn,
 		const double *nodes, int Nnodes,
 		int L, int N)
 {
 	assert(L > 0);
 	assert(N > 1);
 	assert(nodes != NULL);
-	//const int alpha = 2;
+	//const int alpha = ALPHA;
 	int spin = 0;
 	int verbosity = 0;
 	int n, offset_lm, offset_r;
@@ -129,7 +129,7 @@ void flag_core_synthesis(complex double *f,
 	//printf("> Mapped spherical Laguerre transform...");fflush(NULL);
 	flag_spherlaguerre_mapped_synthesis(flmr, flmn, nodes, Nnodes, N, flmsize);
 	//printf("done\n");
-	
+
 	for (n = 0; n < Nnodes; n++){
 		//printf("> Synthesis: layer %i on %i\n",n+1,Nnodes);
 		offset_lm = n * flmsize;
@@ -140,7 +140,7 @@ void flag_core_synthesis(complex double *f,
     free(flmr);
 }
 
-void flag_core_analysis_real(complex double *flmn, 
+void flag_core_analysis_real(complex double *flmn,
 		const double *f, double R, int L, int N)
 {
 	assert(L > 0);
@@ -175,9 +175,9 @@ void flag_core_analysis_real(complex double *flmn,
     free(flmr);
 }
 
-void flag_core_synthesis_real(double *f, 
-		const complex double *flmn, 
-		const double *nodes, int Nnodes, 
+void flag_core_synthesis_real(double *f,
+		const complex double *flmn,
+		const double *nodes, int Nnodes,
 		int L, int N)
 {
 	assert(L > 0);
@@ -232,13 +232,13 @@ double j_ell(double X, int l)
           else
              JL = sin(AX) / AX;
           break;
-      case 1 : 
+      case 1 :
           if( AX < 0.2 )
              JL = AX / 3.0 * (1.0 - AX2 / 10.0 * ( 1.0 - AX2 / 28.0 ) );
           else
              JL = (sin(AX) / AX - cos(AX)) / AX;
           break;
-      case 2 : 
+      case 2 :
           if( AX < 0.3 )
              JL = AX2 / 15.0 * (1.0 - AX2 / 14.0 * (1.0 - AX2 / 36.0));
           else
@@ -266,23 +266,23 @@ double j_ell(double X, int l)
           if( AX < 1.0 )
             JL = pow(AX2, 3.0) / 135135.0 * (1.0 - AX2 / 30.0 * (1.0 - AX2 / 68.0));
           else
-             JL = (sin(AX) * ( - 1.0 + (210.0 - (4725.0 - 10395.0 / AX2) / AX2) / AX2)  +  
+             JL = (sin(AX) * ( - 1.0 + (210.0 - (4725.0 - 10395.0 / AX2) / AX2) / AX2)  +
                   cos(AX) * ( - 21.0 + (1260.0 - 10395.0 / AX2) / AX2) / AX) / AX;
           break;
 
       default :
-  
+
        NU = 0.50 + L;
        NU2 = pow(NU, 2.0);
        if(AX < 1.0 - 40)
           JL = 0.0;
        else if( (AX2 / (double)L) < 0.5){
-          JL = exp(L * log(AX / NU) - LN2 + NU * ONEMLN2 - (1.0 - (1.0 - 3.50 / NU2) / NU2 / 30.0) / 12.0 / NU)  
+          JL = exp(L * log(AX / NU) - LN2 + NU * ONEMLN2 - (1.0 - (1.0 - 3.50 / NU2) / NU2 / 30.0) / 12.0 / NU)
                 / NU * (1.0 - AX2 / (4.0 * NU + 4.0) * (1.0 - AX2 / (8.0 * NU + 16.0) * (1.0 - AX2 / (12.0 * NU + 36.0))));
        }else if((pow(L, 2.0) / AX) < 5.0 - 1){
           BETA = AX - PID2 * (L + 1);
-          JL = (cos(BETA) * (1.0 - (NU2 - 0.250) * (NU2 - 2.250) / 8.0 / AX2 * (1.0 - (NU2 - 6.25) * (NU2 - 12.250) / 48.0 / AX2))  
-                - sin(BETA) * (NU2 - 0.250) / 2.0 / AX *  (1.0 - (NU2 - 2.250) * (NU2 - 6.250) / 24.0 / AX2 * (1.0 - (NU2 - 12.25) *   
+          JL = (cos(BETA) * (1.0 - (NU2 - 0.250) * (NU2 - 2.250) / 8.0 / AX2 * (1.0 - (NU2 - 6.25) * (NU2 - 12.250) / 48.0 / AX2))
+                - sin(BETA) * (NU2 - 0.250) / 2.0 / AX *  (1.0 - (NU2 - 2.250) * (NU2 - 6.250) / 24.0 / AX2 * (1.0 - (NU2 - 12.25) *
                (NU2 - 20.25) / 80.0 / AX2)) ) / AX   ;
        }else{
           L3 = pow(NU, 0.325);
@@ -295,10 +295,10 @@ double j_ell(double X, int l)
              COT3B = pow(COTB, 3.0);
              COT6B = pow(COT3B, 2.0);
              SEC2B = pow(SECB, 2.0);
-             EXPTERM = ( (2.0 + 3.0 * SEC2B) * COT3B / 24.0  
-                   -  ( (4.0 + SEC2B) * SEC2B * COT6B / 16.0  
-                   +  ((16.0 - (1512.0 + (3654.0 + 375.0 * SEC2B) * SEC2B) * SEC2B) * COT3B / 5760.0  
-                   +  (32.0 + (288.0 + (232.0 + 13.0 * SEC2B) * SEC2B) * SEC2B) * SEC2B * COT6B / 128.0 / NU) * COT6B / NU)  
+             EXPTERM = ( (2.0 + 3.0 * SEC2B) * COT3B / 24.0
+                   -  ( (4.0 + SEC2B) * SEC2B * COT6B / 16.0
+                   +  ((16.0 - (1512.0 + (3654.0 + 375.0 * SEC2B) * SEC2B) * SEC2B) * COT3B / 5760.0
+                   +  (32.0 + (288.0 + (232.0 + 13.0 * SEC2B) * SEC2B) * SEC2B) * SEC2B * COT6B / 128.0 / NU) * COT6B / NU)
                    / NU) / NU;
              JL = sqrt(COTB * COSB) / (2.0 * NU) * exp( - NU * BETA + NU / COTB - EXPTERM);
           }else if (AX  >  NU + 1.48 * L3){
@@ -310,10 +310,10 @@ double j_ell(double X, int l)
              COT3B = pow(COTB, 3.0);
              COT6B = pow(COT3B, 2.0);
              SEC2B = pow(SECB, 2.0);
-             TRIGARG = NU / COTB - NU * BETA - PID4  
-                   - ((2.0 + 3.0 * SEC2B) * COT3B / 24.0   
+             TRIGARG = NU / COTB - NU * BETA - PID4
+                   - ((2.0 + 3.0 * SEC2B) * COT3B / 24.0
                    + (16.0 - (1512.0 + (3654.0 + 375.0 * SEC2B) * SEC2B) * SEC2B) * COT3B * COT6B / 5760.0 / NU2) / NU;
-             EXPTERM = ( (4.0 + SEC2B) * SEC2B * COT6B / 16.0  
+             EXPTERM = ( (4.0 + SEC2B) * SEC2B * COT6B / 16.0
                    - (32.0 + (288.0 + (232.0 + 13.0 * SEC2B) * SEC2B) * SEC2B) * SEC2B *  pow(COT6B, 2.0) / 128.0 / NU2) / NU2;
              JL = sqrt(COTB * COSB) / NU * exp( - EXPTERM) * cos(TRIGARG);
           }else{
@@ -323,19 +323,19 @@ double j_ell(double X, int l)
              SX2 = pow(SX, 2.0);
              SECB = pow(SX, 0.3333333333333333);
              SEC2B = pow(SECB, 2.0);
-             JL = ( GAMMA1 * SECB  +  BETA * GAMMA2 * SEC2B  
-                   - (BETA2 / 18.0 - 1.0 / 45.0) * BETA * SX * SECB * GAMMA1  
-                   - ((BETA2 - 1.0) * BETA2 / 36.0 + 1.0 / 420.0) * SX * SEC2B * GAMMA2    
-                   + (((BETA2 / 1620.0 - 7.0 / 3240.0) * BETA2 + 1.0 / 648.0) * BETA2 - 1.0 / 8100.0) * SX2 * SECB * GAMMA1  
-                   + (((BETA2 / 4536.0 - 1.0 / 810.0) * BETA2 + 19.0 / 11340.0) * BETA2 - 13.0 / 28350.0) * BETA * SX2 * SEC2B * GAMMA2  
-                   - ((((BETA2 / 349920.0 - 1.0 / 29160.0) * BETA2 + 71.0 / 583200.0) * BETA2 - 121.0 / 874800.0) *   
+             JL = ( GAMMA1 * SECB  +  BETA * GAMMA2 * SEC2B
+                   - (BETA2 / 18.0 - 1.0 / 45.0) * BETA * SX * SECB * GAMMA1
+                   - ((BETA2 - 1.0) * BETA2 / 36.0 + 1.0 / 420.0) * SX * SEC2B * GAMMA2
+                   + (((BETA2 / 1620.0 - 7.0 / 3240.0) * BETA2 + 1.0 / 648.0) * BETA2 - 1.0 / 8100.0) * SX2 * SECB * GAMMA1
+                   + (((BETA2 / 4536.0 - 1.0 / 810.0) * BETA2 + 19.0 / 11340.0) * BETA2 - 13.0 / 28350.0) * BETA * SX2 * SEC2B * GAMMA2
+                   - ((((BETA2 / 349920.0 - 1.0 / 29160.0) * BETA2 + 71.0 / 583200.0) * BETA2 - 121.0 / 874800.0) *
                   BETA2 + 7939.0 / 224532000.0) * BETA * SX2 * SX * SECB * GAMMA1) * sqrt(SX) / ROOTPI12;
           }
         }
       break;
     }
-        
-    if( (X < 0) && (L % 2 != 0) ) 
+
+    if( (X < 0) && (L % 2 != 0) )
       JL = -JL;
 
     return(JL);
@@ -348,4 +348,79 @@ void flag_spherbessel_basis(double *jell, const int ell, const double *nodes, in
 	int i;
 	for (i = 0; i < Nnodes; i++)
 		jell[i] = j_ell(nodes[i], ell);
+}
+
+
+
+
+void flag_core_fourierbessel_analysis(complex double *flmn,
+		const complex double *f,
+		double R, int L, int N)
+{
+	assert(L > 0);
+	assert(N > 1);
+	//const int alpha = ALPHA;
+	int spin = 0;
+	int verbosity = 0;
+	int n;
+	int flmsize = ssht_flm_size(L);
+	int frsize = ssht_fr_size_mw(L);
+	ssht_dl_method_t dl_method = SSHT_DL_TRAPANI;
+	int offset_lm, offset_r;
+
+	complex double *flmr;
+	flag_core_allocate_flmn(&flmr, L, N);
+
+	for (n = 0; n < N; n++){
+		//printf("> Analysis: layer %i on %i\n", n+1,N+1);
+		offset_lm = n * flmsize;
+		offset_r = n * frsize;
+		ssht_core_mw_forward_sov_conv_sym(flmr + offset_lm, f + offset_r, L, spin, dl_method, verbosity);
+	}
+
+	double *nodes = (double*)calloc(N, sizeof(double));
+	double *weights = (double*)calloc(N, sizeof(double));
+	assert(nodes != NULL);
+	assert(weights != NULL);
+	flag_spherlaguerre_sampling(nodes, weights, R, N);
+	//printf("> Mapped spherical Laguerre transform...");
+	fflush(NULL);
+	flag_spherlaguerre_mapped_analysis(flmn, flmr, nodes, weights, N, flmsize);
+	//printf("done\n");
+	free(nodes);
+	free(weights);
+    free(flmr);
+
+}
+
+void flag_core_fourierbessel_synthesis(complex double *f,
+		const complex double *flmn,
+		const double *nodes, int Nnodes,
+		int L, int N)
+{
+	assert(L > 0);
+	assert(N > 1);
+	assert(nodes != NULL);
+	//const int alpha = ALPHA;
+	int spin = 0;
+	int verbosity = 0;
+	int n, offset_lm, offset_r;
+	int flmsize = ssht_flm_size(L);
+	int frsize = ssht_fr_size_mw(L);
+	ssht_dl_method_t dl_method = SSHT_DL_TRAPANI;
+
+	complex double *flmr;
+	flag_core_allocate_flmn(&flmr, L, Nnodes);
+	//printf("> Mapped spherical Laguerre transform...");fflush(NULL);
+	flag_spherlaguerre_mapped_synthesis(flmr, flmn, nodes, Nnodes, N, flmsize);
+	//printf("done\n");
+
+	for (n = 0; n < Nnodes; n++){
+		//printf("> Synthesis: layer %i on %i\n",n+1,Nnodes);
+		offset_lm = n * flmsize;
+		offset_r = n * frsize;
+		ssht_core_mw_inverse_sov_sym(f + offset_r, flmr + offset_lm, L, spin, dl_method, verbosity);
+	}
+
+    free(flmr);
 }

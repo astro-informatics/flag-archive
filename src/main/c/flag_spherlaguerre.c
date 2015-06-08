@@ -1,12 +1,12 @@
  // FLAG package
-// Copyright (C) 2012 
+// Copyright (C) 2012
 // Boris Leistedt & Jason McEwen
 
 #include "flag.h"
 #include <math.h>
 #include <stdlib.h>
-#include <complex.h> 
-#include <fftw3.h> 
+#include <complex.h>
+#include <fftw3.h>
 #include <ssht.h>
 #include <assert.h>
 
@@ -62,7 +62,7 @@ void flag_spherlaguerre_quadrature(double *roots, double *weights, int N, int al
 	double infbound ;
 	double supbound ;
 	const int NITERMAX = 2000;
-	const int MAXIT = 250; 
+	const int MAXIT = 250;
 	int niter, i, n;
 	int facalpha = factorial_range(N+1, N+alpha);
 
@@ -117,7 +117,7 @@ void flag_spherlaguerre_quadrature(double *roots, double *weights, int N, int al
 			pp = (N * p1 - N * p2) / z;
 			z1 = z;
 			// Newton step
-			z = z1 - p1/pp; 
+			z = z1 - p1/pp;
 			//printf(" %f ", z);
 			if( cabs(z - z1) < 1e-16 ){
 				//printf("MAXIT = %i err = %2.2e\n",i,cabs(taubis-tau));
@@ -143,7 +143,7 @@ void flag_spherlaguerre_quadrature(double *roots, double *weights, int N, int al
 	// Check order
 	for (n = 1; n < N-1; n++)
 		if( roots[n] <= roots[n-1] )
-			printf("Problem with %ith root! : %f < %f < %f\n", 
+			printf("Problem with %ith root! : %f < %f < %f\n",
 				n, roots[n-1], roots[n], roots[n+1]);
 
 }
@@ -152,9 +152,9 @@ double flag_spherlaguerre_tau(double R, int N)
 {
 	assert(R > 0.0);
 	assert(N > 1);
-	const int alpha = 2;
+	const int alpha = ALPHA;
 	double tau;
-	
+
 	/*
 	double *roots = (double*)calloc(N+1, sizeof(double));
 	double *weights = (double*)calloc(N+1, sizeof(double));
@@ -163,7 +163,7 @@ double flag_spherlaguerre_tau(double R, int N)
 	free(roots);
 	free(weights);
 	*/
-	
+
 	if( N < 5 ){
 
 		double *roots = (double*)calloc(N, sizeof(double));
@@ -211,7 +211,7 @@ double flag_spherlaguerre_tau(double R, int N)
 			pp = (N * p1 - N * p2) / tau;
 			taubis = tau;
 			// Newton step
-			tau = taubis - p1/pp; 
+			tau = taubis - p1/pp;
 			if( cabs(taubis - tau) < 1e-16 ){
 				//printf("MAXIT = %i err = %2.2e\n",i,cabs(taubis-tau));
 				break;
@@ -229,7 +229,7 @@ void flag_spherlaguerre_sampling(double *nodes, double *weights, double R, int N
 {
 	assert(R > 0.0);
 	assert(N > 1);
-	const int alpha = 2;
+	const int alpha = ALPHA;
 
 	flag_spherlaguerre_quadrature(nodes, weights, N, alpha);
 	double tau = R / nodes[N-1];
@@ -256,7 +256,7 @@ void flag_spherlaguerre_analysis(double *fn, const double *f, const double *node
 {
 	assert(N > 1);
 	int i, n;
-	const int alpha = 2;
+	const int alpha = ALPHA;
 
 	const double R = nodes[N-1];
 	const double tau = flag_spherlaguerre_tau(R, N);
@@ -272,14 +272,14 @@ void flag_spherlaguerre_analysis(double *fn, const double *f, const double *node
 
 		fn[0] += factor * pow(factorial_range(1, alpha), -0.5) * lagu1;
 
-		for (n = 1; n < N; n++) 
-		{ 
-			lagu2 = 
-				( 
-					(alpha + 2 * n - 1 - r) * lagu1 - 
+		for (n = 1; n < N; n++)
+		{
+			lagu2 =
+				(
+					(alpha + 2 * n - 1 - r) * lagu1 -
 					(alpha + n - 1) * lagu0
 				) / n;
- 
+
 			fn[n] += factor * pow(factorial_range(n+1, n+alpha), -0.5) * lagu2;
 
 			lagu0 = lagu1;
@@ -287,15 +287,19 @@ void flag_spherlaguerre_analysis(double *fn, const double *f, const double *node
 		}
 	}
 
-	
 }
 
 void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nodes, int Nnodes, int N)
 {
+	flag_spherlaguerre_synthesis_gen(f, fn, nodes, Nnodes, N, ALPHA);
+}
+
+
+void flag_spherlaguerre_synthesis_gen(double *f, const double *fn, const double *nodes, int Nnodes, int N, int alpha)
+{
 	assert(N > 1);
 	assert(Nnodes > 1);
 	int i, n;
-	const int alpha = 2;
 	complex double factor, lagu0, lagu1, lagu2, r;
 
 	const double R = nodes[Nnodes-1];
@@ -311,11 +315,11 @@ void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nod
 
 		f[i] += factor * pow(factorial_range(1, alpha), -0.5) * lagu1 * fn[0];
 
-		for (n = 1; n < N; n++) 
-		{ 
-			lagu2 = 
-				( 
-					(alpha + 2 * n - 1 - r) * lagu1 - 
+		for (n = 1; n < N; n++)
+		{
+			lagu2 =
+				(
+					(alpha + 2 * n - 1 - r) * lagu1 -
 					(alpha + n - 1) * lagu0
 				) / n;
 
@@ -324,10 +328,9 @@ void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nod
 			lagu0 = lagu1;
 			lagu1 = lagu2;
 		}
-		
 	}
-
 }
+
 
 void flag_spherlaguerre_mapped_analysis(complex double *fn, const complex double *f, const double *nodes, const double *weights, int N, int mapsize)
 {
@@ -335,7 +338,7 @@ void flag_spherlaguerre_mapped_analysis(complex double *fn, const complex double
 	assert(mapsize > 1);
 	int i, n, l, offset_i, offset_n;
 	double factor, lagu0, lagu1, lagu2, r;
-	const int alpha = 2;
+	const int alpha = ALPHA;
 
 	const double R = nodes[N-1];
 	const double tau = flag_spherlaguerre_tau(R, N);
@@ -353,23 +356,23 @@ void flag_spherlaguerre_mapped_analysis(complex double *fn, const complex double
 
 		temp[0] = factor * pow(factorial_range(1, alpha), -0.5) * lagu1;
 
-		for (n = 1; n < N; n++) 
-		{ 
-			lagu2 = 
-				( 
-					(alpha + 2 * n - 1 - r) * lagu1 - 
+		for (n = 1; n < N; n++)
+		{
+			lagu2 =
+				(
+					(alpha + 2 * n - 1 - r) * lagu1 -
 					(alpha + n - 1) * lagu0
 				) / n;
- 
+
 			temp[n] = factor * pow(factorial_range(n+1, n+alpha), -0.5) * lagu2;
-			
+
 			lagu0 = lagu1;
 			lagu1 = lagu2;
 		}
 
 		offset_i = i * mapsize;
-		for (n = 0; n < N; n++) 
-		{ 
+		for (n = 0; n < N; n++)
+		{
 			offset_n = n * mapsize;
 			for(l=0; l<mapsize; l++)
 			{
@@ -389,7 +392,7 @@ void flag_spherlaguerre_mapped_synthesis(complex double *f, const complex double
 	assert(Nnodes > 1);
 	assert(mapsize > 1);
 	int i, n, l, offset_n, offset_i;
-	const int alpha = 2;
+	const int alpha = ALPHA;
 
 	const double R = nodes[Nnodes-1];
 	const double tau = flag_spherlaguerre_tau(R, N);
@@ -410,11 +413,11 @@ void flag_spherlaguerre_mapped_synthesis(complex double *f, const complex double
 
 		temp[0] = factor * pow(factorial_range(1, alpha), -0.5) * lagu1 ;
 
-		for (n = 1; n < N; n++) 
-		{ 
-			lagu2 = 
-				( 
-					(alpha + 2 * n - 1 - r) * lagu1 - 
+		for (n = 1; n < N; n++)
+		{
+			lagu2 =
+				(
+					(alpha + 2 * n - 1 - r) * lagu1 -
 					(alpha + n - 1) * lagu0
 				) / n;
 
@@ -426,16 +429,16 @@ void flag_spherlaguerre_mapped_synthesis(complex double *f, const complex double
 		}
 
 		offset_i = i * mapsize;
-		for (n = 0; n < N; n++) 
+		for (n = 0; n < N; n++)
 		{
 			offset_n = n * mapsize;
 			for(l=0; l<mapsize; l++)
-			{			
+			{
 				f[l+offset_i] += temp[n] * fn[l+offset_n];
 			}
-		}	
+		}
 	}
-	
+
 	free(temp);
 
 }
@@ -446,7 +449,7 @@ void flag_spherlaguerre_basis(double *KN, const int N, const double *nodes, int 
 	assert(Nnodes > 0);
 	assert(N > 0);
 	int i, n;
-	const int alpha = 2;
+	const int alpha = ALPHA;
 	double factor, lagu0, lagu1, lagu2, r;
 
 	for (i = 0; i < Nnodes; i++)
@@ -460,10 +463,10 @@ void flag_spherlaguerre_basis(double *KN, const int N, const double *nodes, int 
 		KN[i * N] = factor * pow(factorial_range(1, alpha), -0.5) * lagu1;
 
 		if ( N > 1 ) {
-		
-			for (n = 1; n < N; n++) 
-			{ 
-				lagu2 = ( (alpha + 2 * n - 1 - r) * lagu1 - 
+
+			for (n = 1; n < N; n++)
+			{
+				lagu2 = ( (alpha + 2 * n - 1 - r) * lagu1 -
 						(alpha + n - 1) * lagu0 ) / n;
 				lagu0 = lagu1;
 				lagu1 = lagu2;
@@ -471,7 +474,26 @@ void flag_spherlaguerre_basis(double *KN, const int N, const double *nodes, int 
 			}
 
 		}
-		
+
+	}
+
+}
+
+
+void flag_spherbessel_sampling(double *nodes, double *weights, double R, int N)
+{
+	assert(R > 0.0);
+	assert(N > 1);
+	const int alpha = ALPHA;
+
+	flag_spherlaguerre_quadrature(nodes, weights, N, alpha);
+	double tau = R / nodes[N-1];
+
+	int n;
+	for (n=0; n<N; n++){
+		weights[n] = 1;
+		nodes[n] *= tau;
+		//printf("Node %i = %f with weight %f \n",n,nodes[n],weights[n]);
 	}
 
 }

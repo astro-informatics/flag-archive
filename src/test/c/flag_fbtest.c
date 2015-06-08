@@ -162,8 +162,8 @@ void flag_sbesselslag_test_simple(int Nk, int N, double R, int seed)
 	int ell = 0;
 	int Nnodes = N;
 	int Ninte = 20000;
- 	double kmin = 0.05;
- 	double kmax = 0.5;
+ 	double kmin = 0.01;
+ 	double kmax = 25.0;
  	double rmin = 0;
  	double rmax = 2000;
 
@@ -211,18 +211,19 @@ void flag_sbesselslag_test_simple(int Nk, int N, double R, int seed)
 	}
 
 	//------- FLK from spherical Laguerre transform
-
+	printf("Running flag_spherlaguerre2spherbessel\n");
  	double *flk_slag = (double*)calloc(Nk, sizeof(double));
 	flag_spherlaguerre2spherbessel(flk_slag, fn, kvalues, Nk, N, ell, tau);
+	printf("Finished flag_spherlaguerre2spherbessel\n");
 
 
 	//-------
 
 	for (n = 0; n < Nk; n++){
-		printf("> k = %f : inte = %f / anal = %f  / slag = %f\n", kvalues[n], flk_int[n], flk_anal[n], flk_slag[n]);
+		printf("> k = %f : integ = %f / analyt = %f  / spherlag = %f\n", kvalues[n], flk_int[n], flk_anal[n], flk_slag[n]);
 	}
 	for (n = 0; n < Nk; n++){
-		printf("> k = %f : slag / anal = %f \n", kvalues[n], flk_slag[n] / flk_anal[n]);
+		printf("> k = %f : spherlag / analyt = %f \n", kvalues[n], flk_slag[n] / flk_anal[n]);
 	}
 	
 	free(f);
@@ -250,7 +251,7 @@ void flag_sbesselslag_test_jlK(double Kval, int ell, int Nk, int N, double R, in
 	double *fn = (double*)calloc(N, sizeof(double));
 	flag_spherlaguerre_analysis(fn, f, nodes, weights, N);
  	double tau = flag_spherlaguerre_tau(R, N);
- 
+
 	// Check the SLAG coefficients
 	double *fn_bis = (double*)calloc(N, sizeof(double));
 	flag_sbesselslag(fn_bis, ell, &Kval, 1, N, tau);
@@ -290,11 +291,12 @@ int main(int argc, char *argv[])
 	const int NREPEAT = 4;
 	const int NSCALE = 5;
 	const double Kval = 0.15;
-	const int ell = 0;
+	const int ell = 3;
 	const int L = 4;
-	const int N = 31;
-	const int Nk = 5;
-	const double R = 200.0;
+	const int N = 64;
+	const int Nk = 40;
+	double tau = flag_spherlaguerre_tau(1.0, N);
+	const double R = 1.0 / tau;
 	const int seed = (int)(10000.0*(double)clock()/(double)CLOCKS_PER_SEC);
 
 	printf("==========================================================\n");
@@ -302,11 +304,16 @@ int main(int argc, char *argv[])
 	printf("  L = %i   N = %i   R = %4.1f   seed = %i\n", L, N, R, seed);
 	printf("----------------------------------------------------------\n");
 
-	printf("> Testing 1D spherical Bessel transform...\n");
-	flag_sbesselslag_test_jlK(Kval, ell, Nk, N, R, seed);
+	//flag_sbesselslag_test_jlK(Kval, ell, Nk, N, R, seed);
+	fflush(NULL);
+
+	printf("----------------------------------------------------------\n");
+
+	flag_sbesselslag_test_simple(Nk, N, R, seed);
 	fflush(NULL);
 
 	printf("==========================================================\n");
-
+	printf("  L = %i   N = %i   R = %4.1f   seed = %i\n", L, N, R, seed);
+	
 	return 0;		
 }

@@ -1,12 +1,12 @@
 // FLAG package
-// Copyright (C) 2012 
+// Copyright (C) 2012
 // Boris Leistedt & Jason McEwen
 
 #include "flag.h"
 #include <math.h>
 #include <stdlib.h>
-#include <complex.h> 
-#include <fftw3.h> 
+#include <complex.h>
+#include <fftw3.h>
 #include <ssht.h>
 #include <stdio.h>
 #include <string.h>
@@ -36,15 +36,15 @@ double maxerr(double *a, double *b, int size)
 	return value;
 }
 
-double ran2_dp(int idum) 
+double ran2_dp(int idum)
 {
-  int IM1=2147483563,IM2=2147483399,IMM1=IM1-1, 
-    IA1=40014,IA2=40692,IQ1=53668,IQ2=52774,IR1=12211,IR2=3791, 
+  int IM1=2147483563,IM2=2147483399,IMM1=IM1-1,
+    IA1=40014,IA2=40692,IQ1=53668,IQ2=52774,IR1=12211,IR2=3791,
     NTAB=32,NDIV=1+IMM1/NTAB;
 
   double AM=1./IM1,EPS=1.2e-7,RNMX=1.-EPS;
   int j,k;
-  static int iv[32],iy,idum2 = 123456789; 
+  static int iv[32],iy,idum2 = 123456789;
   // N.B. in C static variables are initialised to 0 by default.
 
   if (idum <= 0) {
@@ -71,7 +71,7 @@ double ran2_dp(int idum)
   return (AM*iy < RNMX ? AM*iy : RNMX); // min(AM*iy,RNMX);
 
 }
-	
+
 void flag_random_f(complex double *f, int L, int N, int seed)
 {
 	int i;
@@ -80,7 +80,7 @@ void flag_random_f(complex double *f, int L, int N, int seed)
 		f[i] = (2.0*ran2_dp(seed) - 1.0) + I * (2.0*ran2_dp(seed) - 1.0);
 	}
 }
-	
+
 void flag_random_flmn(complex double *flmn, int L, int N, int seed)
 {
 	int i;
@@ -114,7 +114,7 @@ void flag_random_flmn_real(complex double *flmn, int L, int N, int seed)
 }
 
 void print_f(const complex double *f,int L, int N)
-{	
+{
 	int mapsize = (2*L-1)*L;
 	int n, j;
 	for(n=0;n<N+1;n++){
@@ -127,7 +127,7 @@ void print_f(const complex double *f,int L, int N)
 }
 
 void print_f_real(const double *f,int L, int N)
-{	
+{
 	int mapsize = (2*L-1)*L;
 	int n, j;
 	for(n=0;n<N+1;n++){
@@ -140,7 +140,7 @@ void print_f_real(const double *f,int L, int N)
 }
 
 void print_flmn(const complex double *flmn,int L, int N)
-{	
+{
 	int mapsize = ssht_flm_size(L);
 	int n, j;
 	for(n=0;n<N;n++){
@@ -164,14 +164,14 @@ void flag_sampling_test(int L, int N, double R)
 	free(thetas);
 	free(phis);
 	free(laguweights);
-	
+
 }
 
 void flag_spherlaguerre_quadrature_test(int N)
 {
 	double *roots = (double*)calloc(N, sizeof(double));
 	double *weights = (double*)calloc(N, sizeof(double));
-	const int alpha = 2;
+	const int alpha = ALPHA;
 
 	flag_spherlaguerre_quadrature(roots, weights, N, alpha);
 	//int n;
@@ -184,7 +184,7 @@ void flag_spherlaguerre_tau_test(int N)
 {
 	const double R = 1.0;
 	double tau = flag_spherlaguerre_tau(R, N);
-	const int alpha = 2;
+	const int alpha = ALPHA;
 
 	double *roots = (double*)calloc(N, sizeof(double));
 	double *weights = (double*)calloc(N, sizeof(double));
@@ -216,7 +216,7 @@ void flag_spherlaguerre_sampling_test(int N, double R)
 }
 
 void flag_spherlaguerre_cmplx_transform_test(int L, int N, double R, int seed)
-{	
+{
 	clock_t time_start, time_end;
 	complex double *f, *fn, *fn_rec;
 	int flmsize = ssht_flm_size(L);
@@ -235,16 +235,16 @@ void flag_spherlaguerre_cmplx_transform_test(int L, int N, double R, int seed)
 	time_start = clock();
 	flag_spherlaguerre_mapped_synthesis(f, fn, nodes, N, N, flmsize);
 	time_end = clock();
-	printf("  - Duration of mapped inverse synthesis : %4.4f  seconds\n", 
+	printf("  - Duration of mapped inverse synthesis : %4.4f  seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
 
 	time_start = clock();
 	flag_spherlaguerre_mapped_analysis(fn_rec, f, nodes, weights, N, flmsize);
 	time_end = clock();
-	printf("  - Duration of mapped forward analysis  : %4.4f  seconds\n", 
+	printf("  - Duration of mapped forward analysis  : %4.4f  seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
-	
-	printf("  - Maximum abs error on reconstruction  : %6.5e\n", 
+
+	printf("  - Maximum abs error on reconstruction  : %6.5e\n",
 		maxerr_cplx(fn, fn_rec, N));
 
 
@@ -256,7 +256,7 @@ void flag_spherlaguerre_cmplx_transform_test(int L, int N, double R, int seed)
 }
 
 void flag_spherlaguerre_transform_test(int N, double R)
-{	
+{
 	clock_t time_start, time_end;
 	double *f = (double*)calloc(N, sizeof(double));
 	double *fn = (double*)calloc(N, sizeof(double));
@@ -277,31 +277,31 @@ void flag_spherlaguerre_transform_test(int N, double R)
 	time_start = clock();
 	flag_spherlaguerre_synthesis(f, fn, nodes, N, N);
 	time_end = clock();
-	printf("  - Duration of 1D inverse synthesis     : %4.0e  seconds\n", 
+	printf("  - Duration of 1D inverse synthesis     : %4.0e  seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
 
 	time_start = clock();
 	flag_spherlaguerre_analysis(fnrec, f, nodes, weights, N);
 	time_end = clock();
-	printf("  - Duration of 1D forward analysis      : %4.0e  seconds\n", 
+	printf("  - Duration of 1D forward analysis      : %4.0e  seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
-	
-	printf("  - Maximum abs error on reconstruction  : %6.5e\n", 
+
+	printf("  - Maximum abs error on reconstruction  : %6.5e\n",
 		maxerr(fn, fnrec, N));
-	
+
 	/*
 	printf("\nTau = %f\n",flag_spherlaguerre_tau(1.0, N));
 	for (n=0; n<N+1; n++){
 	   printf("%i > node=%f",n, nodes[n]);
 	   printf(" weight=%f",weights[n]);
-	   printf(" f=%f\n",f[n]);   
+	   printf(" f=%f\n",f[n]);
 	}
 	for (n=0; n<N; n++){
 	   printf(" fn=%f - fnrec=%f",fn[n],fnrec[n]);
 	   printf(" d=%2.2e r=%2.2e\n",fn[n]-fnrec[n],fn[n]/fnrec[n]);
 	}
 	*/
-	
+
 
 	free(f);
 	free(fn);
@@ -330,18 +330,18 @@ void flag_transform_test(int L, int N, double R, int seed)
     time_start = clock();
 	flag_core_synthesis(f, flmn, nodes, N, L, N);
 	time_end = clock();
-	printf("  - Duration of full 3D synthesis        : %4.4f seconds\n", 
+	printf("  - Duration of full 3D synthesis        : %4.4f seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
 	//print_f(f, L, N);
 
 	time_start = clock();
 	flag_core_analysis(flmnrec, f, R, L, N);
 	time_end = clock();
-	printf("  - Duration of full 3D analysis         : %4.4f seconds\n", 
+	printf("  - Duration of full 3D analysis         : %4.4f seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
 	//print_flmn(flmnrec, L, N);
 
-	printf("  - Maximum abs error on reconstruction  : %6.5e\n", 
+	printf("  - Maximum abs error on reconstruction  : %6.5e\n",
 		maxerr_cplx(flmn, flmnrec, flag_core_flmn_size(L, N)));
 
 	free(f);
@@ -383,15 +383,15 @@ void flag_transform_furter_test(int L, int N, double R, int seed)
 	time_start = clock();
 	flag_spherlaguerre_mapped_synthesis(flmr, flmn, nodes, N, N, flmsize);
 	time_end = clock();
-	printf("  - Synthesis : SLAG 3D synthes duration : %4.4f seconds\n", 
+	printf("  - Synthesis : SLAG 3D synthes duration : %4.4f seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
 	time_start = clock();
 
 	flag_spherlaguerre_mapped_analysis(flmn_rec, flmr, nodes, weights, N, flmsize);
 	time_end = clock();
-	printf("  - Synthesis : SLAG 3D analys duration  : %4.4f seconds\n", 
+	printf("  - Synthesis : SLAG 3D analys duration  : %4.4f seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
-	printf("  - SLAG maximum absolute error          : %6.5e\n", 
+	printf("  - SLAG maximum absolute error          : %6.5e\n",
 		maxerr_cplx(flmn, flmn_rec, flag_core_flmn_size(L, N)));
 	//for (n = 0; n < N; n++)
 		//for (i = 0; i < flmsize; i++)
@@ -414,14 +414,14 @@ void flag_transform_furter_test(int L, int N, double R, int seed)
 	//for (n = 0; n < N; n++)
 		//for (i = 0; i < frsize; i++)
 			//printf("n=%i - i=%i - (%f,%f)\n",n,i,creal(f[i+n*frsize]),cimag(f[i+n*frsize]));
-	
-	printf("  - Synthesis : SSHT forward av duration : %4.4f seconds\n", 
+
+	printf("  - Synthesis : SSHT forward av duration : %4.4f seconds\n",
 		t_for / (double)CLOCKS_PER_SEC);
-	printf("  - Analysis : SSHT backward av duration : %4.4f seconds\n", 
+	printf("  - Analysis : SSHT backward av duration : %4.4f seconds\n",
 		t_back / (double)CLOCKS_PER_SEC);
-	printf("  - SSHT maximum absolute error          : %6.5e\n", 
+	printf("  - SSHT maximum absolute error          : %6.5e\n",
 		maxerr_cplx(flmr, flmr_rec, flag_core_flmn_size(L, N)));
-	
+
 	free(flmn_rec);
 	flag_core_allocate_f(&flmn_rec, L, N);
 	free(flmr);
@@ -430,16 +430,16 @@ void flag_transform_furter_test(int L, int N, double R, int seed)
 	time_start = clock();
 	flag_spherlaguerre_mapped_analysis(flmn_rec, flmr_rec, nodes, weights, N, flmsize);
 	time_end = clock();
-	printf("  - Analysis : SLAG 3D analysis duration : %4.4f seconds\n", 
+	printf("  - Analysis : SLAG 3D analysis duration : %4.4f seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
 	time_start = clock();
 	flag_spherlaguerre_mapped_synthesis(flmr, flmn_rec, nodes, N, N, flmsize);
 	time_end = clock();
-	printf("  - Analysis : SLAG 3D synthesis duration: %4.4f seconds\n", 
+	printf("  - Analysis : SLAG 3D synthesis duration: %4.4f seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
-	printf("  - SLAG maximum absolute error          : %6.5e\n", 
+	printf("  - SLAG maximum absolute error          : %6.5e\n",
 		maxerr_cplx(flmr, flmr_rec, flag_core_flmn_size(L, N)));
-	printf("  - Final FLAG maximum absolute error    : %6.5e\n", 
+	printf("  - Final FLAG maximum absolute error    : %6.5e\n",
 		maxerr_cplx(flmn, flmn_rec, flag_core_flmn_size(L, N)));
 
 	free(flmn);
@@ -469,17 +469,17 @@ void flag_transform_real_test(int L, int N, double R, int seed)
     time_start = clock();
 	flag_core_synthesis_real(f, flmn, nodes, N, L, N);
 	time_end = clock();
-	printf("  - Duration of full 3D synthesis        : %4.4f seconds\n", 
+	printf("  - Duration of full 3D synthesis        : %4.4f seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
-	
+
 	time_start = clock();
 	flag_core_analysis_real(flmnrec, f, R, L, N);
 	time_end = clock();
-	printf("  - Duration of full 3D analysis         : %4.4f seconds\n", 
+	printf("  - Duration of full 3D analysis         : %4.4f seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
 	//print_flmn(flmnrec, L, N);
 
-	printf("  - Maximum abs error on reconstruction  : %6.5e\n", 
+	printf("  - Maximum abs error on reconstruction  : %6.5e\n",
 		maxerr_cplx(flmn, flmnrec, flag_core_flmn_size(L, N)));
 
 	free(f);
@@ -502,14 +502,14 @@ void flag_transform_performance_test(double R, int NREPEAT, int NSCALE, int seed
 	int N = 2;
 
 	for (sc=0; sc<NSCALE; sc++) {
-		
+
 		L *= 2;
 		N *= 2;
 
 		flag_spherlaguerre_tau_test(N);
-	
+
 		flag_core_allocate_flmn(&flmn, L, N);
-		
+
 		double *nodes = (double*)calloc(N, sizeof(double));
 		double *weights = (double*)calloc(N, sizeof(double));
 
@@ -550,7 +550,7 @@ void flag_transform_performance_test(double R, int NREPEAT, int NSCALE, int seed
 		tottime_analysis = tottime_analysis / (double)NREPEAT;
 		accuracy = accuracy / (double)NREPEAT;
 
-		
+
 		printf("  - Average duration for FLAG synthesis  : %4.4f seconds\n", tottime_synthesis);
 		printf("  - Average duration for FLAG analysis   : %4.4f seconds\n", tottime_analysis);
 		printf("  - Average max error on reconstruction  : %6.5e\n", accuracy);
@@ -565,26 +565,27 @@ void flag_transform_performance_test(double R, int NREPEAT, int NSCALE, int seed
 }
 
 
-int main(int argc, char *argv[]) 
+int main(int argc, char *argv[])
 {
 	//const int NREPEAT = 4;
 	//const int NSCALE = 5;
 	const int L = 32;
 	const int N = 32;
-	const double R = 420.0;
+	const double R = 1.0;
 	const int seed = (int)(10000.0*(double)clock()/(double)CLOCKS_PER_SEC);
 
-	/*
+
 	double *roots = (double*)calloc(N, sizeof(double));
 	double *weights = (double*)calloc(N, sizeof(double));
 	int i;
-	const int alpha = 2;
-	flag_spherlaguerre_quadrature(roots, weights, N, alpha);
+	//const int alpha = ALPHA;
+	//flag_spherlaguerre_quadrature(roots, weights, N, alpha);
+    flag_spherlaguerre_sampling(roots, weights, R, N);
 	for(i=0;i<N;i++)
-		printf("Root[%i] = %f with weight %5.5e\n",i,roots[i],weights[i]);	
+		printf("Root[%i] = %f with weight %5.5e\n",i,roots[i],weights[i]);
 	free(roots);
 	free(weights);
-	*/
+
 
 	printf("==========================================================\n");
 	printf("PARAMETERS : ");
@@ -642,5 +643,5 @@ int main(int argc, char *argv[])
 
 	//printf("==========================================================\n");
 
-	return 0;		
+	return 0;
 }

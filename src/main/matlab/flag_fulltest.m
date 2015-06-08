@@ -10,7 +10,7 @@ close all;
 % Main parameters
 L = 32
 P = 32
-R = 10.0    
+R = 1.0    
 
 % Generate random 3D FLAG decomposition
 flmn = zeros(P, L^2);
