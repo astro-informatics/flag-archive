@@ -24,6 +24,14 @@ void flag_spherlaguerre_quadrature(double *roots, double *weights, int N, int al
 double flag_spherlaguerre_tau(double R, int N);
 
 /*!
+ * Compute spherical Laguerre maximum R.
+ *
+ * \param[in]  N Harmonic band-limit.
+ * \retval R Radial limit / boundary.
+ */
+double flag_spherlaguerre_Rmax(int N);
+
+/*!
  * Compute spherical Laguerre sampling scheme.
  *
  * \param[out]  nodes Nodes of the sampling.
@@ -32,7 +40,7 @@ double flag_spherlaguerre_tau(double R, int N);
  * \param[in]  N Harmonic band-limit.
  * \retval none
  */
-void flag_spherlaguerre_sampling(double *nodes, double *weights, double R, int N);
+void flag_spherlaguerre_sampling(double *nodes, double *weights, double tau, int N);
 
 void flag_spherbessel_sampling(double *nodes, double *weights, double R, int N);
 
@@ -46,7 +54,7 @@ void flag_spherbessel_sampling(double *nodes, double *weights, double R, int N);
  * \param[in]  N Harmonic band-limit.
  * \retval none
  */
-void flag_spherlaguerre_analysis(double *fn, const double *f, const double *nodes, const double *weights, int N);
+void flag_spherlaguerre_analysis(double *fn, const double *f, const double *nodes, const double *weights, double tau, int N);
 
 /*!
  * Perform spherical Laguerre synthesis.
@@ -57,9 +65,9 @@ void flag_spherlaguerre_analysis(double *fn, const double *f, const double *node
  * \param[in]  N Harmonic band-limit.
  * \retval none
  */
-void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nodes, int Nnodes, int N);
+void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nodes, int Nnodes, double tau, int N);
 
-void flag_spherlaguerre_synthesis_gen(double *f, const double *fn, const double *nodes, int Nnodes, int N, int alpha);
+void flag_spherlaguerre_synthesis_gen(double *f, const double *fn, const double *nodes, int Nnodes, double tau, int N, int alpha);
 
 
 /*!
@@ -84,7 +92,7 @@ void flag_spherlaguerre_allocate_sampling(double **nodes, double **weights, int 
  * \param[in]  N Harmonic band-limit.
  * \retval none
  */
-void flag_spherlaguerre_mapped_analysis(complex double *fn, const complex double *f, const double *weights, const double *nodes, int N, int mapsize);
+void flag_spherlaguerre_mapped_analysis(complex double *fn, const complex double *f, const double *weights, const double *nodes, double tau, int N, int mapsize);
 
 /*!
  * Perform spherical Laguerre synthesis.
@@ -97,7 +105,7 @@ void flag_spherlaguerre_mapped_analysis(complex double *fn, const complex double
  * \param[in]  N Harmonic band-limit.
  * \retval none
  */
-void flag_spherlaguerre_mapped_synthesis(complex double *f, const complex double *fn, const double *nodes, int Nnodes, int N, int mapsize);
+void flag_spherlaguerre_mapped_synthesis(complex double *f, const complex double *fn, const double *nodes, int Nnodes, double tau, int N, int mapsize);
 
 
 /*!

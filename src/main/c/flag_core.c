@@ -70,12 +70,11 @@ void flag_core_allocate_f_real(double **f, int L, int N)
 
 void flag_core_analysis(complex double *flmn,
 		const complex double *f,
-		double R, int L, int N)
+		int L, double tau, int N, int spin)
 {
 	assert(L > 0);
 	assert(N > 1);
 	//const int alpha = ALPHA;
-	int spin = 0;
 	int verbosity = 0;
 	int n;
 	int flmsize = ssht_flm_size(L);
@@ -97,10 +96,10 @@ void flag_core_analysis(complex double *flmn,
 	double *weights = (double*)calloc(N, sizeof(double));
 	assert(nodes != NULL);
 	assert(weights != NULL);
-	flag_spherlaguerre_sampling(nodes, weights, R, N);
+	flag_spherlaguerre_sampling(nodes, weights, tau, N);
 	//printf("> Mapped spherical Laguerre transform...");
 	fflush(NULL);
-	flag_spherlaguerre_mapped_analysis(flmn, flmr, nodes, weights, N, flmsize);
+	flag_spherlaguerre_mapped_analysis(flmn, flmr, nodes, weights, tau, N, flmsize);
 	//printf("done\n");
 	free(nodes);
 	free(weights);
@@ -111,13 +110,12 @@ void flag_core_analysis(complex double *flmn,
 void flag_core_synthesis(complex double *f,
 		const complex double *flmn,
 		const double *nodes, int Nnodes,
-		int L, int N)
+		int L, double tau, int N, int spin)
 {
 	assert(L > 0);
 	assert(N > 1);
 	assert(nodes != NULL);
 	//const int alpha = ALPHA;
-	int spin = 0;
 	int verbosity = 0;
 	int n, offset_lm, offset_r;
 	int flmsize = ssht_flm_size(L);
@@ -127,7 +125,7 @@ void flag_core_synthesis(complex double *f,
 	complex double *flmr;
 	flag_core_allocate_flmn(&flmr, L, Nnodes);
 	//printf("> Mapped spherical Laguerre transform...");fflush(NULL);
-	flag_spherlaguerre_mapped_synthesis(flmr, flmn, nodes, Nnodes, N, flmsize);
+	flag_spherlaguerre_mapped_synthesis(flmr, flmn, nodes, Nnodes, tau, N, flmsize);
 	//printf("done\n");
 
 	for (n = 0; n < Nnodes; n++){
@@ -141,7 +139,7 @@ void flag_core_synthesis(complex double *f,
 }
 
 void flag_core_analysis_real(complex double *flmn,
-		const double *f, double R, int L, int N)
+		const double *f, int L, double tau, int N)
 {
 	assert(L > 0);
 	assert(N > 1);
@@ -165,10 +163,10 @@ void flag_core_analysis_real(complex double *flmn,
 	double *weights = (double*)calloc(N, sizeof(double));
 	assert(nodes != NULL);
 	assert(weights != NULL);
-	flag_spherlaguerre_sampling(nodes, weights, R, N);
+	flag_spherlaguerre_sampling(nodes, weights, tau, N);
 	//printf("> Mapped spherical Laguerre transform...");
 	fflush(NULL);
-	flag_spherlaguerre_mapped_analysis(flmn, flmr, nodes, weights, N, flmsize);
+	flag_spherlaguerre_mapped_analysis(flmn, flmr, nodes, weights, tau, N, flmsize);
 	//printf("done\n");
 	free(nodes);
 	free(weights);
@@ -178,7 +176,7 @@ void flag_core_analysis_real(complex double *flmn,
 void flag_core_synthesis_real(double *f,
 		const complex double *flmn,
 		const double *nodes, int Nnodes,
-		int L, int N)
+		int L, double tau, int N)
 {
 	assert(L > 0);
 	assert(N > 1);
@@ -191,7 +189,7 @@ void flag_core_synthesis_real(double *f,
 	complex double *flmr;
 	//printf("> Mapped spherical Laguerre transform...");fflush(NULL);
 	flag_core_allocate_flmn(&flmr, L, Nnodes);
-	flag_spherlaguerre_mapped_synthesis(flmr, flmn, nodes, Nnodes, N, flmsize);
+	flag_spherlaguerre_mapped_synthesis(flmr, flmn, nodes, Nnodes, tau, N, flmsize);
 	//printf("done\n");
 
 	for (n = 0; n < Nnodes; n++){
@@ -355,7 +353,7 @@ void flag_spherbessel_basis(double *jell, const int ell, const double *nodes, in
 
 void flag_core_fourierbessel_analysis(complex double *flmn,
 		const complex double *f,
-		double R, int L, int N)
+		int L, double tau, int N)
 {
 	assert(L > 0);
 	assert(N > 1);
@@ -382,10 +380,10 @@ void flag_core_fourierbessel_analysis(complex double *flmn,
 	double *weights = (double*)calloc(N, sizeof(double));
 	assert(nodes != NULL);
 	assert(weights != NULL);
-	flag_spherlaguerre_sampling(nodes, weights, R, N);
+	flag_spherlaguerre_sampling(nodes, weights, tau, N);
 	//printf("> Mapped spherical Laguerre transform...");
 	fflush(NULL);
-	flag_spherlaguerre_mapped_analysis(flmn, flmr, nodes, weights, N, flmsize);
+	flag_spherlaguerre_mapped_analysis(flmn, flmr, nodes, weights, tau, N, flmsize);
 	//printf("done\n");
 	free(nodes);
 	free(weights);
@@ -396,7 +394,7 @@ void flag_core_fourierbessel_analysis(complex double *flmn,
 void flag_core_fourierbessel_synthesis(complex double *f,
 		const complex double *flmn,
 		const double *nodes, int Nnodes,
-		int L, int N)
+		int L, double tau, int N)
 {
 	assert(L > 0);
 	assert(N > 1);
@@ -412,7 +410,7 @@ void flag_core_fourierbessel_synthesis(complex double *f,
 	complex double *flmr;
 	flag_core_allocate_flmn(&flmr, L, Nnodes);
 	//printf("> Mapped spherical Laguerre transform...");fflush(NULL);
-	flag_spherlaguerre_mapped_synthesis(flmr, flmn, nodes, Nnodes, N, flmsize);
+	flag_spherlaguerre_mapped_synthesis(flmr, flmn, nodes, Nnodes, tau, N, flmsize);
 	//printf("done\n");
 
 	for (n = 0; n < Nnodes; n++){

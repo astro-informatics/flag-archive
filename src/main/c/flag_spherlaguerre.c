@@ -67,7 +67,7 @@ void flag_spherlaguerre_quadrature(double *roots, double *weights, int N, int al
 	int facalpha = factorial_range(N+1, N+alpha);
 
 	double h = 1.0 / (double) N;
-	double vinf, vsup, p1, p2, pp, z, z1, temp;
+	double vinf, vsup, p1, p2, pp, z = 0.0, z1, temp;
 	double normfac = 1.0;
 
 	// First low-bound
@@ -148,12 +148,20 @@ void flag_spherlaguerre_quadrature(double *roots, double *weights, int N, int al
 
 }
 
+
+
 double flag_spherlaguerre_tau(double R, int N)
 {
 	assert(R > 0.0);
+	double Rmax = flag_spherlaguerre_Rmax(N);
+	return R / Rmax;
+}
+
+double flag_spherlaguerre_Rmax(int N)
+{
 	assert(N > 1);
 	const int alpha = ALPHA;
-	double tau;
+	double R;
 
 	/*
 	double *roots = (double*)calloc(N+1, sizeof(double));
@@ -169,7 +177,7 @@ double flag_spherlaguerre_tau(double R, int N)
 		double *roots = (double*)calloc(N, sizeof(double));
 		double *weights = (double*)calloc(N, sizeof(double));
 		flag_spherlaguerre_quadrature(roots, weights, N, alpha);
-		tau = roots[N-1];
+		R = roots[N-1];
 		free(roots);
 		free(weights);
 
@@ -201,38 +209,37 @@ double flag_spherlaguerre_tau(double R, int N)
 		vsup = eval_laguerre_rescaled(infbound, N-1, alpha, normfac);
 
 		// Linear interpolation for root first estimation
-		tau = infbound - vinf * (supbound-infbound) / (vsup-vinf);
+		R = infbound - vinf * (supbound-infbound) / (vsup-vinf);
 
 		for (i = 1; i <= MAXIT; i++)
 		{
-			p1 = eval_laguerre_rescaled(tau, N, alpha, normfac);
-			p2 = eval_laguerre_rescaled(tau, N-1, alpha, normfac);
+			p1 = eval_laguerre_rescaled(R, N, alpha, normfac);
+			p2 = eval_laguerre_rescaled(R, N-1, alpha, normfac);
 			// Derivative
-			pp = (N * p1 - N * p2) / tau;
-			taubis = tau;
+			pp = (N * p1 - N * p2) / R;
+			taubis = R;
 			// Newton step
-			tau = taubis - p1/pp;
-			if( cabs(taubis - tau) < 1e-16 ){
+			R = taubis - p1/pp;
+			if( cabs(taubis - R) < 1e-16 ){
 				//printf("MAXIT = %i err = %2.2e\n",i,cabs(taubis-tau));
 				break;
 			}
 		}
 	}
 
-	//printf("Tau = %4.4e\n",tau);
+	//printf("R = %4.4e\n",R);
 	//printf("Taubis = %4.4e\n",tau_bis);
 
-	return R / tau;
+	return R;
 }
 
-void flag_spherlaguerre_sampling(double *nodes, double *weights, double R, int N)
+void flag_spherlaguerre_sampling(double *nodes, double *weights, double tau, int N)
 {
-	assert(R > 0.0);
+	assert(tau > 0.0);
 	assert(N > 1);
 	const int alpha = ALPHA;
 
 	flag_spherlaguerre_quadrature(nodes, weights, N, alpha);
-	double tau = R / nodes[N-1];
 
 	int n;
 	for (n=0; n<N; n++){
@@ -252,14 +259,12 @@ void flag_spherlaguerre_allocate_sampling(double **nodes, double **weights, int 
 	assert(weights != NULL);
 }
 
-void flag_spherlaguerre_analysis(double *fn, const double *f, const double *nodes, const double *weights, int N)
+void flag_spherlaguerre_analysis(double *fn, const double *f, const double *nodes, const double *weights, double tau, int N)
 {
 	assert(N > 1);
 	int i, n;
 	const int alpha = ALPHA;
 
-	const double R = nodes[N-1];
-	const double tau = flag_spherlaguerre_tau(R, N);
 	double r, factor, lagu0, lagu1, lagu2;
 
 	for(i=0; i<N; i++)
@@ -289,21 +294,18 @@ void flag_spherlaguerre_analysis(double *fn, const double *f, const double *node
 
 }
 
-void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nodes, int Nnodes, int N)
+void flag_spherlaguerre_synthesis(double *f, const double *fn, const double *nodes, int Nnodes, double tau, int N)
 {
-	flag_spherlaguerre_synthesis_gen(f, fn, nodes, Nnodes, N, ALPHA);
+	flag_spherlaguerre_synthesis_gen(f, fn, nodes, Nnodes, tau, N, ALPHA);
 }
 
 
-void flag_spherlaguerre_synthesis_gen(double *f, const double *fn, const double *nodes, int Nnodes, int N, int alpha)
+void flag_spherlaguerre_synthesis_gen(double *f, const double *fn, const double *nodes, int Nnodes, double tau, int N, int alpha)
 {
 	assert(N > 1);
 	assert(Nnodes > 1);
 	int i, n;
 	complex double factor, lagu0, lagu1, lagu2, r;
-
-	const double R = nodes[Nnodes-1];
-	const double tau = flag_spherlaguerre_tau(R, N);
 
 	for (i = 0; i < Nnodes; i++)
 	{
@@ -332,7 +334,7 @@ void flag_spherlaguerre_synthesis_gen(double *f, const double *fn, const double 
 }
 
 
-void flag_spherlaguerre_mapped_analysis(complex double *fn, const complex double *f, const double *nodes, const double *weights, int N, int mapsize)
+void flag_spherlaguerre_mapped_analysis(complex double *fn, const complex double *f, const double *nodes, const double *weights, double tau, int N, int mapsize)
 {
 	assert(N > 1);
 	assert(mapsize > 1);
@@ -340,8 +342,6 @@ void flag_spherlaguerre_mapped_analysis(complex double *fn, const complex double
 	double factor, lagu0, lagu1, lagu2, r;
 	const int alpha = ALPHA;
 
-	const double R = nodes[N-1];
-	const double tau = flag_spherlaguerre_tau(R, N);
 	double *temp = (double*)calloc(N, sizeof(double));
 	//double normfac;
 
@@ -386,7 +386,7 @@ void flag_spherlaguerre_mapped_analysis(complex double *fn, const complex double
 
 }
 
-void flag_spherlaguerre_mapped_synthesis(complex double *f, const complex double *fn, const double *nodes, int Nnodes, int N, int mapsize)
+void flag_spherlaguerre_mapped_synthesis(complex double *f, const complex double *fn, const double *nodes, int Nnodes, double tau, int N, int mapsize)
 {
 	assert(N > 1);
 	assert(Nnodes > 1);
@@ -394,16 +394,12 @@ void flag_spherlaguerre_mapped_synthesis(complex double *f, const complex double
 	int i, n, l, offset_n, offset_i;
 	const int alpha = ALPHA;
 
-	const double R = nodes[Nnodes-1];
-	const double tau = flag_spherlaguerre_tau(R, N);
 	double r;
 	double factor, lagu0, lagu1, lagu2;
 	double *temp = (double*)calloc(N, sizeof(double));
-	double normfac;
 
 	for (i = 0; i < Nnodes; i++)
 	{
-		normfac = 1.0;
 		r = nodes[i]/tau;
 		factor = exp(-r/4.0);
 		// was factor = (1.0/r) * exp(-r/2.0) * (1.0/sqrt(tau));

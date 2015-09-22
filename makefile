@@ -7,13 +7,14 @@ FFTWDIR	= ${FFTW}
 # Directory for GSL
 GSLDIR	= ${GSL}
 # Directory for MATLAB
-MLAB	=  /Applications/MATLAB_R2011b.app
+MLAB	=  /Applications/MATLAB_R2013a.app
 # Directory for DOXYGEN
 DOXYGEN_PATH=doxygen
 
 # Compiler and options
 CC	= gcc
-OPT	= -Wall -O3 -g -DFLAG_VERSION=\"1.0b1\" -DFLAG_BUILD=\"`svnversion -n .`\"
+OPT	= -Wall -O3 -g
+# OPT = -Wall -O3 -g -DFLAG_VERSION=\"1.0b1\" -DFLAG_BUILD=\"`svnversion -n .`\"
 UNAME := $(shell uname)
 
 # ======================================== #
@@ -35,8 +36,8 @@ ifeq ($(UNAME), Darwin)
 endif
 
 # === GSL ===
-GSLLIB	= $(GSLDIR)/lib
-GSLINC	= $(GSLDIR)/include
+GSLLIB	= $(GSLDIR)/include
+GSLINC	= $(GSLDIR)/lib
 GSLLIBN= gsl
 
 # === FLAG ===
@@ -119,7 +120,7 @@ $(FLAGTESTOBJ)/%.o: %.c
 	$(CC) $(OPT) $(FFLAGS) -c $< -o $@
 
 $(FLAGOBJMAT)/%_mex.o: %_mex.c $(FLAGLIB)/lib$(FLAGLIBN).a
-	$(CC) $(OPT) $(FFLAGS) -c $< -o $@ -I${MLABINC} 
+	$(CC) $(OPT) $(FFLAGS) -c $< -o $@ -I${MLABINC}
 
 $(FLAGOBJMEX)/%_mex.$(MEXEXT): $(FLAGOBJMAT)/%_mex.o $(FLAGLIB)/lib$(FLAGLIBN).a
 	$(MEX) $< -o $@ $(LDFLAGSMEX) $(MEXFLAGS) -L$(MLABLIB)
@@ -127,7 +128,7 @@ $(FLAGOBJMEX)/%_mex.$(MEXEXT): $(FLAGOBJMAT)/%_mex.o $(FLAGLIB)/lib$(FLAGLIBN).a
 # ======================================== #
 
 .PHONY: default
-default: lib test about tidy
+default: lib test tidy
 
 .PHONY: matlab
 matlab: lib $(FLAGOBJSMEX) about
@@ -152,7 +153,7 @@ $(FLAGBIN)/flag_fbtest: $(FLAGTESTOBJ)/flag_fbtest.o $(FLAGLIB)/lib$(FLAGLIBN).a
 
 .PHONY: about
 about: $(FLAGBIN)/flag_about
-$(FLAGBIN)/flag_about: $(FLAGOBJ)/flag_about.o 
+$(FLAGBIN)/flag_about: $(FLAGOBJ)/flag_about.o
 	$(CC) $(OPT) $< -o $(FLAGBIN)/flag_about
 	$(FLAGBIN)/flag_about
 
@@ -176,6 +177,6 @@ tidy:
 	rm -f $(FLAGOBJ)/*.o
 	rm -f $(FLAGTESTOBJ)/*.o
 	rm -f $(FLAGOBJMEX)/*.o
-	rm -f *~ 
+	rm -f *~
 
 # ======================================== #

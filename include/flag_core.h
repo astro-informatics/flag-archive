@@ -1,11 +1,11 @@
 // FLAG package
-// Copyright (C) 2012 
+// Copyright (C) 2012
 // Boris Leistedt & Jason McEwen
 
 #ifndef FLAG_CORE
 #define FLAG_CORE
 
-#include <complex.h> 
+#include <complex.h>
 
 
 /*!
@@ -41,7 +41,7 @@ void flag_core_allocate_f(complex double **f, int L, int N);
 /*!
  * Get size of the full FLAG decomposition.
  *
- * \param[in]  L Angular harmonic band-limit. 
+ * \param[in]  L Angular harmonic band-limit.
  * \param[in]  N Radial harmonic band-limit.
  * \retval N*L^2
  */
@@ -50,7 +50,7 @@ int flag_core_flmn_size(int L, int N);
 /*!
  * Get size of the full dataset for MW sampling.
  *
- * \param[in]  L Angular harmonic band-limit. 
+ * \param[in]  L Angular harmonic band-limit.
  * \param[in]  N Radial harmonic band-limit.
  * \retval N*L*(2*L-1)
  */
@@ -61,25 +61,25 @@ int flag_core_f_size_mw(int L, int N);
  *
  * \param[out] flmn Fourier-Laguerre coefficients.
  * \param[in]  f Input dataset (MW sampling, complex signal)
- * \param[in]  L Angular harmonic band-limit. 
+ * \param[in]  L Angular harmonic band-limit.
  * \param[in]  N Radial harmonic band-limit.
  * \retval none
  */
-void flag_core_analysis(complex double *flmn, const complex double *f, double R, int L, int N);
+void flag_core_analysis(complex double *flmn, const complex double *f, int L, double tau, int N, int spin);
 
 /*!
  * Perform Fourier-Laguerre synthesis (MW sampling, complex signal).
  *
  * \param[out]  f Input dataset (MW sampling, complex signal)
  * \param[in] flmn Fourier-Laguerre coefficients.
- * \param[in]  L Angular harmonic band-limit. 
+ * \param[in]  L Angular harmonic band-limit.
  * \param[in]  N Radial harmonic band-limit.
  * \retval none
  */
- void flag_core_synthesis(complex double *f, const complex double *flmn, const double *nodes, int Nnodes, int L, int N);
+ void flag_core_synthesis(complex double *f, const complex double *flmn, const double *nodes, int Nnodes, int L, double tau, int N, int spin);
 
-void flag_core_fourierbessel_analysis(complex double *flmn, const complex double *f, double R, int L, int N);
-void flag_core_fourierbessel_synthesis(complex double *f, const complex double *flmn, const double *nodes, int Nnodes, int L, int N);
+void flag_core_fourierbessel_analysis(complex double *flmn, const complex double *f, int L, double tau, int N);
+void flag_core_fourierbessel_synthesis(complex double *f, const complex double *flmn, const double *nodes, int Nnodes, int L, double tau, int N);
 
 
 /*!
@@ -87,22 +87,22 @@ void flag_core_fourierbessel_synthesis(complex double *f, const complex double *
  *
  * \param[out] flmn Fourier-Laguerre coefficients.
  * \param[in]  f Input dataset (MW sampling, real signal)
- * \param[in]  L Angular harmonic band-limit. 
+ * \param[in]  L Angular harmonic band-limit.
  * \param[in]  N Radial harmonic band-limit.
  * \retval none
  */
-void flag_core_analysis_real(complex double *flmn, const double *f, double R, int L, int N);
+void flag_core_analysis_real(complex double *flmn, const double *f, int L, double tau, int N);
 
 /*!
  * Perform Fourier-Laguerre synthesis (MW sampling, real signal).
  *
  * \param[out]  f Input dataset (MW sampling, real signal)
  * \param[in] flmn Fourier-Laguerre coefficients.
- * \param[in]  L Angular harmonic band-limit. 
+ * \param[in]  L Angular harmonic band-limit.
  * \param[in]  N Radial harmonic band-limit.
  * \retval none
  */
-void flag_core_synthesis_real(double *f, const complex double *flmn, const double *nodes, int Nnodes, int L, int N);
+void flag_core_synthesis_real(double *f, const complex double *flmn, const double *nodes, int Nnodes, int L, double tau, int N);
 
 
 /*!

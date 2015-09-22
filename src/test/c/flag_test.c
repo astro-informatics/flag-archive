@@ -152,13 +152,13 @@ void print_flmn(const complex double *flmn,int L, int N)
 	printf("\n");
 }
 
-void flag_sampling_test(int L, int N, double R)
+void flag_sampling_test(int L, int N, double tau)
 {
 
 	double *rs, *thetas, *phis, *laguweights;
 
-	flag_sampling_allocate(&rs, &thetas, &phis, &laguweights, R, L, N);
-	flag_sampling(rs, thetas, phis, laguweights, R, L, N);
+	flag_sampling_allocate(&rs, &thetas, &phis, &laguweights, L, N);
+	flag_sampling(rs, thetas, phis, laguweights, tau, L, N);
 
 	free(rs);
 	free(thetas);
@@ -200,12 +200,12 @@ void flag_spherlaguerre_tau_test(int N)
 	assert(cabs(tau_bis-tau) < 1e-14);
 }
 
-void flag_spherlaguerre_sampling_test(int N, double R)
+void flag_spherlaguerre_sampling_test(int N, double tau)
 {
 	double *nodes = (double*)calloc(N, sizeof(double));
 	double *weights = (double*)calloc(N, sizeof(double));
 
-	flag_spherlaguerre_sampling(nodes, weights, R, N);
+	flag_spherlaguerre_sampling(nodes, weights, tau, N);
 	assert(nodes != NULL);
 	assert(weights != NULL);
 
@@ -215,7 +215,7 @@ void flag_spherlaguerre_sampling_test(int N, double R)
 	free(weights);
 }
 
-void flag_spherlaguerre_cmplx_transform_test(int L, int N, double R, int seed)
+void flag_spherlaguerre_cmplx_transform_test(int L, int N, double tau, int seed)
 {
 	clock_t time_start, time_end;
 	complex double *f, *fn, *fn_rec;
@@ -230,16 +230,16 @@ void flag_spherlaguerre_cmplx_transform_test(int L, int N, double R, int seed)
 	double *nodes = (double*)calloc(N, sizeof(double));
 	double *weights = (double*)calloc(N, sizeof(double));
 
- 	flag_spherlaguerre_sampling(nodes, weights, R, N);
+ 	flag_spherlaguerre_sampling(nodes, weights, tau, N);
 
 	time_start = clock();
-	flag_spherlaguerre_mapped_synthesis(f, fn, nodes, N, N, flmsize);
+	flag_spherlaguerre_mapped_synthesis(f, fn, nodes, N, tau, N, flmsize);
 	time_end = clock();
 	printf("  - Duration of mapped inverse synthesis : %4.4f  seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
 
 	time_start = clock();
-	flag_spherlaguerre_mapped_analysis(fn_rec, f, nodes, weights, N, flmsize);
+	flag_spherlaguerre_mapped_analysis(fn_rec, f, nodes, weights, tau, N, flmsize);
 	time_end = clock();
 	printf("  - Duration of mapped forward analysis  : %4.4f  seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
@@ -255,7 +255,7 @@ void flag_spherlaguerre_cmplx_transform_test(int L, int N, double R, int seed)
 	free(nodes);
 }
 
-void flag_spherlaguerre_transform_test(int N, double R)
+void flag_spherlaguerre_transform_test(int N, double tau)
 {
 	clock_t time_start, time_end;
 	double *f = (double*)calloc(N, sizeof(double));
@@ -272,16 +272,16 @@ void flag_spherlaguerre_transform_test(int N, double R)
 	double *nodes = (double*)calloc(N, sizeof(double));
 	double *weights = (double*)calloc(N, sizeof(double));
 
- 	flag_spherlaguerre_sampling(nodes, weights, R, N);
+ 	flag_spherlaguerre_sampling(nodes, weights, tau, N);
 
 	time_start = clock();
-	flag_spherlaguerre_synthesis(f, fn, nodes, N, N);
+	flag_spherlaguerre_synthesis(f, fn, nodes, N, tau, N);
 	time_end = clock();
 	printf("  - Duration of 1D inverse synthesis     : %4.0e  seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
 
 	time_start = clock();
-	flag_spherlaguerre_analysis(fnrec, f, nodes, weights, N);
+	flag_spherlaguerre_analysis(fnrec, f, nodes, weights, tau, N);
 	time_end = clock();
 	printf("  - Duration of 1D forward analysis      : %4.0e  seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
@@ -310,10 +310,12 @@ void flag_spherlaguerre_transform_test(int N, double R)
 	free(nodes);
 }
 
-void flag_transform_test(int L, int N, double R, int seed)
+void flag_transform_test(int L, int N, double tau, int seed)
 {
 	complex double *f, *flmn, *flmnrec;
 	clock_t time_start, time_end;
+
+	int spin = 0;
 
 	flag_core_allocate_f(&f, L, N);
 	flag_core_allocate_flmn(&flmn, L, N);
@@ -325,17 +327,17 @@ void flag_transform_test(int L, int N, double R, int seed)
 	double *nodes = (double*)calloc(N, sizeof(double));
 	double *weights = (double*)calloc(N, sizeof(double));
 
- 	flag_spherlaguerre_sampling(nodes, weights, R, N);
+ 	flag_spherlaguerre_sampling(nodes, weights, tau, N);
 
     time_start = clock();
-	flag_core_synthesis(f, flmn, nodes, N, L, N);
+	flag_core_synthesis(f, flmn, nodes, N, L, tau, N, spin);
 	time_end = clock();
 	printf("  - Duration of full 3D synthesis        : %4.4f seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
 	//print_f(f, L, N);
 
 	time_start = clock();
-	flag_core_analysis(flmnrec, f, R, L, N);
+	flag_core_analysis(flmnrec, f, L, tau, N, spin);
 	time_end = clock();
 	printf("  - Duration of full 3D analysis         : %4.4f seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
@@ -353,7 +355,7 @@ void flag_transform_test(int L, int N, double R, int seed)
 
 
 
-void flag_transform_furter_test(int L, int N, double R, int seed)
+void flag_transform_furter_test(int L, int N, double tau, int seed)
 {
 	int spin = 0;
 	int verbosity = 0;
@@ -366,7 +368,7 @@ void flag_transform_furter_test(int L, int N, double R, int seed)
 	double *nodes = (double*)calloc(N, sizeof(double));
 	double *weights = (double*)calloc(N, sizeof(double));
 	printf("Sampling...");fflush(NULL);
-	flag_spherlaguerre_sampling(nodes, weights, R, N);
+	flag_spherlaguerre_sampling(nodes, weights, tau, N);
 	printf("done\n");fflush(NULL);
 
 	complex double *flmn, *flmr, *flmn_rec, *f, *flmr_rec;
@@ -381,13 +383,13 @@ void flag_transform_furter_test(int L, int N, double R, int seed)
 
 	printf("Starting synthesis\n");fflush(NULL);
 	time_start = clock();
-	flag_spherlaguerre_mapped_synthesis(flmr, flmn, nodes, N, N, flmsize);
+	flag_spherlaguerre_mapped_synthesis(flmr, flmn, nodes, N, tau, N, flmsize);
 	time_end = clock();
 	printf("  - Synthesis : SLAG 3D synthes duration : %4.4f seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
 	time_start = clock();
 
-	flag_spherlaguerre_mapped_analysis(flmn_rec, flmr, nodes, weights, N, flmsize);
+	flag_spherlaguerre_mapped_analysis(flmn_rec, flmr, nodes, weights, tau, N, flmsize);
 	time_end = clock();
 	printf("  - Synthesis : SLAG 3D analys duration  : %4.4f seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
@@ -428,12 +430,12 @@ void flag_transform_furter_test(int L, int N, double R, int seed)
 	flag_core_allocate_flmn(&flmr, L, N);
 
 	time_start = clock();
-	flag_spherlaguerre_mapped_analysis(flmn_rec, flmr_rec, nodes, weights, N, flmsize);
+	flag_spherlaguerre_mapped_analysis(flmn_rec, flmr_rec, nodes, weights, tau, N, flmsize);
 	time_end = clock();
 	printf("  - Analysis : SLAG 3D analysis duration : %4.4f seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
 	time_start = clock();
-	flag_spherlaguerre_mapped_synthesis(flmr, flmn_rec, nodes, N, N, flmsize);
+	flag_spherlaguerre_mapped_synthesis(flmr, flmn_rec, nodes, N, tau, N, flmsize);
 	time_end = clock();
 	printf("  - Analysis : SLAG 3D synthesis duration: %4.4f seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
@@ -448,7 +450,7 @@ void flag_transform_furter_test(int L, int N, double R, int seed)
 	free(flmr_rec);
 }
 
-void flag_transform_real_test(int L, int N, double R, int seed)
+void flag_transform_real_test(int L, int N, double tau, int seed)
 {
 	double *f;
 	complex *flmn, *flmnrec;
@@ -464,16 +466,16 @@ void flag_transform_real_test(int L, int N, double R, int seed)
 	double *nodes = (double*)calloc(N, sizeof(double));
 	double *weights = (double*)calloc(N, sizeof(double));
 
- 	flag_spherlaguerre_sampling(nodes, weights, R, N);
+ 	flag_spherlaguerre_sampling(nodes, weights, tau, N);
 
     time_start = clock();
-	flag_core_synthesis_real(f, flmn, nodes, N, L, N);
+	flag_core_synthesis_real(f, flmn, nodes, N, L, tau, N);
 	time_end = clock();
 	printf("  - Duration of full 3D synthesis        : %4.4f seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
 
 	time_start = clock();
-	flag_core_analysis_real(flmnrec, f, R, L, N);
+	flag_core_analysis_real(flmnrec, f, L, tau, N);
 	time_end = clock();
 	printf("  - Duration of full 3D analysis         : %4.4f seconds\n",
 		(time_end - time_start) / (double)CLOCKS_PER_SEC);
@@ -490,7 +492,7 @@ void flag_transform_real_test(int L, int N, double R, int seed)
 }
 
 
-void flag_transform_performance_test(double R, int NREPEAT, int NSCALE, int seed)
+void flag_transform_performance_test(double tau, int NREPEAT, int NSCALE, int seed)
 {
 	complex double *f, *flmn, *flmnrec;
 	clock_t time_start, time_end;
@@ -498,6 +500,7 @@ void flag_transform_performance_test(double R, int NREPEAT, int NSCALE, int seed
 	double tottime_analysis = 0, tottime_synthesis = 0;
 	double accuracy = 0.0;
 
+	int spin = 0;
 	int L = 2;
 	int N = 2;
 
@@ -514,10 +517,10 @@ void flag_transform_performance_test(double R, int NREPEAT, int NSCALE, int seed
 		double *weights = (double*)calloc(N, sizeof(double));
 
 		//printf("> Radial sampling...");fflush(NULL);
-	 	flag_spherlaguerre_sampling(nodes, weights, R, N);
+	 	flag_spherlaguerre_sampling(nodes, weights, tau, N);
 	 	//printf("done\n");
 
-	 	printf("\n  > R = %4.4f  --  L =  %i N = %i \n", R, L, N);
+	 	printf("\n  > tau = %4.4f  --  L =  %i N = %i \n", tau, L, N);
 	 	for (repeat=0; repeat<NREPEAT; repeat++){
 
 	 		//printf("  -> Iteration : %i on %i\n",repeat+1,NREPEAT);
@@ -527,14 +530,14 @@ void flag_transform_performance_test(double R, int NREPEAT, int NSCALE, int seed
 			flag_core_allocate_f(&f, L, N);
 
 		    time_start = clock();
-			flag_core_synthesis(f, flmn, nodes, N, L, N);
+			flag_core_synthesis(f, flmn, nodes, N, L, tau, N, spin);
 			time_end = clock();
 			tottime_synthesis += (time_end - time_start) / (double)CLOCKS_PER_SEC;
 			//printf("  - Duration for FLAG synthesis   : %4.4f seconds\n", (time_end - time_start) / (double)CLOCKS_PER_SEC);
 			flag_core_allocate_flmn(&flmnrec, L, N);
 
 			time_start = clock();
-			flag_core_analysis(flmnrec, f, R, L, N);
+			flag_core_analysis(flmnrec, f, L, tau, N, spin);
 			time_end = clock();
 			tottime_analysis += (time_end - time_start) / (double)CLOCKS_PER_SEC;
 			//printf("  - Duration for FLAG analysis   : %4.4f seconds\n", (time_end - time_start) / (double)CLOCKS_PER_SEC);
@@ -571,7 +574,7 @@ int main(int argc, char *argv[])
 	//const int NSCALE = 5;
 	const int L = 32;
 	const int N = 32;
-	const double R = 1.0;
+	const double tau = 1.0;
 	const int seed = (int)(10000.0*(double)clock()/(double)CLOCKS_PER_SEC);
 
 
@@ -580,7 +583,7 @@ int main(int argc, char *argv[])
 	int i;
 	//const int alpha = ALPHA;
 	//flag_spherlaguerre_quadrature(roots, weights, N, alpha);
-    flag_spherlaguerre_sampling(roots, weights, R, N);
+    flag_spherlaguerre_sampling(roots, weights, tau, N);
 	for(i=0;i<N;i++)
 		printf("Root[%i] = %f with weight %5.5e\n",i,roots[i],weights[i]);
 	free(roots);
@@ -589,7 +592,7 @@ int main(int argc, char *argv[])
 
 	printf("==========================================================\n");
 	printf("PARAMETERS : ");
-	printf("  L = %i   N = %i   R = %4.1f   seed = %i\n", L, N, R, seed);
+	printf("  L = %i   N = %i   tau = %4.1f   seed = %i\n", L, N, tau, seed);
 	printf("----------------------------------------------------------\n");
 	printf("> Testing Laguerre quadrature...");
 	flag_spherlaguerre_quadrature_test(N);
@@ -600,45 +603,45 @@ int main(int argc, char *argv[])
 	printf("OK\n");
 
 	printf("> Testing Laguerre sampling scheme...");
-	flag_spherlaguerre_sampling_test(N, R);
+	flag_spherlaguerre_sampling_test(N, tau);
 	printf("OK\n");
 
 	printf("----------------------------------------------------------\n");
 
 	printf("> Testing 1D Laguerre transform...\n");
-	flag_spherlaguerre_transform_test(N, R);
+	flag_spherlaguerre_transform_test(N, tau);
 	fflush(NULL);
 
 	printf("----------------------------------------------------------\n");
 
 	printf("> Testing cmplx mapped Laguerre transform...\n");
-	flag_spherlaguerre_cmplx_transform_test(L, N, R, seed);
+	flag_spherlaguerre_cmplx_transform_test(L, N, tau, seed);
 	fflush(NULL);
 
 	printf("----------------------------------------------------------\n");
 
 	printf("> Testing FLAG sampling scheme...");
-	flag_sampling_test(L, N, R);
+	flag_sampling_test(L, N, tau);
 	printf("OK\n");
 
 	printf("> Testing FLAG transform...\n");
-	flag_transform_test(L, N, R, seed);
+	flag_transform_test(L, N, tau, seed);
 	fflush(NULL);
 
 	printf("> Testing REAL FLAG transform...\n");
-	flag_transform_real_test(L, N, R, seed);
+	flag_transform_real_test(L, N, tau, seed);
 	fflush(NULL);
 
 	printf("----------------------------------------------------------\n");
 
 	printf("> Testing FLAG in further details...\n");
-	flag_transform_furter_test(L, N, R, seed);
+	flag_transform_furter_test(L, N, tau, seed);
 	fflush(NULL);
 
 	printf("==========================================================\n");
 
 	//printf("> FLAG transform : performance and accuracy tests\n");
-	//flag_transform_performance_test(R, NREPEAT, NSCALE, seed);
+	//flag_transform_performance_test(tau, NREPEAT, NSCALE, seed);
 	//fflush(NULL);
 
 	//printf("==========================================================\n");

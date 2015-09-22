@@ -1,16 +1,16 @@
 // FLAG package
-// Copyright (C) 2012 
+// Copyright (C) 2012
 // Boris Leistedt & Jason McEwen
 
 #ifndef FLAG_SAMPLING
 #define FLAG_SAMPLING
 
 /* FOR FUTURE IMPROVEMENTS // multi-scheme support
-enum ssht_methods { 
-	MW, 
-	MWSS, 
-	GL, 
-	DH 
+enum ssht_methods {
+	MW,
+	MWSS,
+	GL,
+	DH
 };
 */
 
@@ -26,7 +26,7 @@ enum ssht_methods {
  * \param[in]  N Radial harmonic band-limit.
  * \retval none
  */
-void flag_sampling_allocate(double **rs, double **thetas, double **phis, double **laguweights, double R, int L, int N);
+void flag_sampling_allocate(double **rs, double **thetas, double **phis, double **laguweights, int L, int N);
 
 /*!
  * Compute FLAG sampling.
@@ -40,6 +40,6 @@ void flag_sampling_allocate(double **rs, double **thetas, double **phis, double 
  * \param[in]  N Radial harmonic band-limit.
  * \retval none
  */
-void flag_sampling(double *rs, double *thetas, double *phis, double *laguweights, double R, int L, int N);
+void flag_sampling(double *rs, double *thetas, double *phis, double *laguweights, double tau, int L, int N);
 
 #endif

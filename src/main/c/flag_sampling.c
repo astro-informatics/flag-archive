@@ -1,12 +1,12 @@
 // FLAG package
-// Copyright (C) 2012 
+// Copyright (C) 2012
 // Boris Leistedt & Jason McEwen
 
 #include "flag.h"
 #include <math.h>
 #include <stdlib.h>
-#include <complex.h> 
-#include <fftw3.h> 
+#include <complex.h>
+#include <fftw3.h>
 #include <ssht.h>
 #include <assert.h>
 
@@ -45,11 +45,10 @@ void allocate_ssht_sampling(double **thetas, double **phis, int L)
 
 }
 
-void flag_sampling_allocate(double **rs, double **thetas, double **phis, double **laguweights, double R, int L, int N)
+void flag_sampling_allocate(double **rs, double **thetas, double **phis, double **laguweights, int L, int N)
 {
   assert(L > 0);
   assert(N > 1);
-  assert(R > 0.0);
   allocate_ssht_sampling(thetas, phis, L);
   flag_spherlaguerre_allocate_sampling(rs, laguweights, N);
 }
@@ -67,11 +66,11 @@ void ssht_sampling_mw(double *thetas, double *phis, int L)
 	  phis[p] = ssht_sampling_mw_p2phi(p, L);
 }
 
-void flag_sampling(double *rs, double *thetas, double *phis, double *laguweights, double R, int L, int N) 
+void flag_sampling(double *rs, double *thetas, double *phis, double *laguweights, double tau, int L, int N)
 {
   assert(L > 0);
   assert(N > 1);
-  assert(R > 0.0);
-	flag_spherlaguerre_sampling(rs, laguweights, R, N);
+  assert(tau > 0.0);
+	flag_spherlaguerre_sampling(rs, laguweights, tau, N);
 	ssht_sampling_mw(thetas, phis, L);
 }
