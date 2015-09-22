@@ -1,6 +1,6 @@
 
                              FLAG CODE 
-		http://www.mrao.cam.ac.uk/~jdm57/flag
+                http://astro-informatics.github.io/flag
               Fast Fourier-Laguerre transform on the ball
 	   Exact spherical Bessel and Fourier-Bessel transforms
   ----------------------------------------------------------------
@@ -30,11 +30,11 @@ INSTALLATION
      See documentation
 
 REQUIREMENTS
-     SSHT (http://www.mrao.cam.ac.uk/~jdm57/ssht/index.html)
-     FFTW (http://www.fftw.org/)
+     SSHT (http://www.spinsht.org)
+     FFTW (http://www.fftw.org)
 
 DOWNLOAD
-     http://www.mrao.cam.ac.uk/~jdm57/flag
+     http://www.jasonmcewen.org/codes.html
 
 SUPPORT
      Please email the authors.
