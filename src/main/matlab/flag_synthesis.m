@@ -16,7 +16,8 @@ function f = flag_synthesis(flmp, varargin)
 %                        true         [assume f real (improves performance)] }
 %  'L'               = { Harmonic band-limit; L > 1 (default=guessed) }
 %  'P'               = { Radial band-limit; N > 1 (default=guessed) }
-%  'R'               = { Radial boundary; R > 0 (default=1.0) }
+%  'tau'               = { Radial scale factor: tau > 0 (default=1.0) }
+%  'spin'               = { spin (default=0) }
 %
 % FLAG package to perform 3D Fourier-Laguerre Analysis
 % Copyright (C) 2012  Boris Leistedt & Jason McEwen
@@ -29,15 +30,16 @@ Lguessed = sqrt(sz(2));
 p = inputParser;
 p.addRequired('flmp', @isnumeric);          
 p.addParamValue('L', Lguessed, @isnumeric);          
-p.addParamValue('P', Pguessed, @isnumeric);   
+p.addParamValue('P', Pguessed, @isnumeric);         
+p.addParamValue('spin', 0, @isnumeric);   
 p.addParamValue('Nodes', 0.0, @isnumeric);
-p.addParamValue('R', 1.0, @isnumeric);   
+p.addParamValue('tau', 1.0, @isnumeric);   
 p.addParamValue('Reality', false, @islogical);
 p.parse(flmp, varargin{:});
 args = p.Results;
 
 % Compute inverse transform.
-f_vec = flag_synthesis_mex(flmp, args.L, args.P, args.Nodes, args.R, args.Reality);
+f_vec = flag_synthesis_mex(flmp, args.L, args.P, args.Nodes, args.tau, args.Reality, args.spin);
 
 sz = size(args.Nodes);
 P = sz(2);

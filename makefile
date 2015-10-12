@@ -7,7 +7,7 @@ FFTWDIR	= ${FFTW}
 # Directory for GSL
 GSLDIR	= ${GSL}
 # Directory for MATLAB
-MLAB	=  /Applications/MATLAB_R2013a.app
+MLAB	=  /Applications/MATLAB_R2015b.app
 # Directory for DOXYGEN
 DOXYGEN_PATH=doxygen
 
@@ -123,7 +123,7 @@ $(FLAGOBJMAT)/%_mex.o: %_mex.c $(FLAGLIB)/lib$(FLAGLIBN).a
 	$(CC) $(OPT) $(FFLAGS) -c $< -o $@ -I${MLABINC}
 
 $(FLAGOBJMEX)/%_mex.$(MEXEXT): $(FLAGOBJMAT)/%_mex.o $(FLAGLIB)/lib$(FLAGLIBN).a
-	$(MEX) $< -o $@ $(LDFLAGSMEX) $(MEXFLAGS) -L$(MLABLIB)
+	$(MEX) $< -output $@ $(LDFLAGSMEX) $(MEXFLAGS) -L$(MLABLIB)
 
 # ======================================== #
 

@@ -1,4 +1,4 @@
-% flag_fulltest - Run all tests
+% flag_fulltest - tauun all tests
 %
 % FLAG package to perform 3D Fourier-Laguerre Analysis
 % Copyright (C) 2012  Boris Leistedt & Jason McEwen
@@ -10,7 +10,7 @@ close all;
 % Main parameters
 L = 32
 P = 32
-R = 1.0    
+tau = 1.0    
 
 % Generate random 3D FLAG decomposition
 flmn = zeros(P, L^2);
@@ -27,16 +27,16 @@ f = flag_synthesis(flmn, 'L', L, 'P', P);
 flmn_rec = flag_analysis(f, 'L', L, 'P', P);
 flag_custom_transform_error = max(max(abs(flmn-flmn_rec)))
 
-nodes = slag_sampling(P, R);
+nodes = slag_sampling(P, tau);
 % Test exactness for complex FLAG transform on the same grid
 f = flag_synthesis(flmn, 'L', L, 'P', P, 'Nodes', nodes);
-flmn_rec = flag_analysis(f, 'L', L, 'P', P, 'R', R);
+flmn_rec = flag_analysis(f, 'L', L, 'P', P, 'tau', tau);
 flag_grid_transform_error = max(max(abs(flmn-flmn_rec)))
 
-nodes = slag_sampling(P, R);
+nodes = slag_sampling(P, tau);
 % Test exactness for complex FLAG transform on the same grid
-f = flag_synthesis(flmn, 'R', R);
-flmn_rec = flag_analysis(f, 'R', R);
+f = flag_synthesis(flmn, 'tau', tau);
+flmn_rec = flag_analysis(f, 'tau', tau);
 flag_bound_transform_error = max(max(abs(flmn-flmn_rec)))
 
 % Impose reality on flms.
@@ -65,11 +65,11 @@ fn_rec = slag_analysis(f);
 slag_default_transform_error = max(max(abs(fn-fn_rec)))
 
 % Test exactness of SLAG transform
-[f, nodes] = slag_synthesis(fn, 'P', P, 'R', R);
-fn_rec = slag_analysis(f, 'P', P, 'R', R);
+[f, nodes] = slag_synthesis(fn, 'P', P, 'tau', tau);
+fn_rec = slag_analysis(f, 'P', P, 'tau', tau);
 slag_custom_transform_error = max(max(abs(fn-fn_rec)))
 
-nodes2 = slag_sampling(P, R);
+nodes2 = slag_sampling(P, tau);
 if (max(abs(nodes-nodes2))) ~= 0
     print('Problem with sampling scheme');
 end

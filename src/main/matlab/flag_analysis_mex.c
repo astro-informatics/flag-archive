@@ -12,14 +12,14 @@
  *
  * Usage: 
  *   flmn = ...
- *     flag_analysis_mex(f, L, N, R, reality);
+ *     flag_analysis_mex(f, L, N, tau, reality, spin);
  *
  */
 void mexFunction( int nlhs, mxArray *plhs[],
                   int nrhs, const mxArray *prhs[])
 {
 
-  int i, L, N, n, f_m, f_n, reality;
+  int i, spin, L, N, n, f_m, f_n, reality;
   int f_is_complex;
   double *flmn_real = NULL, *flmn_imag = NULL;
   double *f_real = NULL, *f_imag = NULL;
@@ -29,7 +29,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
   int iin = 0, iout = 0;
 
   /* Check number of arguments. */
-  if(nrhs!=5) {
+  if(nrhs!=6) {
     mexErrMsgIdAndTxt("flag_analysis_mex:InvalidInput:nrhs",
           "Require five inputs.");
   }
@@ -99,27 +99,38 @@ void mexFunction( int nlhs, mxArray *plhs[],
     mexErrMsgIdAndTxt("flag_analysis_mex:InvalidInput:bandLimitNonInt",
           "Harmonic band-limit N must be positive integer.");
 
-  // Parse harmonic band-limit R
+  // Parse tau
   iin = 3;
   if( !mxIsDouble(prhs[iin]) || 
       mxIsComplex(prhs[iin]) || 
       mxGetNumberOfElements(prhs[iin])!=1 ) {
-    mexErrMsgIdAndTxt("slag_synthesis_mex:InvalidInput:Rlimit",
-          "Radial limit R must be positive real.");
+    mexErrMsgIdAndTxt("slag_synthesis_mex:InvalidInput:taulimit",
+          "Radial scale factor tau must be positive real.");
   }
-  double R = mxGetScalar(prhs[iin]);
-  if ( R <= 0 )
-    mexErrMsgIdAndTxt("slag_synthesis_mex:InvalidInput:RLimitNonInt",
-          "Radial limit R must be positive real.");
+  double tau = mxGetScalar(prhs[iin]);
+  if ( tau <= 0 )
+    mexErrMsgIdAndTxt("slag_synthesis_mex:InvalidInput:TauLimitNonInt",
+          "Radial scale factor tau must be positive real.");
 
+  iin = 5;
+  if( !mxIsDouble(prhs[iin]) || 
+      mxIsComplex(prhs[iin]) || 
+      mxGetNumberOfElements(prhs[iin])!=1 ) {
+    mexErrMsgIdAndTxt("flag_analysis_mex:InvalidInput:spin",
+          "spin must be integer.");
+  }
+  spin = (int)mxGetScalar(prhs[iin]);
+  if (mxGetScalar(prhs[iin]) > (double)spin || spin < 0)
+    mexErrMsgIdAndTxt("flag_analysis_mex:InvalidInput:bandLimitNonInt",
+          "spin must be positive integer.");
 
   ntheta = L;
   nphi = 2 * L - 1;
   flmn = (complex double*)calloc(L*L*N, sizeof(complex double));
   if (reality) {
-    flag_core_analysis_real(flmn, fr, R, L, N);
+    flag_core_analysis_real(flmn, fr, L, tau, N);
   } else {
-    flag_core_analysis(flmn, f, R, L, N); 
+    flag_core_analysis(flmn, f, L, tau, N, spin); 
   }
 
   // Copy flm to output

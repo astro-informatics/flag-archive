@@ -12,7 +12,7 @@
  *
  * Usage: 
  *   fn = ...
- *     slag_analysis_mex(f, N, R);
+ *     slag_analysis_mex(f, N, tau);
  *
  */
 void mexFunction( int nlhs, mxArray *plhs[],
@@ -20,7 +20,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
 {
 
   int n, i, N, f_m, f_n;
-  double R;
+  double tau;
   double *fn_real, *f_real;
   double *fn = NULL, *f = NULL, *nodes = NULL, *weights = NULL;
   int iin = 0, iout = 0;
@@ -66,21 +66,21 @@ void mexFunction( int nlhs, mxArray *plhs[],
   if( !mxIsDouble(prhs[iin]) || 
       mxIsComplex(prhs[iin]) || 
       mxGetNumberOfElements(prhs[iin])!=1 ) {
-    mexErrMsgIdAndTxt("slag_analysis_mex:InvalidInput:Rlimit",
+    mexErrMsgIdAndTxt("slag_analysis_mex:InvalidInput:taulimit",
           "Radial limit R must be positive real.");
   }
-  R = mxGetScalar(prhs[iin]);
-  if ( R <= 0)
-    mexErrMsgIdAndTxt("slag_analysis_mex:InvalidInput:RLimitNonInt",
-          "Radial limit R must be positive real.");
+  tau = mxGetScalar(prhs[iin]);
+  if ( tau <= 0)
+    mexErrMsgIdAndTxt("slag_analysis_mex:InvalidInput:tauLimitNonInt",
+          "Radial scale factor tau must be positive real.");
 
   nodes = (double*)calloc(N, sizeof(double));
   weights = (double*)calloc(N, sizeof(double));
-  flag_spherlaguerre_sampling(nodes, weights, R, N);
+  flag_spherlaguerre_sampling(nodes, weights, tau, N);
 
   // Run spherical Laguerre analysis
   fn = (double*)calloc(N, sizeof(double));
-	flag_spherlaguerre_analysis(fn, f, nodes, weights, N);
+	flag_spherlaguerre_analysis(fn, f, nodes, weights, tau, N);
 
   iout = 0;
   plhs[iout] = mxCreateDoubleMatrix(1, N, mxREAL);

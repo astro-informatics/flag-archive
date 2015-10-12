@@ -12,7 +12,7 @@
  *
  * Usage: 
  *   [f, nodes] = ...
- *     slag_synthesis_mex(fn, N, R, nodes);
+ *     slag_synthesis_mex(fn, N, tau, nodes);
  *
  */
 void mexFunction( int nlhs, mxArray *plhs[],
@@ -20,7 +20,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
 {
 
   int n, i, N, fn_m, fn_n, nodes_m, nodes_n;
-  double R;
+  double tau;
   double *fn_real, *f_real, *nodes_in, *nodes_out, *weights;
   double *fn = NULL, *f = NULL, *nodes = NULL;
   int iin = 0, iout = 0;
@@ -62,18 +62,18 @@ void mexFunction( int nlhs, mxArray *plhs[],
     mexErrMsgIdAndTxt("slag_synthesis_mex:InvalidInput:fnSize",
 		      "Invalid number of harmonic coefficients.");
 
-  // Parse harmonic band-limit R
+  // Parse harmonic band-limit tau
   iin = 2;
   if( !mxIsDouble(prhs[iin]) || 
       mxIsComplex(prhs[iin]) || 
       mxGetNumberOfElements(prhs[iin])!=1 ) {
-    mexErrMsgIdAndTxt("slag_synthesis_mex:InvalidInput:Rlimit",
-          "Radial limit R must be positive real.");
+    mexErrMsgIdAndTxt("slag_synthesis_mex:InvalidInput:taulimit",
+          "scale factor tau must be positive real.");
   }
-  R = mxGetScalar(prhs[iin]);
-  if ( R <= 0 )
-    mexErrMsgIdAndTxt("slag_synthesis_mex:InvalidInput:RLimitNonInt",
-          "Radial limit R must be positive real.");
+  tau = mxGetScalar(prhs[iin]);
+  if ( tau <= 0 )
+    mexErrMsgIdAndTxt("slag_synthesis_mex:InvalidInput:tauLimitNonInt",
+          "Radial scale factor tau must be positive real.");
   
 
   // Parse nodes
@@ -90,7 +90,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
       nodes[i] = nodes_in[i];
 
     // Run spherical Laguerre synthesis
-    flag_spherlaguerre_synthesis(f, fn, nodes, nodes_m*nodes_n, N);
+    flag_spherlaguerre_synthesis(f, fn, nodes, nodes_m*nodes_n, tau, N);
 
     iout = 0;
     plhs[iout] = mxCreateDoubleMatrix(nodes_m, nodes_n, mxREAL);
@@ -109,11 +109,11 @@ void mexFunction( int nlhs, mxArray *plhs[],
 
     weights = (double*)calloc(N, sizeof(double));
     nodes = (double*)calloc(N, sizeof(double));
-    flag_spherlaguerre_sampling(nodes, weights, R, N);
+    flag_spherlaguerre_sampling(nodes, weights, tau, N);
     free(weights);
 
     // Run spherical Laguerre synthesis
-    flag_spherlaguerre_synthesis(f, fn, nodes, N, N);
+    flag_spherlaguerre_synthesis(f, fn, nodes, N, tau, N);
 
     iout = 0;
     plhs[iout] = mxCreateDoubleMatrix(1, N, mxREAL);
